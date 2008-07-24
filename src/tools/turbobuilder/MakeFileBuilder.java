@@ -68,14 +68,17 @@ public class MakeFileBuilder extends TurboBuilder {
 				deps += " " + dep;
 			}
 			if (entry.getKey().equals("all")) {
-				firstBlock.add(0, "all :" + deps);
 				firstBlock.add(0, "");
+				firstBlock.add(1, "all :" + deps);
+				firstBlock.add(2, "\t@echo done");
 			} else if (entry.getKey().equals("tools") || entry.getKey().equals("mcabrowser") || entry.getKey().equals("mcagui")) {
 				firstBlock.add("");
 				firstBlock.add(entry.getKey() + " :" + deps);
+				firstBlock.add("\t@echo done");
 			} else {
 				firstBlock.add("");
 				firstBlock.add(entry.getKey() + " : tools" + deps);
+				firstBlock.add("\t@echo done");
 			}
 		}
 		firstBlock.add(0, phony);
@@ -217,7 +220,7 @@ public class MakeFileBuilder extends TurboBuilder {
 				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboC);
 				//turboCb.add("\tcat " + cAbs + " | sed -e 's/#include \"/#import \"/' >> " + turboC);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboC);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboC);
+				turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboC);
 			} else {
 				turboCompiles += cAbs + " ";
 			}
@@ -250,7 +253,7 @@ public class MakeFileBuilder extends TurboBuilder {
 			if (blacklist == null || !blacklist.contains(c)) {
 				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboCpp);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboCpp);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboCpp);
+				turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboCpp);
 			} else {
 				turboCompiles += cAbs + " ";
 			}

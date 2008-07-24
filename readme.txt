@@ -42,7 +42,12 @@ Instructions (for use with make):
    
    This is necessary in every console dealing with MCA - 
    just as MCA's ordinary mcasetenv command.
-   
+
+   To reset the target to the default call (any suggestions for 
+   a nicer solution are appreciated):
+
+   source script/mcasetenv --target=
+
 5) Perform library check:
    
    updatelibdb
@@ -54,6 +59,25 @@ Instructions (for use with make):
    significantly faster on a local system). 
    This has to be done again when relevant system libraries have 
    changed.   
+
+   The libdb.raw is the "raw external library database".
+   It can be edited by hand. Syntax is hopefully more or less
+   self-explanatory. There is one line per external library.
+   (Each line replaces one respective Scons library check script)
+   Format:
+
+   <libname>: <compiler flags>
+
+   If the 'compiler flags' are 'N/A' this indicates that
+   the library is not/never available.
+
+   Note: -D <define>  can be used to set any defines when the 
+                      external library is used.
+
+   In the transformation to the libdb.txt:
+   '$MCAHOME$' is replaced with the MCA root directory.
+   -I<headers files> is replaced with -I<path to these headers>
+   -L<path to library> are automatically generated.
    
 6) Make Makefile:
 
