@@ -45,5 +45,5 @@ qwt:		-lqwt
 solid:		-I<SOLID/SOLID.h> -lsolid
 soqt:		-I<Inventor/Qt/SoQt.h> -lSoQt
 xerces:		-I<xercesc/util/PlatformUtils.hpp> -lxerces-c
-xml2:		-I<libxml/parser.h> -lxml2
+xml2:		-D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
 xml++:		-lxml++-1.0 -I<libxml++/libxml++.h>

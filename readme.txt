@@ -16,7 +16,7 @@ Instructions (for use with make):
 
 1) Check out make_builder project in the <MCAHOME> directory:
 
-   svn co https://merkur.informatik.uni-kl.de/svn/mca2_make_builder/trunk make_builder
+   svn co https://agrosy.informatik.uni-kl.de/svn/mca2_make_builder/trunk make_builder
 
 2) Build the project:
    In <MCAHOME>/make_builder directory, call...
@@ -126,12 +126,22 @@ Setting up the Eclipse IDE for debugging:
 
    Enough RAM... Eclipse typically occupies ~500 MB.
 
-1) Setting up Project:
+1) Setting up Eclipse:
+
+   To enable the c++ support follow these instructions:
+
+   Enable "Classic Updates" in Window/Preferences: General/Capabilities
+   Help/Software Updates > Manage Configuration...
+	Right Click on "Eclipse SDK"
+	Add > Extension Location: "/usr/local/lib/eclipse-3.4"
+   Restart Eclipse
+
+2) Setting up Project:
 
    Select:
    - File->New Project...
    - C++ Project
-   - Project name: mca2; 
+   - Project name: mca2
      Location: <MCAHOME> directory; 
      Project Type: Makefile Project
    - Finish 
@@ -145,7 +155,7 @@ Setting up the Eclipse IDE for debugging:
    recommended so that Eclipse will find all necessary include
    files.
    
-2) Debugging an MCA-based application:
+3) Debugging an MCA-based application:
 
    Typically - after building, all binaries are available in the
    'Project Explorer' View. Selecting a binary
