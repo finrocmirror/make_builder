@@ -1,0 +1,12 @@
+dm_strat_birchfield: pnmio.c 								# variable verbose in two sources
+kernel: tRWLock.cpp 										# _MCA_DEBUG_ is undefined
+general: mRandom.cpp										# R defined... difficulties later...
+asn: constr_SET.c GeneralizedTime.c	UTCTime.c per_encoder.c	# viel...
+gui_draw2dworldmultibot: tDraw2DWorldMultiBot.cpp  			# global_sgn redefined
+dm_strat_ms_stereo_match: -importmode						# h files are not guarded
+ravon_hires_cam: mGeometryEvaluator.cpp						# namespace import leads to ambiguous function call 'pow'
+dialog_system: -linklibs									# no closure yet
+camera_sensor: CMVision.cpp									# namespace import leads to ambiguous function call 'max'
+mcabrowser: tMainWindow.cpp tQPortDestination.cpp			# xpm includes not guarded
+mcagui: tDial.cpp tLCD.cpp tWidgetBoard.cpp tSlider.cpp	tLED.cpp tIntegerInput.cpp tValueInput.cpp # double global enums, xpm includes not guarded
+rfid: tBluetoothRFIDReader.cpp

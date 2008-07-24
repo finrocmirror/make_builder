@@ -1,0 +1,46 @@
+Turbo-charged MCA Builder - Copyright 2008 by Max Reichardt
+
+This is an experimental build tool for MCA.
+It compiles MCA projects comparably fast by merging source 
+files to few large source files before compiling.
+
+(the following information is slightly outdated...)
+
+It should be called from the MCAHOME directory.
+
+Syntax: turbobuild [options] <project name>
+
+ If project name is 'all' all projects in the 'projects' 
+ subdirectory are compiled.
+
+options:
+ --jobs=<n>      If this parameter is specified, the actual calls 
+                 to 'gcc' are decoupled from preprocessing and
+                 executed by n independent threads.
+ --kernel=<path> Compile with alternative MCA kernel in <path>.
+ --build=<name>  Compiled Binaries are placed in path export/<name>
+                 Default name is 'experimental'.
+ --so			 Compile parts to shared objects (instead of 
+                 executables)
+ --notests       Do not compile test parts (minor speedup).
+ --make          Create make file in current directory instead of
+                 compiling directly.
+
+Config Files: 
+
+ config.h      config.h file that is prepended to each source file
+
+ libdb.raw     Raw Library "database". Each line stands for one 
+               external library.
+               Format: <libname>: <compiler flags>
+               If the 'compiler flags' are 'N/A' this indicates that
+               the library is not available.
+               '$MCAHOME$' is replaced with the MCA root directory.
+               
+ libdb.txt     Library database generated from libdb.raw using the
+               updatelibdb command.
+
+ critical.txt  Contains names of source files that need to be compiled
+               separately (in rare cases this is necessary - because of 
+               namespace issues and unhandled duplicate declarations)
+              

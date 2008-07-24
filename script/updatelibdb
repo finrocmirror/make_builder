@@ -1,0 +1,3 @@
+#!/bin/sh
+cd $MCAHOME
+java -jar make_builder/dist/build.jar --updatelibs

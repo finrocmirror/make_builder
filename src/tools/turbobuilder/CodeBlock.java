@@ -1,0 +1,65 @@
+package tools.turbobuilder;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * @author max
+ *
+ * Block of code
+ */
+public class CodeBlock extends ArrayList<Object> {
+
+	/** uid */
+	private static final long serialVersionUID = 8641893763578667982L;
+	boolean globalNamespace = false;
+	static final AtomicInteger x = new AtomicInteger();
+
+	public CodeBlock() {}
+	
+	public CodeBlock(List<String> diff) {
+		addAll(diff);
+	}
+
+	public void writeTo(Writer w) throws Exception {
+		PrintWriter pw = new PrintWriter(w);
+		writeToInternal(pw);
+		pw.close();
+	}
+	
+	private void writeToInternal(PrintWriter pw) throws Exception {
+		for (Object element : this) {
+			if (element instanceof String) {
+				pw.println(element.toString());
+			} else if (element instanceof CodeBlock) {
+				//CodeBlock cb = (CodeBlock)element;
+				//if (!cb.globalNamespace) {
+					((CodeBlock)element).writeToInternal(pw);
+				/*} else {
+					File f = new File("/tmp/temp" + x.getAndIncrement() + ".h");
+					pw.println("#include \"" + f.getAbsolutePath() + "\"");
+					cb.writeTo(f);
+				}*/
+			}
+		}
+	}
+
+	public void removeRange(int start, int end) {
+		int elements = end - start + 1;
+		for (int i = 0; i < elements; i++) {
+			remove(start);
+		}
+	}
+
+	public void writeTo(File file) throws Exception {
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+		writeTo(pw);
+		pw.close();
+	}
+}

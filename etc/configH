@@ -1,0 +1,34 @@
+#ifndef BUILD_I686_LINUX_DEBUG_CONFIG_H_SEEN
+#define BUILD_I686_LINUX_DEBUG_CONFIG_H_SEEN
+
+// removes some warnings
+#undef LDM
+#undef LDML
+#undef LDEBUGMSG
+
+#undef _MCA_LXRT_ 
+#define _MCA_LXRT_VERSION_ ""
+#define _MCA_LINUX_VERSION_ ""
+#define HAVE_POCO_GLOB_H 1
+#define HAVE_BOOST_VERSION_HPP 1
+#define HAVE_LIBBOOST_REGEX 1
+#define HAVE_LIBDC1394 1
+#define HAVE_LIBFESTIVAL 1
+/* #undef HAVE_LIBNEWTON */
+/* #undef HAVE_LIBNEWTON2 */
+/* #undef HAVE_PARAPIN_H */
+#define HAVE_LIBQWT 1
+
+// MCA2 Version
+#define _MCA_VERSION_ "2.4.1"
+
+// Debugging
+#define  _MCA_DEBUG_
+#define  _MCA_PROFILING_ 
+
+// System and System versions
+#define _MCA_LINUX_
+#undef _MCA_SYSTEM_DARWIN_ 
+#undef _MCA_WIN32_ 
+
+#endif /* BUILD_I686_LINUX_DEBUG_CONFIG_H_SEEN */
