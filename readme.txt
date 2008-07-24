@@ -24,12 +24,12 @@ Instructions (for use with make):
    ant
    
 3) Replace the <MCAHOME>/script/mcasetenv.py script with the 
-   modified version found in 
-   <MCAHOME>/make_builder/script/mcasetenv.
+   modified version found in <MCAHOME>/make_builder/script/ .
    
    It has two modifications:
    - The path also includes (<MCAHOME>/make_builder/script)
-   - It accepts alternative targets (with -t; see below)
+   - It accepts alternative targets (with the -t command line
+     option; see below)
 
 4) Set MCA environment variable (in <MCAHOME> directory):
 
@@ -52,7 +52,8 @@ Instructions (for use with make):
    
    This operation can take a few minutes to complete (typically,
    significantly faster on a local system). 
-   This has to be done again when system libraries have changed.   
+   This has to be done again when relevant system libraries have 
+   changed.   
    
 6) Make Makefile:
 
