@@ -220,7 +220,9 @@ public class MakeFileBuilder extends TurboBuilder {
 				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboC);
 				//turboCb.add("\tcat " + cAbs + " | sed -e 's/#include \"/#import \"/' >> " + turboC);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboC);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboC);
+				//turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboC);
+				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboC);
+				turboCb.add("\techo \\#undef MODULE_DEBUG >> " + turboC);
 			} else {
 				turboCompiles += cAbs + " ";
 			}
@@ -253,7 +255,9 @@ public class MakeFileBuilder extends TurboBuilder {
 			if (blacklist == null || !blacklist.contains(c)) {
 				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboCpp);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboCpp);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboCpp);
+				//turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboCpp);
+				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboCpp);
+				turboCb.add("\techo \\#undef MODULE_DEBUG >> " + turboCpp);
 			} else {
 				turboCompiles += cAbs + " ";
 			}
@@ -364,7 +368,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		makefile.add(cb);
 		
 		// turbo
-		if (turboCb.size() >= 6) {
+		if (turboCb.size() >= 7) {
 			turboCb.add(0, turboDeps);
 			mkdir(turboCb, target);
 			turboCb.add("\tgcc -o " + target + " " + turboCompiles + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
