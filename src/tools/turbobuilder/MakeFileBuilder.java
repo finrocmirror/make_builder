@@ -37,7 +37,7 @@ public class MakeFileBuilder extends TurboBuilder {
 	
 	final boolean turbo;
 	
-	final String TEMPDIR = "/tmp/makebuilder";
+	final String TEMPDIR = "/tmp/mbuild_" + Util.whoami();
 	
 	public static final String MCAOPTS = "-include Makefile.h -Ilibraries -Iprojects -Itools -I. ";
 

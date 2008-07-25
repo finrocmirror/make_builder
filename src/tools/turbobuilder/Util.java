@@ -225,4 +225,14 @@ public class Util {
 	public static File getFileInEtcDir(String filename) {
 		return new File(new File(Files.getRootDir(LibDB.class)).getParent() + File.separator + "etc" + File.separator + filename);
 	}
+
+	public static String whoami() {
+		try {
+			Process p = Runtime.getRuntime().exec("whoami");
+			return Files.readLines(p.getInputStream()).get(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "" + System.currentTimeMillis();
+		}
+	}
 }
