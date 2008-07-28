@@ -218,13 +218,13 @@ public class TurboBuilder implements FilenameFilter {
 		}
 			
 		// build descriptionbuilder first
-		for (int i = 0; i < buildEntities.size(); i++) {
+		/*for (int i = 0; i < buildEntities.size(); i++) {
 			BuildEntity be = buildEntities.get(i);
 			if (be.name.equals("descriptionbuilder")) {
 				build(be, true);
 				break;
 			}
-		}
+		}*/
 		
 		// build entities
 		while(true) {
@@ -331,7 +331,7 @@ public class TurboBuilder implements FilenameFilter {
 	}
 	
 	public String getDescriptionBuilderCall() {
-		return buildPath.getAbsolutePath() + FS + "bin" + FS + "descriptionbuilder";
+		return HOME.getAbsolutePath() + FS + "script" + FS + "description_builder.pl";
 	}
 
 	public static void println(String s) {

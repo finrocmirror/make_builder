@@ -99,9 +99,9 @@ public class MakeFileBuilder extends TurboBuilder {
 	public void init(File targetFile) throws Exception {
 		if (descrBuilderBin == null) {
 			targetBase = targetFile.getParentFile().getParent().substring(rootlen);
-			targetBin = targetBase + FS + "bin";
+			targetBin = targetBase + FS + "script";
 			targetLib = targetBase + FS + "lib";
-			descrBuilderBin = targetBin + FS + "descriptionbuilder ";
+			descrBuilderBin = HOME.getAbsolutePath() + "/script/description_builder.pl ";
 			descrBuilderBinExt = "MCAHOME=" + HOME.getAbsolutePath() + " " + descrBuilderBin;
 
 			// cache h files
@@ -143,9 +143,9 @@ public class MakeFileBuilder extends TurboBuilder {
 		String tempFile = tempBuildPath + FS + be.name + "temp.o";
 		String tempFileCpp = tempBuildPath + FS + be.name + "temp.cpp";
 		String firstLine = target + " : ";
-		if (!target.endsWith("/descriptionbuilder")) {
+		/*if (!target.endsWith("/descriptionbuilder")) {
 			firstLine += descrBuilderBin + " ";
-		}
+		}*/
 		String secondLine = "";
 		
 		// generate compiler options
