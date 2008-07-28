@@ -236,7 +236,7 @@ public class LibDBBuilder implements FilenameFilter {
 				if (!excludes.contains(f.getAbsolutePath())) {
 					cacheFiles(f, header, libs, mocs, level + 1, excludes);
 				} else {
-					System.out.println("Skipping " + f.getAbsolutePath()); 
+					System.out.print(" Skipping " + f.getAbsolutePath() + " "); 
 				}
 			} else if (f.getName().endsWith(".h") || f.getName().endsWith(".hpp")) {
 				header.add(f);
