@@ -32,7 +32,16 @@ public class LibDBBuilder implements FilenameFilter {
 		List<String> rawLibDB = Files.readLines(Util.getFileInEtcDir("libdb.raw"));
 		String searchDirString = rawLibDB.remove(0);
 		searchDirString = searchDirString.substring(searchDirString.indexOf(":") + 1);
-		String[] searchDirs = searchDirString.split(" "); 
+		String[] searchDirsTmp = searchDirString.split(" ");
+		List<String> searchDirs = new ArrayList<String>();
+		List<String> excludes = new ArrayList<String>();
+		for (String s : searchDirsTmp) {
+			if (s.startsWith("!")) {
+				excludes.add(s.substring(1));
+			} else {
+				searchDirs.add(s);
+			}
+		}
 		
 		// cache all of the system's .h/.hpp and lib*.so files
 		System.out.println("Collecting .h, .hpp, lib*.so and lib*.a files from...");
@@ -43,7 +52,7 @@ public class LibDBBuilder implements FilenameFilter {
 			searchDir = searchDir.trim();
 			if (searchDir.length() > 0) {
 				System.out.print(" " + searchDir + "...");
-				cacheFiles(new File(searchDir), header, libs, mocs, 0);
+				cacheFiles(new File(searchDir), header, libs, mocs, 0, excludes);
 				System.out.println(" done");
 			}
 		}
@@ -208,7 +217,7 @@ public class LibDBBuilder implements FilenameFilter {
 	}
 
 	// for caching files...
-	private void cacheFiles(File path, List<File> header, List<File> libs, List<File> mocs, int level) throws Exception {
+	private void cacheFiles(File path, List<File> header, List<File> libs, List<File> mocs, int level, List<String> excludes) throws Exception {
 		if (!path.isDirectory()) {
 			return;
 		}
@@ -224,7 +233,11 @@ public class LibDBBuilder implements FilenameFilter {
 			String pathC = path.getCanonicalPath();
 			String fileC = f.getCanonicalPath();
 			if (f.isDirectory() && (!pathC.startsWith(fileC)) && fileC.startsWith(pathC)) {
-				cacheFiles(f, header, libs, mocs, level + 1);
+				if (!excludes.contains(f.getAbsolutePath())) {
+					cacheFiles(f, header, libs, mocs, level + 1, excludes);
+				} else {
+					System.out.println("Skipping " + f.getAbsolutePath()); 
+				}
 			} else if (f.getName().endsWith(".h") || f.getName().endsWith(".hpp")) {
 				header.add(f);
 			} else if (f.getName().endsWith(".so") || f.getName().endsWith(".a")) {

@@ -62,7 +62,14 @@ Instructions (for use with make):
 
    The libdb.raw is the "raw external library database".
    It can be edited by hand. Syntax is hopefully more or less
-   self-explanatory. There is one line per external library.
+   self-explanatory. 
+
+   The first line lists all directories in which the tool will
+   search for headers and libraries. To exclude a directory from
+   the search, an entry with a preceding ! is used (e.g.
+   !/usr/local/attic)
+
+   Then, there is one line per external library.
    (Each line replaces one respective Scons library check script)
    Format:
 
