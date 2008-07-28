@@ -26,8 +26,7 @@ public class MakeFileBuilder extends TurboBuilder {
 	String tempBuildPathBase;  // temporary build path where .o files are placed
 	int rootlen;
 	
-	String descrBuilderBin;
-	String descrBuilderBinExt;
+	String descrBuilderBin = "script/description_builder.pl ";
 	String targetBase, targetLib, targetBin;
 	SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
 	
@@ -97,16 +96,14 @@ public class MakeFileBuilder extends TurboBuilder {
 	}
 
 	public void init(File targetFile) throws Exception {
-		if (descrBuilderBin == null) {
+		if (hCache == null) {
 			targetBase = targetFile.getParentFile().getParent().substring(rootlen);
 			targetBin = targetBase + FS + "script";
 			targetLib = targetBase + FS + "lib";
-			descrBuilderBin = HOME.getAbsolutePath() + "/script/description_builder.pl ";
-			descrBuilderBinExt = "MCAHOME=" + HOME.getAbsolutePath() + " " + descrBuilderBin;
 
 			// cache h files
 			System.out.println("Caching local .h-files");
-			hCache = new MakeFileHCache(HOME.getAbsolutePath(), makefile, descrBuilderBin, descrBuilderBinExt, tempBuildPathBase);
+			hCache = new MakeFileHCache(HOME.getAbsolutePath(), makefile, descrBuilderBin, descrBuilderBin, tempBuildPathBase);
 			makefile.add("");
 			makefileT.addAll(makefile);  // duplicate
 		}
@@ -143,9 +140,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		String tempFile = tempBuildPath + FS + be.name + "temp.o";
 		String tempFileCpp = tempBuildPath + FS + be.name + "temp.cpp";
 		String firstLine = target + " : ";
-		/*if (!target.endsWith("/descriptionbuilder")) {
-			firstLine += descrBuilderBin + " ";
-		}*/
+
 		String secondLine = "";
 		
 		// generate compiler options
@@ -344,8 +339,8 @@ public class MakeFileBuilder extends TurboBuilder {
 					generatedPrinted = true;
 				}
 				if (!inc.template && inc.descr) {
-					hdr2.add("\t" + descrBuilderBinExt + inc.relFile + " >> " + tempFileCpp);
-					turboCb.add("\t" + descrBuilderBinExt + inc.relFile + importString + " >> " + turboCpp);
+					hdr2.add("\t" + descrBuilderBin + inc.relFile + " >> " + tempFileCpp);
+					turboCb.add("\t" + descrBuilderBin + inc.relFile + importString + " >> " + turboCpp);
 				}
 				if (inc.moc) {
 					String qtCall = LibDB.getLib(be.qt4 ? "moc-qt4" : "moc-qt3").options.trim();
