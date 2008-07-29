@@ -1,4 +1,26 @@
 Turbo-charged MCA Builder - Copyright 2008 by Max Reichardt
+===========================================================
+
+Brief commands:
+--------------------
+--initialisation--
+cd $MCAHOME && svn co https://agrosy.informatik.uni-kl.de/svn/mca2_make_builder/trunk make_builder && cd - && cd $MCAHOME/make_builder && ant && cd - && cd $MCAHOME/script/ && rm mcasetenv.py && ln -s ../make_builder/script/mcasetenv.py && cd - && cd $MCAHOME && source script/mcasetenv -t make && cd - && updatelibdb && makeMakefile && cd $MCAHOME && make && cd -
+
+--compilation (mcasetenv is assumed to have been correctly called)--
+cd $MCAHOME && makeMakefile && make && cd -
+
+--compilation after changes in libraries--
+cd $MCAHOME && updatelibdb && makeMakefile && make && cd -
+
+--compilation after changes in make_builder svn--
+cd $MCAHOME/make_builder && svn up && ant && cd - && cd $MCAHOME && source script/mcasetenv -t make && cd - && updatelibdb && makeMakefile && cd $MCAHOME && make && cd -
+
+--reset to scons--
+cd $MCAHOME && source script/mcasetenv --target= && cd -
+
+
+Full documentation:
+----------------------------
 
 This is an experimental build tool for MCA.
 (currently only suited for Linux/Unix platforms)
