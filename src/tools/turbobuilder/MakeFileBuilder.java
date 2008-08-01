@@ -39,6 +39,8 @@ public class MakeFileBuilder extends TurboBuilder {
 	final String TEMPDIR = "/tmp/mbuild_" + Util.whoami();
 	
 	public static final String MCAOPTS = "-include Makefile.h -Ilibraries -Iprojects -Itools -I. ";
+	
+	public final List<String> errorMessages = new ArrayList<String>();
 
 	public MakeFileBuilder(Options opts) {
 		super(opts);
@@ -91,8 +93,14 @@ public class MakeFileBuilder extends TurboBuilder {
 			makefileT.writeTo(new File("Makefile"));
 		}
 		
+		// write config file
 		globalDefine.add("");
 		globalDefine.writeTo(new File("Makefile.h"));
+		
+		// print error messages at the end... so nobody will miss them
+		for (String err : errorMessages) {
+			System.err.println(err);
+		}
 	}
 
 	public void init(File targetFile) throws Exception {
@@ -212,12 +220,12 @@ public class MakeFileBuilder extends TurboBuilder {
 					tmpC = true;
 					turboCompiles += turboC + " ";
 				}
-				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboC);
+				turboCb.add("\t@echo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboC);
 				//turboCb.add("\tcat " + cAbs + " | sed -e 's/#include \"/#import \"/' >> " + turboC);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboC);
 				//turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboC);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboC);
-				turboCb.add("\techo \\#undef MODULE_DEBUG >> " + turboC);
+				turboCb.add("\t@echo \\#undef LOCAL_DEBUG >> " + turboC);
+				turboCb.add("\t@echo \\#undef MODULE_DEBUG >> " + turboC);
 			} else {
 				turboCompiles += cAbs + " ";
 			}
@@ -248,11 +256,11 @@ public class MakeFileBuilder extends TurboBuilder {
 			
 			// turbo
 			if (blacklist == null || !blacklist.contains(c)) {
-				turboCb.add("\techo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboCpp);
+				turboCb.add("\t@echo \\#line 1 \\\"" + cAbs + "\\\" >> " + turboCpp);
 				turboCb.add("\tcat " + cAbs + importString + " >> " + turboCpp);
 				//turboCb.add("\techo \\#undef LOCAL_DEBUG\\\\n\\#undef MODULE_DEBUG >> " + turboCpp);
-				turboCb.add("\techo \\#undef LOCAL_DEBUG >> " + turboCpp);
-				turboCb.add("\techo \\#undef MODULE_DEBUG >> " + turboCpp);
+				turboCb.add("\t@echo \\#undef LOCAL_DEBUG >> " + turboCpp);
+				turboCb.add("\t@echo \\#undef MODULE_DEBUG >> " + turboCpp);
 			} else {
 				turboCompiles += cAbs + " ";
 			}
@@ -478,5 +486,10 @@ public class MakeFileBuilder extends TurboBuilder {
 	@Override
 	protected void addDefine(String string) {
 		globalDefine.add("#define " + string);
+	}
+
+	@Override
+	public void printErrorLine(String s) {
+		errorMessages.add(s);
 	}
 }

@@ -171,7 +171,7 @@ public class TurboBuilder implements FilenameFilter {
 				try {
 					processDependency(be, lib, false);
 				} catch (Exception e) {
-					System.err.println(e.getMessage());
+					printErrorLine(e.getMessage());
 					be.missingDep = true;
 				}
 			}
@@ -339,6 +339,14 @@ public class TurboBuilder implements FilenameFilter {
 	}
 
 	public static void printerrln(String s) {
+		System.err.println("[" + Thread.currentThread().getId() + "] " + s);
+	}
+	
+	public void printLine(String s) {
+		System.out.println("[" + Thread.currentThread().getId() + "] " + s);
+	}
+
+	public void printErrorLine(String s) {
 		System.err.println("[" + Thread.currentThread().getId() + "] " + s);
 	}
 	

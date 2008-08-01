@@ -62,7 +62,7 @@ public class SConscript {
 								result.add(be);
 								processCategories(be);
 							} catch (Exception e) { 
-								System.err.println(e.getMessage());
+								tb.printErrorLine(e.getMessage());
 								//e.printStackTrace();
 							}
 							break;

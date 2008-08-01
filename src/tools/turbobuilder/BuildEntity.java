@@ -974,7 +974,7 @@ public abstract class BuildEntity {
 			be.checkDepencies();
 			if (be.missingDep) {
 				missingDep = true;
-				System.err.println("Not building " + name + " due to dependency " + be.name + " which cannot be built");
+				tb.printErrorLine("Not building " + name + " due to dependency " + be.name + " which cannot be built");
 				return;
 			}
 		}
