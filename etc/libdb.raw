@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt3/bin /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/qt/3/lib /usr/X11R6/lib
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt3/bin /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/qt/3/lib /usr/X11R6/lib /usr/X11R6/include
 
 amicom: 	-I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:		-I<'ANN/ANN.h'> -lANN
@@ -43,7 +43,7 @@ pwc: 		-I<pwc-ioctl.h>
 qt:		-D _MCA_QT_3_ -D QT_THREAD_SUPPORT -I<qapplication.h,qpushbutton.h> -lqt-mt
 qt4:		-D _MCA_QT_4_ -D QT_THREAD_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL
 qwt:		-lqwt
-sndfile:	-lsndfile
+sndfile:	-I<sndfile.h> -lsndfile
 solid:		-I<SOLID/SOLID.h> -lsolid
 soqt:		-I<Inventor/Qt/SoQt.h> -lSoQt
 xerces:		-I<xercesc/util/PlatformUtils.hpp> -lxerces-c
