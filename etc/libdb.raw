@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt3/bin /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt3/bin /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/qt/3/lib /usr/X11R6/lib
 
 amicom: 	-I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:		-I<'ANN/ANN.h'> -lANN
@@ -22,6 +22,7 @@ glut:   	-I<GL/glut.h> -lglut -lGLU -lGL
 gsl:		-lgsl -lgslcblas
 opencv_with_highgui: -lcv -lcxcore -lcvaux -lhighgui -I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h>
 ltdl:   	-I<ltdl.h> -lltdl
+lo:		-I<lo/lo.h> -llo
 lxrt:		N/A
 newmat:		-I<newmat/newmat.h> -lnewmat
 newton:		-lNewton
@@ -37,11 +38,12 @@ openssl: 	-I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:		-I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:	-I<parapin.h,parapindriver.h> 
 Poco:		-I<Poco/Glob.h> -lPocoFoundation -lPocoNet
-PostgreSQL: -lpq -I<pg_config.h,postgres.h>
+PostgreSQL:     -lpq -I<pg_config.h,postgres.h>
 pwc: 		-I<pwc-ioctl.h>
-qt:			-D _MCA_QT_3_ -D QT_THREAD_SUPPORT -I<qapplication.h,qpushbutton.h> -lqt-mt
+qt:		-D _MCA_QT_3_ -D QT_THREAD_SUPPORT -I<qapplication.h,qpushbutton.h> -lqt-mt
 qt4:		-D _MCA_QT_4_ -D QT_THREAD_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL
 qwt:		-lqwt
+sndfile:	-lsndfile
 solid:		-I<SOLID/SOLID.h> -lsolid
 soqt:		-I<Inventor/Qt/SoQt.h> -lSoQt
 xerces:		-I<xercesc/util/PlatformUtils.hpp> -lxerces-c
