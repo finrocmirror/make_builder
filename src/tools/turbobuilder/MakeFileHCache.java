@@ -212,7 +212,7 @@ public class MakeFileHCache implements Comparator<Object> {
 					moc = true;
 				}
 
-				if (!classPassed && s.startsWith("template <")) {
+				if (!classPassed && s.startsWith("template") && s.substring(8).trim().startsWith("<")) {
 					template = true;
 				}
 				
