@@ -187,7 +187,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		CodeBlock turboCb = new CodeBlock();
 		makefileT.add(turboCb);
 		boolean tmpC = false;
-		String turboDeps = firstLine;
+		String turboDeps = firstLine + be.sconscript + " ";
 		String turboCompiles = "";
 		String turboC = TEMPDIR + FS + be.name + ".c";
 		String turboCpp = TEMPDIR + FS + be.name + ".cpp";

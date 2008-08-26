@@ -45,6 +45,7 @@ public class SConscript {
 					be.name = line.substring(line.indexOf("'") + 1, line.lastIndexOf("'"));
 					be.sconsID = line.substring(0, line.indexOf("=")).trim();
 					be.rootDir = sconscript.getParentFile();
+					be.sconscript = sconscript.getAbsolutePath().substring(TurboBuilder.HOME.getAbsolutePath().length() + 1);
 					if (tb.opts.DEBUG_SCONSCRIPT_PARSING) {
 						System.out.println("found build task " + be.toString());
 					}

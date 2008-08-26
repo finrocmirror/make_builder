@@ -41,6 +41,7 @@ public abstract class BuildEntity {
 	String name;    // name of entity to be built
 	String sconsID; // variable name of entity in SConscript
 	File rootDir;   // root directory of SConscript
+	String sconscript; // SConscript file relative to root directory
 	List<String> categories = new ArrayList<String>();  // targets/groups in makefiles this build entity belongs to
 	
 	/** Involved source files */
