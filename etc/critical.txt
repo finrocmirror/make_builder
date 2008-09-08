@@ -4,3 +4,4 @@ mGeometryEvaluator.cpp
 mTextureEvaluator.cpp
 highMap.C
 tBluetoothRFIDReader.cpp
+tConvexHullVisualizer.cpp
