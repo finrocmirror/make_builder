@@ -12,7 +12,7 @@ can:		-I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 cg:			-I<Cg/cgGL.h> -lCg -lCgGL
 cgal:   	-I<CGAL/basic.h> -lCGAL -lCGALcore++
 cuda:		-I<cuda.h,builtin_types.h> -lcuda
-dc1394:		-I<dc1394/dc1394_control.h> -ldc1394
+dc1394:		-I<dc1394/dc1394_control.h> -D _LIB_DC1394_PRESENT_ -ldc1394 
 dscud:		-I<dscud.h,DMM32AT_type_defs.h>
 festival:	-lFestival -lestools -lestbase -lesd -leststring -lncurses -I<festival.h> -I<EST_SingleChannelWave.h>
 ffmpeg:		-I<ffmpeg/avcodec.h> -lavcodec
