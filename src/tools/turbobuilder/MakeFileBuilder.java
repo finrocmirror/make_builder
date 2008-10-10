@@ -144,6 +144,20 @@ public class MakeFileBuilder extends TurboBuilder {
 		
 		// process entity		
 		List<MakeFileHCache.HFile> hs = new ArrayList<MakeFileHCache.HFile>();
+		for (String h : be.hs) {
+			// might appear slightly confusing...
+			if (!h.toLowerCase().contains(".h")) {
+				continue;
+			}
+			String source2 = be.rootDir + FS + h;
+			String curDir = source2.substring(rootlen);
+			curDir = curDir.substring(0, curDir.lastIndexOf(FS));
+			MakeFileHCache.HFile hf = hCache.findInclude(h, curDir); 
+			hs.add(hf);
+			if (hf == null) { 
+				throw new RuntimeException("Could not find " + source2);
+			}
+		}
 		
 		String tempFile = tempBuildPath + FS + be.name + "temp.o";
 		String tempFileCpp = tempBuildPath + FS + be.name + "temp.cpp";
