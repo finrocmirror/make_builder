@@ -74,7 +74,9 @@ public class LibDB {
 			String opts = options;
 			while(opts.contains("-D ")) {
 				opts = opts.substring(opts.indexOf("-D ") + 3);
-				libDefines.add(opts.substring(0, opts.indexOf(" ")));
+				if (opts.indexOf(" ") > 0) {
+					libDefines.add(opts.substring(0, opts.indexOf(" ")));
+				}
 			}
 
 			while (options.contains("-lmca2_")) {
