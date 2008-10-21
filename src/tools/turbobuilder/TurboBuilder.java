@@ -309,7 +309,7 @@ public class TurboBuilder implements FilenameFilter {
 			be.extlibs.add(x);
 			be.libs.addAll(x.dependencies);
 			be.qt3 |= lib.equals("qt");
-			be.qt4 |= lib.equals("qt4");
+			be.qt4 |= lib.startsWith("qt4");
 			return;
 		}
 		boolean found = false;
