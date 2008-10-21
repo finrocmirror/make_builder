@@ -45,6 +45,7 @@ qt4:		-D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCor
 qt4core:	-D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
 qt4gui:		-D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -I<QtGui/qapplication.h> -lQtCore -lQtGui
 qt4sql:		-D _MCA_QT_4_ -D _MCA_QT_4_SQL_ -D QT_THREAD_SUPPORT -I<QtSql/qsqldatabase.h> -lQtCore -lQtSql
+qt4opengl:	-D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
 qt3support:	-D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
 qt4_no_debug: 	-D QT_NO_DEBUG_OUTPUT
 qt4_no_warning:	-D QT_NO_WARNING_OUTPUT
