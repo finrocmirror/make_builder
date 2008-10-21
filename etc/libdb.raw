@@ -41,9 +41,11 @@ Poco:		-I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL:     -lpq -I<pg_config.h,postgres.h>
 pwc: 		-I<pwc-ioctl.h>
 qt:		-D _MCA_QT_3_ -D QT_THREAD_SUPPORT -I<qapplication.h,qpushbutton.h> -lqt-mt
-qt3support:	-D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -I<Qt3Support/q3cstring.h> -lQt3Support -lQtCore
 qt4:		-D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
-qt4sql:		-D _MCA_QT_4_SQL_ -D _QT_THREAD_SUPPORT -I<QtSql/qsqldatabase.h>
+qt4core:	-D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
+qt4gui:		-D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -I<QtGui/qapplication.h> -lQtCore -lQtGui
+qt4sql:		-D _MCA_QT_4_ -D _MCA_QT_4_SQL_ -D QT_THREAD_SUPPORT -I<QtSql/qsqldatabase.h> -lQtCore -lQtSql
+qt3support:	-D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
 qt4_no_debug: 	-D QT_NO_DEBUG_OUTPUT
 qt4_no_warning:	-D QT_NO_WARNING_OUTPUT
 quarter:	-lQuarter
