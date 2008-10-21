@@ -14,6 +14,8 @@ public class LibDBBuilder implements FilenameFilter {
 
 	static final String FS = File.separator; 
 	
+	static final String GCC_VERSION = GCC.getGCCVersion();
+	
 	/**
 	 * @param args
 	 */
@@ -89,12 +91,17 @@ public class LibDBBuilder implements FilenameFilter {
 							reduceCandidateDirs(reqHeader, candidateDirs);
 						}
 					}
-					if (candidateDirs.size() > 0) {
-						String dir = mostLikelyIncludeDir(candidateDirs);
-						if (dir != null) {
-							result += "-I" + dir + " ";
+					try {
+						if (candidateDirs.size() > 0) {
+							String dir = mostLikelyIncludeDir(candidateDirs);
+							if (dir != null) {
+								result += "-I" + dir + " ";
+							}
+						} else {
+							missing = temp; 
+							break;
 						}
-					} else {
+					} catch (Exception e) {
 						missing = temp; 
 						break;
 					}
@@ -106,13 +113,18 @@ public class LibDBBuilder implements FilenameFilter {
 					if (candidateDirs.size() == 0) {
 						candidateDirs = getCandidateDirs("lib" + reqLib + ".a", libs);
 					}
-					if (candidateDirs.size() > 0) {
-						String dir = mostLikelyLibDir(candidateDirs);
-						if (dir != null) {
-							result += "-L" + dir + " ";
-						} 
-						result += arg + " ";
-					} else {
+					try {
+						if (candidateDirs.size() > 0) {
+							String dir = mostLikelyLibDir(candidateDirs);
+							if (dir != null) {
+								result += "-L" + dir + " ";
+							} 
+							result += arg + " ";
+						} else {
+							missing = reqLib;
+							break;
+						}
+					} catch (Exception e) {
 						missing = reqLib;
 						break;
 					}
@@ -165,8 +177,9 @@ public class LibDBBuilder implements FilenameFilter {
 		return null;
 	}
 
-	private String mostLikelyLibDir(List<File> candidateDirs) {
+	private String mostLikelyLibDir(List<File> candidateDirs) throws Exception {
 		String best = candidateDirs.get(0).getAbsolutePath();
+		boolean allInGCCDir = true;
 		for (File dir : candidateDirs) {
 			if (dir.getAbsolutePath().equals("/usr/lib")) {
 				return null;
@@ -175,12 +188,24 @@ public class LibDBBuilder implements FilenameFilter {
 			if (dir.getAbsolutePath().length() < best.length()) {
 				best = dir.getAbsolutePath();
 			}
+			allInGCCDir &= dir.getAbsolutePath().contains("/gcc/");
 		}
-		return best;
+
+		if (!allInGCCDir) {
+			return best;
+		} else {
+			for (File dir : candidateDirs) {
+				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
+					return dir.getAbsolutePath();
+				}
+			}
+			throw new Exception("No matching GCC version");
+		}
 	}
 
-	private String mostLikelyIncludeDir(List<File> candidateDirs) {
+	private String mostLikelyIncludeDir(List<File> candidateDirs) throws Exception  {
 		String best = candidateDirs.get(0).getAbsolutePath();
+		boolean allInGCCDir = true;
 		for (File dir : candidateDirs) {
 			if (dir.getAbsolutePath().equals("/usr/include")) {
 				return null;
@@ -189,8 +214,19 @@ public class LibDBBuilder implements FilenameFilter {
 			if (dir.getAbsolutePath().length() < best.length()) {
 				best = dir.getAbsolutePath();
 			}
+			allInGCCDir &= dir.getAbsolutePath().contains("/gcc/");
 		}
-		return best;
+		
+		if (!allInGCCDir) {
+			return best;
+		} else {
+			for (File dir : candidateDirs) {
+				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
+					return dir.getAbsolutePath();
+				}
+			}
+			throw new Exception("No matching GCC version");
+		}
 	}
 
 	private void reduceCandidateDirs(String reqHeader, List<File> candidateDirs) {

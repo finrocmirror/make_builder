@@ -32,8 +32,7 @@ obid:   	-D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -l
 ode:		-I<ode/ode.h> -lode
 oiv:		-I<Inventor/SoDB.h> -lCoin
 opencv: 	-I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h> -lcv -lcxcore -lcvaux
-openmp: 	N/A
-openmp_old:	-I<omp.h> -lgomp -fopenmp
+openmp:		-I<omp.h> -lgomp -fopenmp
 openssl: 	-I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:		-I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:	-I<parapin.h,parapindriver.h> 

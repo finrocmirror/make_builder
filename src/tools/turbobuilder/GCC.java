@@ -362,4 +362,18 @@ public class GCC {
 		
 		enqueueGCCCall(new GCCCall(gccCall, libDir, be, NO_BUILD_ENTITY), true);
 	}
+	
+	public static String getGCCVersion() {
+		try {
+			Process p = Runtime.getRuntime().exec("cpp --version");
+			p.waitFor();
+			for (String s : Files.readLines(p.getInputStream())) {
+				s = s.substring(s.indexOf(")") + 1);
+				return s.substring(0, s.indexOf("(")).trim();
+			}
+		} catch (Exception e) {
+			// no gcc version found
+		}
+		return null;
+	}
 }
