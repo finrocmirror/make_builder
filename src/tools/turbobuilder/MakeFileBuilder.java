@@ -403,9 +403,10 @@ public class MakeFileBuilder extends TurboBuilder {
 	private int countCat(CodeBlock turboCb) {
 		int result = 0;
 		for (Object s : turboCb) {
-			if (s.toString().startsWith("\tcat")) {
-				result++;
+			if (s.toString().startsWith("\techo") || s.toString().startsWith("\t@echo") || s.toString().startsWith("\tmkdir")) {
+				continue;
 			}
+			result++;
 		}
 		return result;
 	}
