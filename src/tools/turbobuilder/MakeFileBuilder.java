@@ -385,7 +385,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		makefile.add(cb);
 		
 		// turbo
-		if (turboCompiles.trim().split(" ").length > 1) {
+		if (countCat(turboCb) > 1 || turboCompiles.trim().split(" ").length > 1) {
 			turboCb.add(0, turboDeps);
 			mkdir(turboCb, target);
 			turboCb.add("\tgcc -o " + target + " " + turboCompiles + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
@@ -400,6 +400,16 @@ public class MakeFileBuilder extends TurboBuilder {
 		sourceFiles.getAndAdd(be.cpps.size() + be.cs.size());
 	}
 	
+	private int countCat(CodeBlock turboCb) {
+		int result = 0;
+		for (Object s : turboCb) {
+			if (s.toString().startsWith("\tcat")) {
+				result++;
+			}
+		}
+		return result;
+	}
+
 	public static void mkdir(CodeBlock cb, String h) {
 		cb.add("\tmkdir -p " + h.substring(0, h.lastIndexOf(FS)));
 	}
