@@ -385,7 +385,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		makefile.add(cb);
 		
 		// turbo
-		if (turboCb.size() >= 7) {
+		if (turboCompiles.trim().split(" ").length > 1) {
 			turboCb.add(0, turboDeps);
 			mkdir(turboCb, target);
 			turboCb.add("\tgcc -o " + target + " " + turboCompiles + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
