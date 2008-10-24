@@ -43,6 +43,7 @@ public class MakeFileBlacklist {
 	public class Element {
 		String name;
 		List<String> compileSeparately = new ArrayList<String>();
+		boolean compileAllSeparately = false;
 		boolean importMode = false;
 		boolean linkLibs = false;
 		
@@ -58,6 +59,8 @@ public class MakeFileBlacklist {
 					importMode = true;
 				} else if (s3.startsWith("-linklibs")) {
 					linkLibs = true;
+				} else if (s3.startsWith("-safe")) {
+					compileAllSeparately = true;
 				} else if (s3.length() > 0) {
 					compileSeparately.add(s3);
 				}
@@ -65,7 +68,7 @@ public class MakeFileBlacklist {
 		}
 
 		public boolean contains(String c) {
-			return compileSeparately.contains(c);
+			return compileAllSeparately || compileSeparately.contains(c);
 		}
 	}
 }

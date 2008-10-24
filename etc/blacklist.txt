@@ -10,5 +10,5 @@ mcabrowser: tMainWindow.cpp tQPortDestination.cpp			# xpm includes not guarded
 mcagui: tDial.cpp tLCD.cpp tWidgetBoard.cpp tSlider.cpp	tLED.cpp tIntegerInput.cpp tValueInput.cpp # double global enums, xpm includes not guarded
 rfid: tBluetoothRFIDReader.cpp
 reconstruction_3d_lib: tConvexHullVisualizer.cpp
-laser_3d_vegetation_discrimination: tProjectionMapDefinitions.cpp tVegetationDiscriminationLaser3D.cpp mVegetationDiscriminationLaser3D.cpp t3DScanEvaluatorGridMapDefinitions.cpp m3DScanEvaluator.cpp tSingleScanEvaluator.cpp tScanList.cpp mDisplaySingleScan.cpp         # namespace import leads to ambiguous reference to ePMP...
+laser_3d_vegetation_discrimination: -safe    # namespace import leads to ambiguous reference to ePMP...
 
