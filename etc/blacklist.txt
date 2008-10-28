@@ -12,3 +12,4 @@ rfid: tBluetoothRFIDReader.cpp
 reconstruction_3d_lib: tConvexHullVisualizer.cpp
 laser_3d_vegetation_discrimination: -safe    # namespace import leads to ambiguous reference to ePMP...
 generic_kinematic_calculation: -safe
+laser_3d_hazard_detection: -safe 
