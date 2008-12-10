@@ -87,6 +87,8 @@ public class MakeFileBuilder extends TurboBuilder {
 		firstBlock.add("clean:");
         firstBlock.add("\trm -R -f " + tempBuildPathBase);
         firstBlock.add("\trm -R -f " + targetBase);
+		firstBlock.add(0, "");
+		firstBlock.add(0, "CFLAGS=-g2");
 		if (!turbo) {
 			makefile.writeTo(new File("Makefile"));
 		} else {
@@ -167,7 +169,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		
 		// generate compiler options
 		String addOpts = "-I" + tempBuildPathBase + FS + "libraries -I" + tempBuildPathBase + FS + "projects -I" + tempBuildPathBase + FS + rootDir;
-		String gccopts = " -g2 -Wall -Wwrite-strings -Wno-unknown-pragmas -L" + targetLib + " " + MCAOPTS + " " + addOpts + " " + be.opts + " ";
+		String gccopts = " $(CFLAGS) -Wall -Wwrite-strings -Wno-unknown-pragmas -L" + targetLib + " " + MCAOPTS + " " + addOpts + " " + be.opts + " ";
 		String rootDirTmp = rootDir;
 		while(rootDirTmp.contains(FS)) {
 			gccopts += "-I" + rootDirTmp + " ";

@@ -168,6 +168,10 @@ Instructions (for use with make):
    Calling 'colormake' instead of 'make' leads to output that is
    easier to read.
 
+   It is possible to set compiler flags with the CFLAGS parameter.
+   To compile in release mode, for instance, call:
+
+   make CFLAGS=-O3
 
 Setting up the Eclipse IDE for debugging:
 
