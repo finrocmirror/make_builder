@@ -173,6 +173,11 @@ Instructions (for use with make):
 
    make CFLAGS=-O3
 
+   It is furthermore possible to use a non-default compiler using
+   the CC flag:
+
+   make CC=gcc-4.2
+
 Setting up the Eclipse IDE for debugging:
 
 0) Requirements: 

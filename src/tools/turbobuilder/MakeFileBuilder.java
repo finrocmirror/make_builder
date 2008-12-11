@@ -87,8 +87,12 @@ public class MakeFileBuilder extends TurboBuilder {
 		firstBlock.add("clean:");
         firstBlock.add("\trm -R -f " + tempBuildPathBase);
         firstBlock.add("\trm -R -f " + targetBase);
-		firstBlock.add(0, "");
-		firstBlock.add(0, "CFLAGS=-g2");
+        CodeBlock preFirstBlock = new CodeBlock();
+        firstBlock.add(0, preFirstBlock);
+		preFirstBlock.add("CFLAGS=-g2");
+		preFirstBlock.add("");
+		preFirstBlock.add("CC=gcc");
+		preFirstBlock.add("");
 		if (!turbo) {
 			makefile.writeTo(new File("Makefile"));
 		} else {
@@ -381,7 +385,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		if (hdr2.size() > 3) {
 			hdr.add(hdr2);
 		}
-		hdr.add("\tgcc -o " + target + (hdr2.size() > 3 ? " " + tempFile : "") + " " + secondLine + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
+		hdr.add("\t$(CC) -o " + target + (hdr2.size() > 3 ? " " + tempFile : "") + " " + secondLine + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
 		cb.add(0,hdr);
 		cb.add("");
 		makefile.add(cb);
@@ -390,12 +394,12 @@ public class MakeFileBuilder extends TurboBuilder {
 		if (countCat(turboCb) > 1 || turboCompiles.trim().split(" ").length > 1) {
 			turboCb.add(0, turboDeps);
 			mkdir(turboCb, target);
-			turboCb.add("\tgcc -o " + target + " " + turboCompiles + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
+			turboCb.add("\t$(CC) -o " + target + " " + turboCompiles + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
 		} else {
 			turboCb.clear();
 			turboCb.add(turboDeps);
 			mkdir(turboCb, target);
-			turboCb.add("\tgcc -o " + target + " " + turboCompile + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
+			turboCb.add("\t$(CC) -o " + target + " " + turboCompile + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
 		}
 		
 		be.built = true;
