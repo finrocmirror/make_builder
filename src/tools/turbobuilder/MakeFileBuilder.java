@@ -230,7 +230,7 @@ public class MakeFileBuilder extends TurboBuilder {
 			cFirst += getHDeps(hs, c, be);
 			cb.add(cFirst);
 			mkdir(cb, o);
-			cb.add("\tgcc -c " + cAbs + " -o " + o + " " + gccoptsLight);
+			cb.add("\t$(CC) -c " + cAbs + " -o " + o + " " + gccoptsLight);
 			
 			// turbo
 			if (blacklist == null || !blacklist.contains(c)) {
@@ -272,7 +272,7 @@ public class MakeFileBuilder extends TurboBuilder {
 			cFirst += getHDeps(hs, c, be);
 			cb.add(cFirst);
 			mkdir(cb, o);
-			cb.add("\tg++ -c " + cAbs + " -o " + o + " " + gccoptsLight);
+			cb.add("\t$(CC) -c " + cAbs + " -o " + o + " " + gccoptsLight);
 			
 			// turbo
 			if (blacklist == null || !blacklist.contains(c)) {
@@ -381,7 +381,7 @@ public class MakeFileBuilder extends TurboBuilder {
 			
 			turboDeps += inc.relFile + " ";
 		}
-		hdr2.add("\tg++ -c -I. " + tempFileCpp + " -o " + tempFile + " " + gccoptsLight);
+		hdr2.add("\t$(CC) -c -I. " + tempFileCpp + " -o " + tempFile + " " + gccoptsLight);
 		if (hdr2.size() > 3) {
 			hdr.add(hdr2);
 		}
