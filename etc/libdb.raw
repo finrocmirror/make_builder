@@ -9,6 +9,7 @@ ax10420:	-I<AX10420.h>
 bdbxml:		-I<dbxml/DbXml.hpp> -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
 bfl:		-I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir 
 boost:		-I<boost/regex.hpp> -lboost_regex
+boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 can:		-I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan 
 cg:			-I<Cg/cgGL.h> -lCg -lCgGL
 cgal:   	-I<CGAL/basic.h> -lCGAL -lCGALcore++
@@ -57,6 +58,7 @@ qwt5:		-I/usr/include/qwt5 -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/Qt
 sndfile:	-I<sndfile.h> -lsndfile
 solid:		-I<SOLID/SOLID.h> -lsolid
 soqt:		-I<Inventor/Qt/SoQt.h> -lSoQt
+tbb:            -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 xerces:		-I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:		-D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2 -I/usr/include/libxml2 -I/usr/include
 xml++:		-lxml++-1.0 -I<libxml++/libxml++.h>
