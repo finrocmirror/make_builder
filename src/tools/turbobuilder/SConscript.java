@@ -97,6 +97,8 @@ public class SConscript {
 									be.os.add(s.trim());
 								} else if (s.endsWith(".ui")) {
 									be.uics.add(s.trim());
+								} else if (s.endsWith(".cu")) {
+									be.cudas.add(s.trim());
 								} else {
 									throw new Exception("Unrecogized source file format " + s);
 								}
