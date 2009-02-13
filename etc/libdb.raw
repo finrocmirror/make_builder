@@ -54,7 +54,7 @@ qt4_no_debug: 	-D QT_NO_DEBUG_OUTPUT
 qt4_no_warning:	-D QT_NO_WARNING_OUTPUT
 quarter:	-lQuarter
 qwt:		-lqwt
-qwt5:		-I/usr/include/qwt5 -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
+qwt5:		-I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 sndfile:	-I<sndfile.h> -lsndfile
 solid:		-I<SOLID/SOLID.h> -lsolid
 soqt:		-I<Inventor/Qt/SoQt.h> -lSoQt
