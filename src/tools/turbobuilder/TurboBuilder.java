@@ -188,6 +188,11 @@ public class TurboBuilder implements FilenameFilter {
 			// collect external libraries needed for building
 			be.mergeExtLibs();
 		}
+		
+		// add available optional libs
+		for (BuildEntity be : buildEntities) {
+			be.addOptionalLibs();
+		}
 
 		// create additional defines
 		for (BuildEntity be : buildEntities) {
@@ -315,7 +320,11 @@ public class TurboBuilder implements FilenameFilter {
 		boolean found = false;
 		for (BuildEntity be2 : buildEntities) {
 			if ((be2 instanceof MCALibrary) && be2.toString().equals(lib)) {
-				be.dependencies.add(be2);
+				if (!optional) {
+					be.dependencies.add(be2);
+				} else {
+					be.optionalDependencies.add(be2);
+				}
 				found = true;
 				break;
 			}

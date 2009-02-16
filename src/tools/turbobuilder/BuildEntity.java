@@ -59,6 +59,7 @@ public abstract class BuildEntity {
 	List<String> optionalLibs = new ArrayList<String>();
 	List<LibDB.ExtLib> extlibs = new ArrayList<LibDB.ExtLib>();
 	List<BuildEntity> dependencies = new ArrayList<BuildEntity>();
+	List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>();
 	boolean qt3, qt4;
 	
 	/** Collections for preprocessing and merging (so that not so many parameters need to be passed among methods) */
@@ -1031,6 +1032,14 @@ public abstract class BuildEntity {
 		built = false;
 		for (BuildEntity be : dependencies) {
 			be.markNotBuilt();
+		}
+	}
+
+	public void addOptionalLibs() {
+		for (BuildEntity be : optionalDependencies) {
+			if (!be.missingDep) {
+				dependencies.add(be);
+			}
 		}
 	}
 }
