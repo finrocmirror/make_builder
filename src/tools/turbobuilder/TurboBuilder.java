@@ -184,14 +184,17 @@ public class TurboBuilder implements FilenameFilter {
 		for (BuildEntity be : buildEntities) {
 			// check whether all dependencies are met
 			be.checkDepencies();
-			
-			// collect external libraries needed for building
-			be.mergeExtLibs();
 		}
 		
 		// add available optional libs
 		for (BuildEntity be : buildEntities) {
 			be.addOptionalLibs();
+		}
+		
+		// add available optional libs
+		for (BuildEntity be : buildEntities) {
+			// collect external libraries needed for building
+			be.mergeExtLibs();
 		}
 
 		// create additional defines
