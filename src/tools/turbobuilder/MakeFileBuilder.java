@@ -317,12 +317,14 @@ public class MakeFileBuilder extends TurboBuilder {
 			cFirst += getHDeps(hs, c, be);
 			cb.add(cFirst);
 			mkdir(cb, o);
-			cb.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			//cb.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			cb.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o);
 			
 			// turbo
 			makefileT.add(cFirst);
 			mkdir(makefileT, o);
-			makefileT.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			//makefileT.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			makefileT.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o);
 			turboDeps += o + " ";
 			turboCompiles += o + " ";
 		}
