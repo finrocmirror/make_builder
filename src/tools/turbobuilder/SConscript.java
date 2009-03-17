@@ -112,6 +112,10 @@ public class SConscript {
 						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddUicFiles", be.uics);
 
 						if (s.contains(be.sconsID + ".build_env.Append")) {
+							while(!s.contains(")")) {
+								s += " " + lines.get(curLine);
+								curLine++;
+							}
 							String s2 = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
 							String[] s3 = s2.split("=");
 							for (int i = 1; i < s3.length; i++) {
