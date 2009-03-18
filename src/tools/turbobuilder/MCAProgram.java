@@ -1,13 +1,13 @@
 package tools.turbobuilder;
 
+/**
+ * @author max
+ *
+ * MCA executable build entity
+ */
 public class MCAProgram extends BuildEntity {
 
-	public MCAProgram(TurboBuilder tb) {
+	public MCAProgram(MakeFileBuilder tb) {
 		super(tb);
 	}
-
-	//@Override
-	//public void gccCall(List<File> cppX) throws Exception {
-	//	GCC.compile(cppX, new String[]{/*MCAROOT + FS + "libraries", MCAROOT, rootDir.getAbsolutePath(), MCAROOT + FS + "tools", MCAROOT + FS + "projects"*/}, dependencies, extlibs, new File("/tmp/" + toString()), true, opts + getCudaOpts());
-	//}
 }

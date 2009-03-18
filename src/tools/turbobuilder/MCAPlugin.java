@@ -1,9 +1,13 @@
 package tools.turbobuilder;
 
-
+/**
+ * @author max
+ *
+ * MCA Plugin build entity
+ */
 public class MCAPlugin extends BuildEntity {
 
-	public MCAPlugin(TurboBuilder tb) {
+	public MCAPlugin(MakeFileBuilder tb) {
 		super(tb);
 		try {
 			this.extlibs.add(LibDB.getLib("ltdl"));

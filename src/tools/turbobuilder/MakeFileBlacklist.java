@@ -13,9 +13,13 @@ import java.util.Map;
  */
 public class MakeFileBlacklist {
 
+	/** List of sources (Scons name => Special settings) */
 	Map<String, Element> list = new HashMap<String, Element>();
 
+	/** Singleton instance */
 	private static MakeFileBlacklist instance;
+	
+	/** @return Singleton instance */
 	public static MakeFileBlacklist getInstance() {
 		if (instance == null) {
 			instance = new MakeFileBlacklist();
@@ -36,17 +40,37 @@ public class MakeFileBlacklist {
 		return instance;
 	}
 	
+	/** 
+	 * @param beName Scons entity (name)
+	 * @return Special settings for this Scons entity (name)
+	 */
 	public Element get(String beName) {
 		return list.get(beName);
 	}
 	
+	/**
+	 * Special make settings for Scons entity
+	 */
 	public class Element {
+		
+		/** name of Scons entity */
 		String name;
+		
+		/** List of files to compile separately */
 		List<String> compileSeparately = new ArrayList<String>();
+		
+		/** Compile all files separately? */
 		boolean compileAllSeparately = false;
+		
+		/** Replace all #includes with #imports - necessary when .h files are not guarded */
 		boolean importMode = false;
+		
+		/** unused - create symbolic links in build dir to binary libraries (.so) in sources */
 		boolean linkLibs = false;
 		
+		/**
+		 * @param s blacklist.txt line
+		 */
 		public Element(String s) {
 			name = s.substring(0, s.indexOf(":"));
 			String rest = s.substring(s.indexOf(":") + 1).trim();
@@ -67,6 +91,12 @@ public class MakeFileBlacklist {
 			}
 		}
 
+		/**
+		 * Compile this file seperately?
+		 * 
+		 * @param c filename
+		 * @return answer
+		 */
 		public boolean contains(String c) {
 			return compileAllSeparately || compileSeparately.contains(c);
 		}

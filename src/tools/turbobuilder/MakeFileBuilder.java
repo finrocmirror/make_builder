@@ -1,7 +1,10 @@
 package tools.turbobuilder;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -12,38 +15,95 @@ import tools.turbobuilder.MakeFileHCache.HFile;
 /**
  * @author max
  *
- * Build makefile instead of compiling
+ * Main class for Building makefiles
  */
-public class MakeFileBuilder extends TurboBuilder {
+public class MakeFileBuilder implements FilenameFilter {
 
-	CodeBlock makefile = new CodeBlock();
-	CodeBlock firstBlock = new CodeBlock();
-	CodeBlock globalDefine = new CodeBlock();
+	/** Input Character set */
+	static final Charset INPUT_CHARSET = Charset.forName("ISO-8859-1");
 
-	// "Turbo" version of above
-	CodeBlock makefileT = new CodeBlock();
+	/** Current working directory - should be $MCAHOME */
+	static final File HOME = new File(".").getAbsoluteFile().getParentFile();
 	
-	String tempBuildPathBase;  // temporary build path where .o files are placed
-	int rootlen;
+	/** Shortcut to file separator */
+	private static final String FS = File.separator;
 	
-	String descrBuilderBin = "script/description_builder.pl ";
+	/** Libraries and executables that need to be built */
+	private final List<BuildEntity> buildEntities = new ArrayList<BuildEntity>();
+
+	/** Options from command line */
+	Options opts;
+
+	/** build path where compiled binaries are placed */
+	File buildPath; 
+	
+	/** Whole makefile */	
+	private CodeBlock makefile = new CodeBlock();
+	
+	/** Start of makefile */
+	private CodeBlock firstBlock = new CodeBlock();
+	
+	/** Global definitions */
+	private CodeBlock globalDefine = new CodeBlock();
+
+	/** "Turbo" version of makefile */
+	private CodeBlock makefileT = new CodeBlock();
+	
+	/** temporary build path where .o files are placed */
+	private String tempBuildPathBase;
+	
+	/** Length of $MCAHOME */
+	private int rootlen;
+	
+	/** Description builder script */
+	private final String descrBuilderBin = "script/description_builder.pl ";
+	
+	/** Target base directory, Target directory for libraries, Target directory for binaries */ 
 	String targetBase, targetLib, targetBin;
-	SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
 	
-	// List with commands necessary for h files
-	// Map<String, CodeBlock> hCodeGen = new HashMap<String, CodeBlock>();
-	MakeFileHCache hCache;
+	/** Categorization of make targets (Target/Category => dependencies) */
+	private SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
 	
-	final boolean turbo;
+	/** Cache for h files */
+	private MakeFileHCache hCache;
 	
-	final String TEMPDIR = "/tmp/mbuild_" + Util.whoami();
+	/** Build "turbo" makefile (where sources are merged in one file before compiling) */ 
+	private final boolean turbo;
 	
+	/** Temporary directory for merged files */
+	private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami();
+	
+	/** Standard compiler options for MCA */
 	public static final String MCAOPTS = "-include Makefile.h -Ilibraries -Iprojects -Itools -I. ";
 	
-	public final List<String> errorMessages = new ArrayList<String>();
+	/** Error message for console - are collected and presented at the end */
+	private final List<String> errorMessages = new ArrayList<String>();
 
+	public static void main(String[] args) {
+		
+		// Call updateLibDb (?)
+		if (args.length > 0 && args[0].equals("--updatelibs")) {
+			LibDBBuilder.main(args);
+			System.exit(0);
+		}
+		
+		// Parse command line options
+		Options options = new Options(args);
+		
+		try {
+			new MakeFileBuilder(options).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			printErrorAdvice();
+		}
+	}
+	
+	/**
+	 * @param opts Command line options
+	 */
 	public MakeFileBuilder(Options opts) {
-		super(opts);
+		this.opts = opts;
+		
 		makefile.add(firstBlock);
 		tempBuildPathBase = "build" + FS + opts.build;
 		rootlen = HOME.getAbsolutePath().length() + 1;
@@ -54,11 +114,134 @@ public class MakeFileBuilder extends TurboBuilder {
 		globalDefine.add("#define _MCA_LINUX_");
 		
 		turbo = opts.combineCppFiles;
+		
+		buildPath = new File(HOME.getAbsolutePath() + FS + "export" + FS + opts.build);
 	}
 	
-	protected void loadCachedData() throws Exception {}
+	/** Create makefile */
+	private void build() throws Exception {
+
+		// Parse Scons scripts
+		System.out.println("Parsing SCons scripts...");
+		//String projectsRoot = HOME.getAbsolutePath() + FS + "projects";
+		for (File sconscript : Files.getAllFiles(HOME, this, false, false)) {
+			if (sconscript.getParentFile().getName().equals("kernel.original")) {
+				continue;
+			}
+			try {
+				// only parse SConsripts in directories tools, projects and libraries
+				String relative = sconscript.getAbsolutePath().substring(HOME.getAbsolutePath().length() + 1);
+				if ((!relative.startsWith("libraries"))  && (!relative.startsWith("projects")) && (!relative.startsWith("tools"))) {
+					continue;
+				}
+				
+				Collection<BuildEntity> temp = SConscript.parse(sconscript, this);
+				buildEntities.addAll(temp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// process dependencies
+		System.out.println("Processing dependencies...");
+		for (BuildEntity be : buildEntities) {
+			for (int i = 0; i < be.libs.size(); i++) {
+				String lib = be.libs.get(i);
+				try {
+					processDependency(be, lib, false);
+				} catch (Exception e) {
+					printErrorLine(e.getMessage());
+					be.missingDep = true;
+				}
+			}
+			for (int i = 0; i < be.optionalLibs.size(); i++) {
+				String lib = be.optionalLibs.get(i);
+				processDependency(be, lib, true);
+			}
+		}
+		
+		for (BuildEntity be : buildEntities) {
+			// check whether all dependencies are met
+			be.checkDepencies();
+		}
+		
+		// add available optional libs
+		for (BuildEntity be : buildEntities) {
+			be.addOptionalLibs();
+		}
+		
+		// add available optional libs
+		for (BuildEntity be : buildEntities) {
+			// collect external libraries needed for building
+			be.mergeExtLibs();
+		}
+
+		// create additional defines
+		for (BuildEntity be : buildEntities) {
+			if (!be.missingDep && be instanceof MCALibrary) {
+				// _LIB_MCA2_COMPUTER_VISION_BASE_PRESENT_
+				addDefine("_LIB_MCA2_" + be.name.toUpperCase() + "_PRESENT_");
+			}
+		}
+		
+		// build entities
+		for (BuildEntity be : buildEntities) {
+			if (be.missingDep || ((!opts.compileTestParts) && be.isTestPart())) {
+				continue;
+			}
+			build(be, false);
+		}
+		
+		// Write makefile
+		storeMakefile();
+		
+		// completed
+		System.out.println("Creating Makefile successful.");
+	}
 	
-	protected void storeCachedData() throws Exception {
+	/**
+	 * Process single dependency of build entity
+	 * 
+	 * @param be Build entity
+	 * @param lib Library name of dependency
+	 * @param optional Optional dependency
+	 */
+	private void processDependency(BuildEntity be, String lib, boolean optional) throws Exception {
+		if (!lib.startsWith("mca2_")) {
+			if (!LibDB.available(lib)) {
+				if (optional) {
+					return;
+				}
+				throw new Exception("Not building " + be.name + " due to missing library " + lib);
+			}
+			LibDB.ExtLib x = LibDB.getLib(lib);
+			be.extlibs.add(x);
+			be.libs.addAll(x.dependencies);
+			//be.qt3 |= lib.equals("qt");
+			//be.qt4 |= lib.startsWith("qt4");
+			return;
+		}
+		boolean found = false;
+		for (BuildEntity be2 : buildEntities) {
+			if ((be2 instanceof MCALibrary) && be2.toString().equals(lib)) {
+				if (!optional) {
+					be.dependencies.add(be2);
+				} else {
+					be.optionalDependencies.add(be2);
+				}
+				found = true;
+				break;
+			}
+		}
+		if (!found && (!optional)) {
+			throw new Exception("Not building " + be.name + " due to missing MCA library " + lib);
+		}
+	}
+	
+	/**
+	 * Create and save Makefile
+	 */
+	private void storeMakefile() throws Exception {
 		
 		// write makefile
 		String phony = ".PHONY: clean";
@@ -89,10 +272,11 @@ public class MakeFileBuilder extends TurboBuilder {
         firstBlock.add("\trm -R -f " + targetBase);
         CodeBlock preFirstBlock = new CodeBlock();
         firstBlock.add(0, preFirstBlock);
-		preFirstBlock.add("CFLAGS=-g2");
-		preFirstBlock.add("");
-		preFirstBlock.add("CC=gcc");
-		preFirstBlock.add("");
+		preFirstBlock.add("CFLAGS=-g2\n");
+		preFirstBlock.add("CC=gcc\n");
+		preFirstBlock.add("BUILD_DIR=" + tempBuildPathBase + "\n");
+		preFirstBlock.add("NVCC_OPTS=-L" + targetLib + " " + MCAOPTS + " " + "-I$(BUILD_DIR)/libraries -I$(BUILD_DIR)/projects\n");
+		preFirstBlock.add("STD_OPTS=-Wall -Wwrite-strings -Wno-unknown-pragmas $(NVCC_OPTS)\n");
 		if (!turbo) {
 			makefile.writeTo(new File("Makefile"));
 		} else {
@@ -109,7 +293,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		}
 	}
 
-	public void init(File targetFile) throws Exception {
+	private void init(File targetFile) throws Exception {
 		if (hCache == null) {
 			targetBase = targetFile.getParentFile().getParent().substring(rootlen);
 			targetBin = targetBase + FS + "script";
@@ -123,8 +307,7 @@ public class MakeFileBuilder extends TurboBuilder {
 		}
 	}
 	
-	@Override
-	protected void build(final BuildEntity be, final boolean immediately) throws Exception {
+	private void build(final BuildEntity be, final boolean immediately) throws Exception {
 
 		System.out.println("Processing " + be.name);
 		
@@ -172,11 +355,15 @@ public class MakeFileBuilder extends TurboBuilder {
 		String secondLine = "";
 		
 		// generate compiler options
-		String addOpts = "-I" + tempBuildPathBase + FS + "libraries -I" + tempBuildPathBase + FS + "projects -I" + tempBuildPathBase + FS + rootDir;
-		String gccopts = " $(CFLAGS) -Wall -Wwrite-strings -Wno-unknown-pragmas -L" + targetLib + " " + MCAOPTS + " " + addOpts + " " + be.opts + " ";
+		/*String addOpts = "-I" + tempBuildPathBase + FS + "libraries -I" + tempBuildPathBase + FS + "projects -I" + tempBuildPathBase + FS + rootDir;
+		String gccopts = " $(CFLAGS) -Wall -Wwrite-strings -Wno-unknown-pragmas -L" + targetLib + " " + MCAOPTS + " " + addOpts + " " + be.opts + " ";*/
+		String gccopts = " $(CFLAGS) $(STD_OPTS) -I$(BUILD_DIR)/" + rootDir + " " + be.opts + " ";
+		String nvccopts = " $(NVCC_OPTS) -I$(BUILD_DIR)/" + rootDir + " " + be.opts + " ";
+		String addOpts = "";
+		
 		String rootDirTmp = rootDir;
 		while(rootDirTmp.contains(FS)) {
-			gccopts += "-I" + rootDirTmp + " ";
+			addOpts += "-I" + rootDirTmp + " ";
 			rootDirTmp = rootDirTmp.substring(0, rootDirTmp.lastIndexOf(FS));
 		}
 		if (!be.compileToExecutable()) {
@@ -185,22 +372,17 @@ public class MakeFileBuilder extends TurboBuilder {
 		
 		for (BuildEntity s : be.dependencies) {
 			firstLine += s.getTarget().getAbsolutePath().substring(rootlen) + " ";
-			gccopts += "-l" + s.toString() + " ";
+			addOpts += "-l" + s.toString() + " ";
 		}
 		for (LibDB.ExtLib s : be.extlibs) {
-			gccopts += s.options + " ";
+			addOpts += s.options + " ";
 		}
 		
-		String gccoptsLight = gccopts;
-		while (gccoptsLight.contains(" -l")) {
-			String temp1 = gccoptsLight.substring(0, gccoptsLight.indexOf(" -l"));
-			String temp2 = gccoptsLight.substring(gccoptsLight.indexOf(" -l") + 3);
-			if (temp2.contains(" ")) {
-				gccoptsLight = temp1 + temp2.substring(temp2.indexOf(" "));
-			} else {
-				gccoptsLight = temp1;
-			}
-		}
+		// create different variants of compiler options
+		String addOptsCompileOnly = removeOptions(removeOptions(addOpts, "-l"), "-L"); 
+		String gccoptsLight = gccopts + addOptsCompileOnly;
+		nvccopts += addOptsCompileOnly;
+		gccopts += addOpts;
 		
 		// for turbo
 		MakeFileBlacklist.Element blacklist = MakeFileBlacklist.getInstance().get(be.name);
@@ -318,13 +500,13 @@ public class MakeFileBuilder extends TurboBuilder {
 			cb.add(cFirst);
 			mkdir(cb, o);
 			//cb.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
-			cb.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			cb.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o + " " + nvccopts);
 			
 			// turbo
 			makefileT.add(cFirst);
 			mkdir(makefileT, o);
 			//makefileT.add("\t/usr/local/cuda/bin/nvcc -c -D_DEBUG " + cAbs + " -o " + o);
-			makefileT.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o);
+			makefileT.add("\tnvcc -c -D_DEBUG " + cAbs + " -o " + o + " " + nvccopts);
 			turboDeps += o + " ";
 			turboCompiles += o + " ";
 		}
@@ -334,20 +516,6 @@ public class MakeFileBuilder extends TurboBuilder {
 		CodeBlock hdr2 = new CodeBlock();
 		hdr2.add("\tmkdir -p " + tempBuildPath);
 		hdr2.add("\techo \\/\\* \\*\\/ > " + tempFileCpp);
-		
-		// process UIC files
-		for (String c : be.uics) {
-			if (be.qt3) {
-				String cAbs = rootDir + FS + c;
-				String cc = tempBuildPathBase + FS + cAbs + ".cc";
-				hdr2.add("\tcat " + cc + " >> " + tempFileCpp);
-				firstLine += cc + " ";
-				
-				// turbo
-				turboCb.add("\tcat " + cc + importString + " >> " + turboCpp);
-				turboDeps += cc + " ";
-			}
-		}
 		
 		// process libs
 		if (blacklist != null && blacklist.linkLibs) {
@@ -373,7 +541,7 @@ public class MakeFileBuilder extends TurboBuilder {
 					turboCb.add("\t" + descrBuilderBin + inc.relFile + importString + " >> " + turboCpp);
 				}
 				if (inc.moc) {
-					String qtCall = LibDB.getLib(be.qt4 ? "moc-qt4" : "moc-qt3").options.trim();
+					String qtCall = LibDB.getLib("moc-qt4").options.trim();
 					String call = qtCall + " " + inc.relFile;
 					hdr2.add("\t" + call + " >> " + tempFileCpp);
 					turboCb.add("\t" + call + importString + " >> " + turboCpp);
@@ -403,11 +571,29 @@ public class MakeFileBuilder extends TurboBuilder {
 			mkdir(turboCb, target);
 			turboCb.add("\t$(CC) -o " + target + " " + turboCompile + " " + gccopts + " -lc -lm -lz -lcrypt -lpthread -lstdc++ -Wl,-rpath," + targetLib + be.getLinkerOpts() + " ");
 		}
-		
-		be.built = true;
-		sourceFiles.getAndAdd(be.cpps.size() + be.cs.size());
 	}
 	
+	/**
+	 * Remove options from options string
+	 * 
+	 * @param original Original string
+	 * @param option Options with this prefix are removed (e.g. -L)
+	 * @return New String
+	 */
+	private String removeOptions(String original, String option) {
+		String opt = " " + option;
+		while (original.contains(opt)) {
+			String temp1 = original.substring(0, original.indexOf(opt));
+			String temp2 = original.substring(original.indexOf(opt) + 3);
+			if (temp2.contains(" ")) {
+				original = temp1 + temp2.substring(temp2.indexOf(" "));
+			} else {
+				original = temp1;
+			}
+		}
+		return original;
+	}
+
 	private int countCat(CodeBlock turboCb) {
 		int result = 0;
 		for (Object s : turboCb) {
@@ -448,32 +634,6 @@ public class MakeFileBuilder extends TurboBuilder {
 		return false;
 	}
 
-	/*private List<String> getHDeps(String call, BuildEntity be) throws Exception {
-		List<String> result = new ArrayList<String>();
-		TurboBuilder.println(call);
-		Process p = Runtime.getRuntime().exec(call);
-		p.waitFor();
-		for (String s : Files.readLines(p.getErrorStream())) {
-			TurboBuilder.println(s);
-		}
-		for (String s : Files.readLines(p.getInputStream())) {
-			if (s.endsWith("\\")) {
-				s = s.substring(0, s.length() - 1);
-			}
-			if (s.contains(":")) {
-				s = s.substring(s.indexOf(":") + 1).trim();
-			}
-			String[] hs = s.trim().split("[ ]");
-			for (String h : hs) {
-				h = h.trim();
-				if (h.length() > 0 && (!h.startsWith("/")) && (!h.endsWith(".cpp"))) {
-					result.add(h);
-				}
-			}
-		}
-		return result;
-	}*/
-	
 	List<MakeFileHCache.HFile> includes2 = new ArrayList<MakeFileHCache.HFile>();
 	
 	private String getHDeps(List<MakeFileHCache.HFile> includes, String source, BuildEntity be) throws Exception {
@@ -516,13 +676,31 @@ public class MakeFileBuilder extends TurboBuilder {
 		return result;
 	}
 
-	@Override
-	protected void addDefine(String string) {
+	/**
+	 * @param string Add define to list of global defines
+	 */
+	private void addDefine(String string) {
 		globalDefine.add("#define " + string);
 	}
 
-	@Override
+	/**
+	 * Print error line deferred (when tool exits)
+	 * 
+	 * @param s line to print
+	 */
 	public void printErrorLine(String s) {
 		errorMessages.add(s);
+	}
+	
+	/** Print advice if an error occured */
+	public static void printErrorAdvice() {
+		System.out.println("An error was encountered during the build process.");
+		System.out.println("Make sure you have the current version of this tool, called ant, and");
+		System.out.println("the libdb.txt file is up to date (call updatelibdb),");
+	}
+	
+	public boolean accept(File dir, String name) {
+		File f = new File(dir.getAbsolutePath() + File.separator + name);
+		return (f.isDirectory() || name.equals("SConscript"));
 	}
 }

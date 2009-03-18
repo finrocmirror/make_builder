@@ -9,17 +9,24 @@ import java.util.Map;
 /**
  * @author max
  *
- * Contains specific information about libraries
+ * Contains specific information about external libraries
+ * 
+ * Handles/manages entries in libdb.txt
  */
 public class LibDB {
 
+	/** Mapping: Library name => library */
 	private static Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
-	static List<String> critical = new ArrayList<String>();
-	
+
+	/** Load libdb.txt at the beginning */
 	static {
 		reinit();
 	}
 
+	/**
+	 * reads and processes libdb.txt file
+	 * may be called again, if file changes 
+	 */
 	public static void reinit() {
 		libs.clear();
 		try {
@@ -29,7 +36,7 @@ public class LibDB {
 				if (s.trim().length() <= 1) {
 					continue;
 				}
-				s = s.replace("$MCAHOME$", TurboBuilder.HOME.getAbsolutePath());
+				s = s.replace("$MCAHOME$", MakeFileBuilder.HOME.getAbsolutePath());
 				int split = s.indexOf(":");
 				String name =  s.substring(0, split).trim();
 				String flags = s.substring(split + 1).trim();
@@ -38,21 +45,14 @@ public class LibDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		try {
-			File f = Util.getFileInEtcDir("critical.txt");
-			List<String> lines = Files.readLines(f);
-			for (String s : lines) {
-				if (s.trim().length() <= 1) {
-					continue;
-				}
-				critical.add(s);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
+	/**
+	 * Add all available libraries to specified lines.
+	 * Entries of the form '_LIB_???_PRESENT_' are added to the list.
+	 * 
+	 * @param defines List with defines
+	 */
 	public static void addDefines(List<String> defines) {
 		for (Map.Entry<String, ExtLib> e : libs.entrySet()) {
 			String opts = e.getValue().options;
@@ -63,12 +63,54 @@ public class LibDB {
 		}
 	}
 	
+	/**
+	 * @param lib Library name
+	 * @return Library with this name
+	 * @throws Exception Thrown when not found
+	 */
+	public static ExtLib getLib(String lib) throws Exception {
+		ExtLib el = libs.get(lib);
+		if (el != null) {
+			return libs.get(lib);
+		}
+		throw new Exception("cannot find entry for external library " + lib);
+	}
+
+	/**
+	 * @param lib Library name
+	 * @return Is library with this name available? 
+	 */
+	public static boolean available(String lib) {
+		ExtLib el = libs.get(lib);
+		if (el != null) {
+			return el.available();
+		}
+		return false;
+	}
+	
+	/**
+	 * @author max
+	 *
+	 * Represents one external library 
+	 */
 	static class ExtLib {
+		
+		/** library name */
 		final String name;
+		
+		/** compiler options to set for this library (line in libdb.txt without '-lmca2_*'s) */
 		final String options;
+		
+		/** Defines possibly set in libdb.txt line */
 		final List<String> libDefines = new ArrayList<String>();
+		
+		/** Dependencies to other mca2 libraries (Strings: "mca2_*") */
 		final List<String> dependencies = new ArrayList<String>();
 		
+		/**
+		 * @param name Library name
+		 * @param options libdb.txt line
+		 */
 		public ExtLib(String name, String options) {
 			this.name = name;
 			String opts = options;
@@ -92,38 +134,11 @@ public class LibDB {
 			this.options = options;
 		}
 		
+		/**
+		 * @return Is library available on current system?
+		 */
 		public boolean available() {
 			return !options.contains("N/A");
 		}
-	}
-
-	public static ExtLib getLib(String lib) throws Exception {
-		ExtLib el = libs.get(lib);
-		if (el != null) {
-			return libs.get(lib);
-		}
-		throw new Exception("cannot find entry for external library " + lib);
-	}
-
-	public static boolean available(String lib) {
-		ExtLib el = libs.get(lib);
-		if (el != null) {
-			return el.available();
-		}
-		return false;
-	}
-
-	public static List<List<String>> partition(List<String> cpps) {
-		List<List<String>> result = new ArrayList<List<String>>();
-		List<String> cur = new ArrayList<String>();
-		result.add(cur);
-		for (String cpp : cpps) {
-			if (critical.contains(cpp)) {
-				cur = new ArrayList<String>();
-				result.add(cur);
-			}
-			cur.add(cpp);
-		}
-		return result;
 	}
 }

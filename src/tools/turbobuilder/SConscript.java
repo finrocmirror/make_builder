@@ -12,10 +12,17 @@ import java.util.List;
  */
 public class SConscript {
 
+	/** Short cut to file separator */
 	public static final String FS = File.separator;
 	
-	/** parses SConscripts and returns a set of build entities */
-	public static Collection<BuildEntity> parse(File sconscript, TurboBuilder tb) throws Exception {
+	/** 
+	 * parses SConscripts and returns a set of build entities 
+	 * 
+	 * @param sconscript SConscript file
+	 * @param tb MakefileBuilder entity
+	 * @return set of build entities
+	 */
+	public static Collection<BuildEntity> parse(File sconscript, MakeFileBuilder tb) throws Exception {
 		List<BuildEntity> result = new ArrayList<BuildEntity>();
 		List<String> lines = Files.readLines(sconscript);
 
@@ -45,7 +52,7 @@ public class SConscript {
 					be.name = line.substring(line.indexOf("'") + 1, line.lastIndexOf("'"));
 					be.sconsID = line.substring(0, line.indexOf("=")).trim();
 					be.rootDir = sconscript.getParentFile();
-					be.sconscript = sconscript.getAbsolutePath().substring(TurboBuilder.HOME.getAbsolutePath().length() + 1);
+					be.sconscript = sconscript.getAbsolutePath().substring(MakeFileBuilder.HOME.getAbsolutePath().length() + 1);
 					if (tb.opts.DEBUG_SCONSCRIPT_PARSING) {
 						System.out.println("found build task " + be.toString());
 					}
@@ -125,7 +132,7 @@ public class SConscript {
 								if (s3[i].contains("[")) {
 									String value = s3[i].substring(s3[i].indexOf("[") + 1, s3[i].indexOf("]")).trim();
 									if (value.contains("os.path.join(mcahome")) {
-										values = new String[]{TurboBuilder.HOME + File.separator + value.substring(value.indexOf("'") + 1, value.lastIndexOf("'"))};
+										values = new String[]{MakeFileBuilder.HOME + File.separator + value.substring(value.indexOf("'") + 1, value.lastIndexOf("'"))};
 									} else {
 										values = value.split(",");
 										for (int j = 0; j < values.length; j++) {
@@ -134,7 +141,7 @@ public class SConscript {
 									}
 								} else {
 									s3[i] = s3[i].replace('"', '\'');
-									s3[i] = s3[i].replace("#", TurboBuilder.HOME + File.separator);
+									s3[i] = s3[i].replace("#", MakeFileBuilder.HOME + File.separator);
 									values = new String[]{s3[i].substring(s3[i].indexOf("'") + 1, s3[i].lastIndexOf("'"))};
 								}
 								for (String val : values) {
@@ -167,6 +174,11 @@ public class SConscript {
 		return result;
 	}
 
+	/**
+	 * Check that all file in build entity exist (throws Exception otherwise)
+	 * 
+	 * @param be Build entity
+	 */
 	private static void checkAllFilesExist(BuildEntity be) throws Exception {
 		checkAllFilesExist(be, be.cs);
 		checkAllFilesExist(be, be.cpps);
@@ -175,6 +187,12 @@ public class SConscript {
 		checkAllFilesExist(be, be.os);
 	}
 
+	/**
+	 * Check that all files in build entity List exist (throws Exception otherwise)
+	 * 
+	 * @param be Buile entity
+	 * @param cs List of files
+	 */
 	private static void checkAllFilesExist(BuildEntity be, List<String> cs) throws Exception {
 		for (String s : cs) {
 			File f = new File(be.rootDir.getAbsolutePath() + FS + s);
@@ -184,8 +202,13 @@ public class SConscript {
 		}
 	}
 
+	/**
+	 * Assign categories/makefile targets to build entity 
+	 * 
+	 * @param be Build entity
+	 */
 	private static void processCategories(BuildEntity be) {
-		String rootDir = be.rootDir.getAbsolutePath().substring(TurboBuilder.HOME.getAbsolutePath().length() + 1);
+		String rootDir = be.rootDir.getAbsolutePath().substring(MakeFileBuilder.HOME.getAbsolutePath().length() + 1);
 		be.categories.add("all");
 		if (rootDir.startsWith("libraries") || rootDir.startsWith("tools")) {
 			be.categories.add("libs");
@@ -205,10 +228,28 @@ public class SConscript {
 		}
 	}
 
+	/**
+	 * Normalize SCons string (removes spaces)
+	 * 
+	 * @param s Original string
+	 * @return Normalized string
+	 */
 	private static String normalize(String s) {
 		return s.replace(" (", "(").replace(" '", "'").replace(" \"", "\"");
 	}
 
+	/**
+	 * Check Sconscript for string list - possibly extract it
+	 * 
+	 * @param sconscript Sconscript file (name)
+	 * @param s current line
+	 * @param lines all lines 
+	 * @param curLine index of current line
+	 * @param sconsID Scons/Python variable name
+	 * @param methodCall Scons method call to search for
+	 * @param resultList List to put results to 
+	 * @return New current line index
+	 */
 	private static int checkFor(File sconscript, String s, List<String> lines, int curLine, String sconsID, String methodCall, List<String> resultList) {
 		try {
 			if (s.contains(sconsID + "." + methodCall + "(\"\"\"")) {

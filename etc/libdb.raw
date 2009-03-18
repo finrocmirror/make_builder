@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt3/bin /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/qt/3/lib /usr/X11R6/lib /usr/X11R6/include
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
 
 amicom: 	-I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:		-I<'ANN/ANN.h'> -lANN
@@ -42,7 +42,6 @@ parapin:	-I<parapin.h,parapindriver.h>
 Poco:		-I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL:     -lpq -I<pg_config.h,postgres.h>
 pwc: 		-I<pwc-ioctl.h>
-qt:		-D _MCA_QT_3_ -D QT_THREAD_SUPPORT -I<qapplication.h,qpushbutton.h> -lqt-mt
 qt4:		-D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
 qt4core:	-D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
 qt4gui:		-D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -I<QtGui/qapplication.h> -lQtCore -lQtGui

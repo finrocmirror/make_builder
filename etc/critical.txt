@@ -1,8 +1,0 @@
-tConvexHullVisualizer.cpp
-CMVision.cpp
-mGeometryEvaluator.cpp
-mTextureEvaluator.cpp
-highMap.C
-tBluetoothRFIDReader.cpp
-tConvexHullVisualizer.cpp
-

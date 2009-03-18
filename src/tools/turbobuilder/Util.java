@@ -9,11 +9,19 @@ import java.util.List;
 /**
  * @author max
  *
+ * Various utility functions
  */
 public class Util {
 
+	/**
+	 * Read all lines from a C++/Java file and remove all comments
+	 * 
+	 * @param f File
+	 * @param setLineMacro set ling macros (currently only false)
+	 * @return List with lines that were read
+	 */
 	public static List<String> readLinesWithoutComments(File f, boolean setLineMacro) throws Exception {
-		char[] data = Files.readStreamFully(new InputStreamReader(new FileInputStream(f), BuildEntity.INPUT_CHARSET));
+		char[] data = Files.readStreamFully(new InputStreamReader(new FileInputStream(f), MakeFileBuilder.INPUT_CHARSET));
 		
 		List<String> lines = new ArrayList<String>();
 		String curFile = f.getAbsolutePath();
@@ -110,122 +118,20 @@ public class Util {
 		
 		return lines;
 	}
-	
-	static String normalize(String s) {
-//		s = s.trim().replace("\t", " ");
-//		if (s.contains("//")) {
-//			s = s.substring(0, s.indexOf("//")).trim();
-//		}
-//		while(s.contains("/*")) {
-//			if (s.contains("*/")) {
-//				s = s.substring(0, s.indexOf("/*")) + s.substring(s.indexOf("*/") + 2);
-//			} else {
-//				s = s.substring(0, s.indexOf("/*")).trim();
-//			}
-//		}
-		return s.trim();
-	}
-	
-	enum State { NEUTRAL, BLOCKED, ID, STRING1, STRING2 }
-	
-	static String findPossibleDefineTokens(String s, TokenCallback tc, boolean lowerCaseTokens) {
-		State state = State.NEUTRAL;
-		int start = 0;
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			
-			// in String?
-			if (c == '\\' && (state == State.STRING1 || state == State.STRING2)) {
-				i++;
-				continue;
-			}
-			if (!(state == State.STRING2) && c == '"') {
-				state = (state == State.STRING1 ? State.NEUTRAL : State.STRING1);
-			}
-			if (!(state == State.STRING1) && c == '\'') {
-				state = (state == State.STRING2 ? State.NEUTRAL : State.STRING2);
-			}
-			if (state == State.STRING1 || state == State.STRING2) {
-				continue;
-			}
-			
-			if ((!lowerCaseTokens) && c >= 'a' && c <= 'z') {
-				if (state == State.NEUTRAL) {
-					try {
-						if (c == 'u' && s.charAt(i+1) == 'n' && s.charAt(i+2) == 'i' && s.charAt(i+3) == 'x' && !Character.isJavaIdentifierPart(s.charAt(4))) {
-							s = possiblyReplace(s, i, i + 4, "unix", tc);
-						}
-						if (c == 'i' && s.charAt(i+1) == '3' && s.charAt(i+2) == '8' && s.charAt(i+3) == '6' && !Character.isJavaIdentifierPart(s.charAt(4))) {
-							s = possiblyReplace(s, i, i + 4, "i386", tc);
-						}
-						if (c == 'l' && s.charAt(i+1) == 'i' && s.charAt(i+2) == 'n' && s.charAt(i+3) == 'u' && s.charAt(i+4) == 'x' && !Character.isJavaIdentifierPart(s.charAt(4))) {
-							s = possiblyReplace(s, i, i + 5, "linux", tc);
-						}
-					} catch (Exception e) {}
-				}
-				state = State.BLOCKED;
-				continue;
-			}
-			if (Character.isJavaIdentifierPart(c)) {
-				if (state == State.BLOCKED) {
-					continue;
-				}
-				if (state == State.NEUTRAL) {
-					if (Character.isJavaIdentifierStart(c)) {
-						state = State.ID;
-						start = i;
-						continue;
-					} else {
-						state = State.BLOCKED;
-					}
-				}
-				if (state == State.ID) {
-					continue;
-				}
-			}
-			if (state == State.ID) {
-				String define = s.substring(start, i);
-				String tmp = possiblyReplace(s, start, i, define, tc);
-				if (!tmp.equals(s)) {
-					i = start - 1;
-				}
-				s = tmp;
-			}
-			state = State.NEUTRAL;
-		}
-		
-		int i = s.length();
-		if (state == State.ID) {
-			String define = s.substring(start, i);
-			String tmp = possiblyReplace(s, start, i, define, tc);
-			if (!tmp.equals(s)) {
-				i = start - 1;
-			}
-			s = tmp;
-			if (i < s.length()) {
-				s = findPossibleDefineTokens(tmp, tc, lowerCaseTokens);
-			}
-		}
-		
-		return s;
-	}
-	
-	private static String possiblyReplace(String s, int start, int i, String def, TokenCallback tc) {
-		String result = tc.tokenCallback(def);
-		if (result != null) {
-			s = s.substring(0, start) + result + s.substring(i);
-		}
-		return s;
-	}
-	
-	public interface TokenCallback {
-		String tokenCallback(String token);
-	}
-	
+
+	/**
+	 * Return File in make_builder etc directory 
+	 * 
+	 * @param filename file name without path
+	 * @return file with path
+	 */
 	public static File getFileInEtcDir(String filename) {
 		return new File(new File(Files.getRootDir(LibDB.class)).getParent() + File.separator + "etc" + File.separator + filename);
 	}
 
+	/**
+	 * @return Name of user currently logged in (only works on Unix/Linux)
+	 */
 	public static String whoami() {
 		try {
 			Process p = Runtime.getRuntime().exec("whoami");

@@ -1,9 +1,13 @@
 package tools.turbobuilder;
 
-
+/**
+ * @author max
+ *
+ * MCA Library build entity
+ */
 public class MCALibrary extends BuildEntity {
 
-	public MCALibrary(TurboBuilder tb) {
+	public MCALibrary(MakeFileBuilder tb) {
 		super(tb);
 	}
 
@@ -11,11 +15,9 @@ public class MCALibrary extends BuildEntity {
 		return "mca2_" + name;
 	}
 	
-	//@Override
-	//public void gccCall(List<File> cppX) throws Exception {
-		//GCC.compile(cppX, new String[]{/*MCAROOT + FS + "libraries", MCAROOT, rootDir.getAbsolutePath(), MCAROOT + FS + "tools", MCAROOT + FS + "projects"*/}, dependencies, extlibs, new File("/tmp/lib" + toString() + ".so"), false, opts + getCudaOpts());
-	//}
-	
+	/**
+	 * @return Raw Compiled Library name (lib*.so)
+	 */
 	public String getLibName() {
 		return "lib" + toString() + ".so";
 	}

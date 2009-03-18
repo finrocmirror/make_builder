@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author max
@@ -18,21 +16,26 @@ public class CodeBlock extends ArrayList<Object> {
 
 	/** uid */
 	private static final long serialVersionUID = 8641893763578667982L;
-	boolean globalNamespace = false;
-	static final AtomicInteger x = new AtomicInteger();
-
-	public CodeBlock() {}
 	
-	public CodeBlock(List<String> diff) {
-		addAll(diff);
-	}
+	public CodeBlock() {}
 
+	/**
+	 * Write contents of CodeBlock to Writer/Stream
+	 * 
+	 * @param w Writer/Stream
+	 * @throws Exception
+	 */
 	public void writeTo(Writer w) throws Exception {
 		PrintWriter pw = new PrintWriter(w);
 		writeToInternal(pw);
 		pw.close();
 	}
-	
+
+	/**
+	 * Helper for above
+	 * 
+	 * @param pw Writer/Stream
+	 */
 	private void writeToInternal(PrintWriter pw) throws Exception {
 		for (Object element : this) {
 			if (element instanceof String) {
@@ -57,6 +60,11 @@ public class CodeBlock extends ArrayList<Object> {
 		}
 	}
 
+	/**
+	 * Write contents of CodeBlock to file
+	 * 
+	 * @param file File
+	 */
 	public void writeTo(File file) throws Exception {
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		writeTo(pw);

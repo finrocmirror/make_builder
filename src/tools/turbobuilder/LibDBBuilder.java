@@ -8,12 +8,15 @@ import java.util.List;
 /**
  * @author max
  *
- * Builds lib-database for specific system
+ * Builds lib-database for specific system.
+ * (Reads libdb.raw and creates libdb.txt)
  */
 public class LibDBBuilder implements FilenameFilter {
 
+	/** File separator shortcut */
 	static final String FS = File.separator; 
 	
+	/** GCC version */
 	static final String GCC_VERSION = GCC.getGCCVersion();
 	
 	/**
@@ -28,6 +31,9 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 	}
 
+	/**
+	 * Reads libdb.raw and creates libdb.txt
+	 */
 	private void buildDB() throws Exception {
 		
 		// read raw db
@@ -139,35 +145,25 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 		
 		// find correct moc and uic commands
-		File mocqt3 = null;
 		File mocqt4 = null;
 		for (File moc : mocs) {
 			String result = callMoc(moc);
 			if (result.contains(" 4.")) {
 				mocqt4 = moc;
-			} else if (result.contains(" 3.")) {
-				mocqt3 = moc;
 			}
 		}
-		newLibDB.add("moc-qt3: " + (mocqt3 != null ? mocqt3.getAbsolutePath() : "N/A"));
 		newLibDB.add("moc-qt4: " + (mocqt4 != null ? mocqt4.getAbsolutePath() : "N/A"));
-		newLibDB.add("uic-qt3: " + (mocqt3 != null ? mocqt3.getParentFile().getAbsolutePath() + FS + "uic" : "N/A"));
 		newLibDB.add("uic-qt4: " + (mocqt4 != null ? mocqt4.getParentFile().getAbsolutePath() + FS + "uic" : "N/A"));
 		
 		Files.writeLines(Util.getFileInEtcDir("libdb.txt"), newLibDB);
 	}
 	
-	/*private List<File> getLibs() throws Exception {
-		List<File> result = new ArrayList<File>();
-		Process p = Runtime.getRuntime().exec("/sbin/ldconfig -p");
-		for (String s : Files.readLines(p.getErrorStream())) {
-			if (s.contains("=>")) {
-				result.add(new File(s.substring(s.indexOf("=>") + 2).trim()));
-			}
-		}
-		return result;
-	}*/
-
+	/**
+	 * Run (qt) moc command
+	 * 
+	 * @param moc Moc executable
+	 * @return String that command returns with no parameter 
+	 */
 	private String callMoc(File moc) throws Exception {
 		Process p = Runtime.getRuntime().exec(moc.getAbsolutePath() + " -v");
 		p.waitFor();
@@ -177,6 +173,13 @@ public class LibDBBuilder implements FilenameFilter {
 		return null;
 	}
 
+	/**
+	 * When library is found in multiple directories -
+	 * returns the most likely one (currently simple heuristics).
+	 * 
+	 * @param candidateDirs The directories
+	 * @return The most likely one
+	 */
 	private String mostLikelyLibDir(List<File> candidateDirs) throws Exception {
 		String best = candidateDirs.get(0).getAbsolutePath();
 		boolean allInGCCDir = true;
@@ -203,6 +206,13 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 	}
 
+	/**
+	 * When headers are found in multiple directories -
+	 * returns the most likely one (currently simple heuristics).
+	 * 
+	 * @param candidateDirs The directories
+	 * @return The most likely one
+	 */
 	private String mostLikelyIncludeDir(List<File> candidateDirs) throws Exception  {
 		String best = candidateDirs.get(0).getAbsolutePath();
 		boolean allInGCCDir = true;
@@ -229,6 +239,12 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 	}
 
+	/**
+	 * Remove directories from candidates that do not contain specfied header
+	 * 
+	 * @param reqHeader Header
+	 * @param candidateDirs List of directories (candidates)
+	 */
 	private void reduceCandidateDirs(String reqHeader, List<File> candidateDirs) {
 		for (int i = 0; i < candidateDirs.size(); i++) {
 			File cdir = candidateDirs.get(i);
@@ -240,6 +256,13 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 	}
 
+	/**
+	 * Get all directories that contain specified file
+	 * 
+	 * @param reqFile the file
+	 * @param files List of all relevant files (cached during search) 
+	 * @return List with directories
+	 */
 	private List<File> getCandidateDirs(String reqFile, List<File> files) {
 		List<File> result = new ArrayList<File>();
 		reqFile = "/" + reqFile;
@@ -252,7 +275,17 @@ public class LibDBBuilder implements FilenameFilter {
 		return result;
 	}
 
-	// for caching files...
+	/** 
+	 * for caching files...
+	 * look for .h/.hpp and lib*.so files in directory and all subdirectories
+	 * 
+	 * @param path Directory to search in
+	 * @param header List with header files
+	 * @param libs List with library files
+	 * @param mocs List with qt-moc executables
+	 * @param level Recursion depth
+	 * @param excludes List of (sub)directories to exclude
+	 */
 	private void cacheFiles(File path, List<File> header, List<File> libs, List<File> mocs, int level, List<String> excludes) throws Exception {
 		if (!path.isDirectory()) {
 			return;
