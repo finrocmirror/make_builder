@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include /usr/src/linux-headers-2.6.26-1-common/include/media/
 
 amicom: 	-I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:		-I<'ANN/ANN.h'> -lANN
@@ -7,15 +7,16 @@ asn:    	-I$MCAHOME$/libraries/asn -lmca2_asn
 asr:        -I$MCAHOME$/libraries/dialog_system -L$MCAHOME$/libraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:	-I<AX10420.h>
 bdbxml:		-I<dbxml/DbXml.hpp> -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
-bfl:		-I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir 
+bfl:		-I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 boost:		-I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
-can:		-I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan 
+can:		-I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 cg:			-I<Cg/cgGL.h> -lCg -lCgGL
 cgal:   	-I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
-cuda:		-I<cuda.h,builtin_types.h> -lcuda
-dc1394:		-I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394 
+cuda:		-I<cuda.h,builtin_types.h> -lcuda -lcudart
+cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/usr/local/include/cuda
+dc1394:		-I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:		-I<dscud.h,DMM32AT_type_defs.h>
 festival:	-lFestival -lestools -lestbase -lesd -leststring -lncurses -I<festival.h> -I<EST_SingleChannelWave.h>
 ffmpeg:		-I<libavcodec/avcodec.h> -lavcodec
@@ -38,7 +39,7 @@ opencv: 	-I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h> -lcv -lcxcore -l
 openmp:		-I<omp.h> -lgomp -fopenmp
 openssl: 	-I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:		-I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
-parapin:	-I<parapin.h,parapindriver.h> 
+parapin:	-I<parapin.h,parapindriver.h>
 Poco:		-I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL:     -lpq -I<pg_config.h,postgres.h>
 pwc: 		-I<pwc-ioctl.h>
