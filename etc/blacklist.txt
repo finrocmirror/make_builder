@@ -10,7 +10,8 @@ mcabrowser: tMainWindow.cpp tQPortDestination.cpp			# xpm includes not guarded
 mcagui: tDial.cpp tLCD.cpp tWidgetBoard.cpp tSlider.cpp	tLED.cpp tIntegerInput.cpp tValueInput.cpp # double global enums, xpm includes not guarded
 rfid: tBluetoothRFIDReader.cpp
 reconstruction_3d_lib: tConvexHullVisualizer.cpp
-laser_3d_vegetation_discrimination: -safe    # namespace import leads to ambiguous reference to ePMP...
+laser_3d_vegetation_discrimination: -safe                   # namespace import leads to ambiguous reference to ePMP...
 generic_kinematic_calculation: -safe
 laser_3d_hazard_detection: -safe 
 gridmap_based_navigation: -safe
+ravon_fundamentals_lib: -safe                               # global variable set_state_period in mDSPBridge and mControllerBridge
