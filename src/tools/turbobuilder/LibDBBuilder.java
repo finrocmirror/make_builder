@@ -19,6 +19,9 @@ public class LibDBBuilder implements FilenameFilter {
 	/** GCC version */
 	static final String GCC_VERSION = GCC.getGCCVersion();
 
+	/** Current working directory - should be $MCAHOME */
+	static final File HOME = new File(".").getAbsoluteFile().getParentFile();
+	
 	/**
 	 * @param args
 	 */
@@ -71,7 +74,9 @@ public class LibDBBuilder implements FilenameFilter {
 		List<String> newLibDB = new ArrayList<String>();
 
 		// make replacements in raw db
+		List<String> furtherLibDirs = new ArrayList<String>();
 		for (String line : rawLibDB) {
+			furtherLibDirs.clear();
 			if (line.trim().length() == 0) {
 				continue;
 			}
@@ -117,26 +122,43 @@ public class LibDBBuilder implements FilenameFilter {
 				// process required libraries
 				} else if (arg.startsWith("-l") && (!arg.startsWith("-lmca2"))) {
 					String reqLib = arg.substring(2, arg.length());
-					List<File> candidateDirs = getCandidateDirs("lib" + reqLib + ".so", libs);
-					if (candidateDirs.size() == 0) {
-						candidateDirs = getCandidateDirs("lib" + reqLib + ".a", libs);
+					
+					// look in directories specified by any preceding -L argument
+					boolean found = false;
+					for (String dir : furtherLibDirs) {
+						String base = dir + File.separator + "lib" + reqLib;
+						if (new File(base + ".so").exists() || new File(base + ".a").exists()) {
+							found = true;
+							break;
+						}
 					}
-					try {
-						if (candidateDirs.size() > 0) {
-							String dir = mostLikelyLibDir(candidateDirs);
-							if (dir != null) {
-								result += "-L" + dir + " ";
+					
+					if (!found) { // usual case
+						List<File> candidateDirs = getCandidateDirs("lib" + reqLib + ".so", libs);
+						if (candidateDirs.size() == 0) {
+							candidateDirs = getCandidateDirs("lib" + reqLib + ".a", libs);
+						}
+						try {
+							if (candidateDirs.size() > 0) {
+								String dir = mostLikelyLibDir(candidateDirs);
+								if (dir != null) {
+									result += "-L" + dir + " ";
+								}
+								result += arg + " ";
+							} else {
+								missing = reqLib;
+								break;
 							}
-							result += arg + " ";
-						} else {
+						} catch (Exception e) {
 							missing = reqLib;
 							break;
 						}
-					} catch (Exception e) {
-						missing = reqLib;
-						break;
 					}
 
+				} else if (arg.startsWith("-L")) {
+					furtherLibDirs.add(arg.substring(2));
+					result += arg + " ";
+					
 				} else {
 					result += arg + " ";
 				}
