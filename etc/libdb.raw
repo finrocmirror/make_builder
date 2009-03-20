@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include /usr/src/linux-headers-2.6.26-1-common/include/media/ /usr/lib/gcc/i486-linux-gnu/4.2/include/
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
 
 
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom

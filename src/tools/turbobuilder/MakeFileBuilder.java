@@ -383,6 +383,7 @@ public class MakeFileBuilder implements FilenameFilter {
 		String gccoptsLight = gccopts + addOptsCompileOnly;
 		nvccopts += addOptsCompileOnly;
 		gccopts += addOpts;
+        nvccopts = nvccopts.replace(" -fopenmp", "");
 
 		// for turbo
 		MakeFileBlacklist.Element blacklist = MakeFileBlacklist.getInstance().get(be.name);

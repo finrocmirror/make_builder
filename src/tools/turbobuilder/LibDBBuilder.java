@@ -14,16 +14,16 @@ import java.util.List;
 public class LibDBBuilder implements FilenameFilter {
 
 	/** File separator shortcut */
-	static final String FS = File.separator; 
-	
+	static final String FS = File.separator;
+
 	/** GCC version */
 	static final String GCC_VERSION = GCC.getGCCVersion();
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+
 		try {
 			new LibDBBuilder().buildDB();
 		} catch (Exception e) {
@@ -35,7 +35,9 @@ public class LibDBBuilder implements FilenameFilter {
 	 * Reads libdb.raw and creates libdb.txt
 	 */
 	private void buildDB() throws Exception {
-		
+
+        System.out.println("Found GCC version: " + GCC_VERSION);
+
 		// read raw db
 		List<String> rawLibDB = Files.readLines(Util.getFileInEtcDir("libdb.raw"));
 		String searchDirString = rawLibDB.remove(0);
@@ -50,7 +52,7 @@ public class LibDBBuilder implements FilenameFilter {
 				searchDirs.add(s);
 			}
 		}
-		
+
 		// cache all of the system's .h/.hpp and lib*.so files
 		System.out.println("Collecting .h, .hpp, lib*.so and lib*.a files from...");
 		List<File> libs = new ArrayList<File>();
@@ -64,10 +66,10 @@ public class LibDBBuilder implements FilenameFilter {
 				System.out.println(" done");
 			}
 		}
-			
+
 		// create new db
 		List<String> newLibDB = new ArrayList<String>();
-		
+
 		// make replacements in raw db
 		for (String line : rawLibDB) {
 			if (line.trim().length() == 0) {
@@ -82,7 +84,7 @@ public class LibDBBuilder implements FilenameFilter {
 			String result = "";
 			for (String arg : args) {
 				arg = arg.trim();
-				
+
 				// process required headers
 				if (arg.startsWith("-I<")) {
 					String temp = arg.substring(3, arg.length() - 1);
@@ -104,14 +106,14 @@ public class LibDBBuilder implements FilenameFilter {
 								result += "-I" + dir + " ";
 							}
 						} else {
-							missing = temp; 
+							missing = temp;
 							break;
 						}
 					} catch (Exception e) {
-						missing = temp; 
+						missing = temp;
 						break;
 					}
-					
+
 				// process required libraries
 				} else if (arg.startsWith("-l") && (!arg.startsWith("-lmca2"))) {
 					String reqLib = arg.substring(2, arg.length());
@@ -124,7 +126,7 @@ public class LibDBBuilder implements FilenameFilter {
 							String dir = mostLikelyLibDir(candidateDirs);
 							if (dir != null) {
 								result += "-L" + dir + " ";
-							} 
+							}
 							result += arg + " ";
 						} else {
 							missing = reqLib;
@@ -139,11 +141,11 @@ public class LibDBBuilder implements FilenameFilter {
 					result += arg + " ";
 				}
 			}
-			
+
 			System.out.println(missing == null ? "yes" : "no (missing " + missing + ")");
 			newLibDB.add(name + ": " + (missing == null ? result : "N/A"));
 		}
-		
+
 		// find correct moc and uic commands
 		File mocqt4 = null;
 		for (File moc : mocs) {
@@ -154,15 +156,15 @@ public class LibDBBuilder implements FilenameFilter {
 		}
 		newLibDB.add("moc-qt4: " + (mocqt4 != null ? mocqt4.getAbsolutePath() : "N/A"));
 		newLibDB.add("uic-qt4: " + (mocqt4 != null ? mocqt4.getParentFile().getAbsolutePath() + FS + "uic" : "N/A"));
-		
+
 		Files.writeLines(Util.getFileInEtcDir("libdb.txt"), newLibDB);
 	}
-	
+
 	/**
 	 * Run (qt) moc command
-	 * 
+	 *
 	 * @param moc Moc executable
-	 * @return String that command returns with no parameter 
+	 * @return String that command returns with no parameter
 	 */
 	private String callMoc(File moc) throws Exception {
 		Process p = Runtime.getRuntime().exec(moc.getAbsolutePath() + " -v");
@@ -176,7 +178,7 @@ public class LibDBBuilder implements FilenameFilter {
 	/**
 	 * When library is found in multiple directories -
 	 * returns the most likely one (currently simple heuristics).
-	 * 
+	 *
 	 * @param candidateDirs The directories
 	 * @return The most likely one
 	 */
@@ -199,7 +201,7 @@ public class LibDBBuilder implements FilenameFilter {
 		} else {
 			for (File dir : candidateDirs) {
 				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
-					return dir.getAbsolutePath();
+					return null;
 				}
 			}
 			throw new Exception("No matching GCC version");
@@ -209,7 +211,7 @@ public class LibDBBuilder implements FilenameFilter {
 	/**
 	 * When headers are found in multiple directories -
 	 * returns the most likely one (currently simple heuristics).
-	 * 
+	 *
 	 * @param candidateDirs The directories
 	 * @return The most likely one
 	 */
@@ -226,13 +228,13 @@ public class LibDBBuilder implements FilenameFilter {
 			}
 			allInGCCDir &= dir.getAbsolutePath().contains("/gcc/");
 		}
-		
+
 		if (!allInGCCDir) {
 			return best;
 		} else {
 			for (File dir : candidateDirs) {
 				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
-					return dir.getAbsolutePath();
+					return null;
 				}
 			}
 			throw new Exception("No matching GCC version");
@@ -241,7 +243,7 @@ public class LibDBBuilder implements FilenameFilter {
 
 	/**
 	 * Remove directories from candidates that do not contain specfied header
-	 * 
+	 *
 	 * @param reqHeader Header
 	 * @param candidateDirs List of directories (candidates)
 	 */
@@ -258,9 +260,9 @@ public class LibDBBuilder implements FilenameFilter {
 
 	/**
 	 * Get all directories that contain specified file
-	 * 
+	 *
 	 * @param reqFile the file
-	 * @param files List of all relevant files (cached during search) 
+	 * @param files List of all relevant files (cached during search)
 	 * @return List with directories
 	 */
 	private List<File> getCandidateDirs(String reqFile, List<File> files) {
@@ -275,10 +277,10 @@ public class LibDBBuilder implements FilenameFilter {
 		return result;
 	}
 
-	/** 
+	/**
 	 * for caching files...
 	 * look for .h/.hpp and lib*.so files in directory and all subdirectories
-	 * 
+	 *
 	 * @param path Directory to search in
 	 * @param header List with header files
 	 * @param libs List with library files
@@ -305,7 +307,7 @@ public class LibDBBuilder implements FilenameFilter {
 				if (!excludes.contains(f.getAbsolutePath())) {
 					cacheFiles(f, header, libs, mocs, level + 1, excludes);
 				} else {
-					System.out.print(" Skipping " + f.getAbsolutePath() + " "); 
+					System.out.print(" Skipping " + f.getAbsolutePath() + " ");
 				}
 			} else if (f.getName().endsWith(".h") || f.getName().endsWith(".hpp")) {
 				header.add(f);

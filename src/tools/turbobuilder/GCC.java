@@ -13,7 +13,7 @@ public class GCC {
 	 */
 	public static String getGCCVersion() {
 		try {
-			Process p = Runtime.getRuntime().exec("cpp --version");
+			Process p = Runtime.getRuntime().exec("gcc --version");
 			p.waitFor();
 			for (String s : Files.readLines(p.getInputStream())) {
 				s = s.substring(s.indexOf(")") + 1);
@@ -21,6 +21,7 @@ public class GCC {
 			}
 		} catch (Exception e) {
 			// no gcc version found
+            e.printStackTrace();
 		}
 		return null;
 	}
