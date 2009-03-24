@@ -129,6 +129,7 @@ public class LibDBBuilder implements FilenameFilter {
 						String base = dir + File.separator + "lib" + reqLib;
 						if (new File(base + ".so").exists() || new File(base + ".a").exists()) {
 							found = true;
+							result += arg + " ";
 							break;
 						}
 					}
