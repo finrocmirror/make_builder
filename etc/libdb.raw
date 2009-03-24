@@ -29,6 +29,7 @@ gsl:        -lgsl -lgslcblas
 opencv_with_highgui: -lcv -lcxcore -lcvaux -lhighgui -I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h>
 ltdl:       -I<ltdl.h> -lltdl
 lo:         -I<lo/lo.h> -llo
+loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util
 lxrt:       N/A
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -lNewton
