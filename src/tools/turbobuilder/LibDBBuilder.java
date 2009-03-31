@@ -198,6 +198,10 @@ public class LibDBBuilder implements FilenameFilter {
 		return null;
 	}
 
+	private static boolean isGCCDir(File dir) {
+		return dir.getAbsolutePath().contains("/gcc/");
+	}
+	
 	/**
 	 * When library is found in multiple directories -
 	 * returns the most likely one (currently simple heuristics).
@@ -206,29 +210,7 @@ public class LibDBBuilder implements FilenameFilter {
 	 * @return The most likely one
 	 */
 	private String mostLikelyLibDir(List<File> candidateDirs) throws Exception {
-		String best = candidateDirs.get(0).getAbsolutePath();
-		boolean allInGCCDir = true;
-		for (File dir : candidateDirs) {
-			if (dir.getAbsolutePath().equals("/usr/lib")) {
-				return null;
-			}
-			// heuristic: shorter paths are better
-			if (dir.getAbsolutePath().length() < best.length()) {
-				best = dir.getAbsolutePath();
-			}
-			allInGCCDir &= dir.getAbsolutePath().contains("/gcc/");
-		}
-
-		if (!allInGCCDir) {
-			return best;
-		} else {
-			for (File dir : candidateDirs) {
-				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
-					return null;
-				}
-			}
-			throw new Exception("No matching GCC version");
-		}
+		return mostLikelyDir(candidateDirs, "/usr/lib", "/usr/local/lib");
 	}
 
 	/**
@@ -238,30 +220,38 @@ public class LibDBBuilder implements FilenameFilter {
 	 * @param candidateDirs The directories
 	 * @return The most likely one
 	 */
-	private String mostLikelyIncludeDir(List<File> candidateDirs) throws Exception  {
+	private String mostLikelyIncludeDir(List<File> candidateDirs) throws Exception {
+		return mostLikelyDir(candidateDirs, "/usr/include", "/usr/local/include");
+	}
+	
+	/** Helper for above two functions */
+	private String mostLikelyDir(List<File> candidateDirs, String defaultDir1, String defaultDir2) throws Exception {
 		String best = candidateDirs.get(0).getAbsolutePath();
 		boolean allInGCCDir = true;
+		boolean someInGCCDir = true;
 		for (File dir : candidateDirs) {
-			if (dir.getAbsolutePath().equals("/usr/include")) {
+			if (dir.getAbsolutePath().equals(defaultDir1) || dir.getAbsolutePath().equals(defaultDir2)) {
 				return null;
 			}
 			// heuristic: shorter paths are better
 			if (dir.getAbsolutePath().length() < best.length()) {
 				best = dir.getAbsolutePath();
 			}
-			allInGCCDir &= dir.getAbsolutePath().contains("/gcc/");
+			allInGCCDir &= isGCCDir(dir);
+			someInGCCDir |= isGCCDir(dir);
 		}
 
-		if (!allInGCCDir) {
-			return best;
-		} else {
+		if (someInGCCDir) {
 			for (File dir : candidateDirs) {
 				if (dir.getAbsolutePath().contains("/" + GCC_VERSION + "/") || dir.getAbsolutePath().endsWith("/" + GCC_VERSION)) {
 					return null;
 				}
 			}
-			throw new Exception("No matching GCC version");
 		}
+		if (isGCCDir(new File(best))) {
+			throw new RuntimeException("No matching GCC version");
+		}
+		return best;
 	}
 
 	/**
