@@ -1,10 +1,17 @@
-package tools.turbobuilder;
+package makebuilder.libdb;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import makebuilder.BuildEntity;
+import makebuilder.MakeFileBuilder;
+import makebuilder.util.CCOptions;
+import makebuilder.util.Files;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -89,23 +96,35 @@ public class LibDB {
 	}
 	
 	/**
+	 * Find local dependencies in external libraries 
+	 * having this is ugly... but sometimes occurs
+	 * 
+	 * @param bes All build entities
+	 */
+	public static void findLocalDependencies(Collection<BuildEntity> bes) {
+		for (ExtLib el : libs.values()) {
+			el.findLocalDependencies(bes);
+		}
+	}
+	
+	/**
 	 * @author max
 	 *
 	 * Represents one external library 
 	 */
-	static class ExtLib {
+	public static class ExtLib {
 		
 		/** library name */
-		final String name;
+		public final String name;
 		
-		/** compiler options to set for this library (line in libdb.txt without '-lmca2_*'s) */
-		final String options;
+		/** compiler options to set for this library */
+		public final String options;
 		
-		/** Defines possibly set in libdb.txt line */
-		final List<String> libDefines = new ArrayList<String>();
+		/** wrapped/more sophisticated version of above */
+		public CCOptions ccOptions;
 		
 		/** Dependencies to other mca2 libraries (Strings: "mca2_*") */
-		final List<String> dependencies = new ArrayList<String>();
+		public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>();
 		
 		/**
 		 * @param name Library name
@@ -113,25 +132,8 @@ public class LibDB {
 		 */
 		public ExtLib(String name, String options) {
 			this.name = name;
-			String opts = options;
-			while(opts.contains("-D ")) {
-				opts = opts.substring(opts.indexOf("-D ") + 3);
-				if (opts.indexOf(" ") > 0) {
-					libDefines.add(opts.substring(0, opts.indexOf(" ")));
-				}
-			}
-
-			while (options.contains("-lmca2_")) {
-				String dep = options.substring(options.indexOf("-lmca2_") + 2);
-				options = options.substring(0, options.indexOf("-lmca2_"));
-				if (dep.contains(" ")) {
-					dep = dep.substring(0, dep.indexOf(" "));
-					options += dep.substring(dep.indexOf(" "));
-				}	
-				dependencies.add(dep);
-			}
-			
 			this.options = options;
+			ccOptions = new CCOptions(options);
 		}
 		
 		/**
@@ -139,6 +141,29 @@ public class LibDB {
 		 */
 		public boolean available() {
 			return !options.contains("N/A");
+		}
+		
+		public String toString() {
+			return name;
+		}
+		
+		/**
+		 * Find local dependencies in external libraries 
+		 * having this is ugly... but sometimes occurs
+		 * 
+		 * @param bes All build entities
+		 */
+		public void findLocalDependencies(Collection<BuildEntity> bes) {
+			ArrayList<String> libCopy = new ArrayList<String>(ccOptions.libs);
+			for (String lib : libCopy) {
+				for (BuildEntity be : bes) {
+					if (be.getTarget().endsWith("/lib" + lib + ".so")) {
+						ccOptions.libs.remove(lib);
+						dependencies.add(be);
+						break;
+					}
+				}
+			}
 		}
 	}
 }

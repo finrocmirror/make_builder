@@ -1,4 +1,4 @@
-package tools.turbobuilder;
+package makebuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6,23 +6,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import makebuilder.util.Files;
+import makebuilder.util.Util;
+
 /**
  * @author max
  *
  * Manages list of sources that cannot be combined in one great file without problems
  */
-public class MakeFileBlacklist {
+public class Blacklist {
 
 	/** List of sources (Scons name => Special settings) */
-	Map<String, Element> list = new HashMap<String, Element>();
+	private Map<String, Element> list = new HashMap<String, Element>();
 
 	/** Singleton instance */
-	private static MakeFileBlacklist instance;
+	private static Blacklist instance;
 	
 	/** @return Singleton instance */
-	public static MakeFileBlacklist getInstance() {
+	public static Blacklist getInstance() {
 		if (instance == null) {
-			instance = new MakeFileBlacklist();
+			instance = new Blacklist();
 			try {
 				File f = Util.getFileInEtcDir("blacklist.txt");
 				List<String> lines = Files.readLines(f);
@@ -54,19 +57,19 @@ public class MakeFileBlacklist {
 	public class Element {
 		
 		/** name of Scons entity */
-		String name;
+		public final String name;
 		
 		/** List of files to compile separately */
-		List<String> compileSeparately = new ArrayList<String>();
+		public final List<String> compileSeparately = new ArrayList<String>();
 		
 		/** Compile all files separately? */
-		boolean compileAllSeparately = false;
+		public boolean compileAllSeparately = false;
 		
 		/** Replace all #includes with #imports - necessary when .h files are not guarded */
-		boolean importMode = false;
+		public boolean importMode = false;
 		
 		/** unused - create symbolic links in build dir to binary libraries (.so) in sources */
-		boolean linkLibs = false;
+		//public boolean linkLibs = false;
 		
 		/**
 		 * @param s blacklist.txt line
@@ -81,8 +84,8 @@ public class MakeFileBlacklist {
 				String s3 = s2.trim();
 				if (s3.startsWith("-import")) {
 					importMode = true;
-				} else if (s3.startsWith("-linklibs")) {
-					linkLibs = true;
+//				} else if (s3.startsWith("-linklibs")) {
+//					linkLibs = true;
 				} else if (s3.startsWith("-safe")) {
 					compileAllSeparately = true;
 				} else if (s3.length() > 0) {

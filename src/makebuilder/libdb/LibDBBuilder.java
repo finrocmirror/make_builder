@@ -1,9 +1,13 @@
-package tools.turbobuilder;
+package makebuilder.libdb;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+
+import makebuilder.util.Files;
+import makebuilder.util.GCC;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -11,7 +15,7 @@ import java.util.List;
  * Builds lib-database for specific system.
  * (Reads libdb.raw and creates libdb.txt)
  */
-public class LibDBBuilder implements FilenameFilter {
+public class LibDBBuilder implements FilenameFilter, Runnable {
 
 	/** File separator shortcut */
 	static final String FS = File.separator;
@@ -22,18 +26,14 @@ public class LibDBBuilder implements FilenameFilter {
 	/** Current working directory - should be $MCAHOME */
 	static final File HOME = new File(".").getAbsoluteFile().getParentFile();
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
+	public void run() {
 		try {
-			new LibDBBuilder().buildDB();
+			buildDB();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Reads libdb.raw and creates libdb.txt
 	 */

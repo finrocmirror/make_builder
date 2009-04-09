@@ -1,19 +1,34 @@
-package tools.turbobuilder;
+package makebuilder.ext.mca;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import makebuilder.BuildEntity;
+import makebuilder.BuildFileLoader;
+import makebuilder.MakeFileBuilder;
+import makebuilder.SourceScanner;
+import makebuilder.SrcFile;
+import makebuilder.util.Files;
 
 /**
  * @author max
  *
  * This classes parses SConscripts
  */
-public class SConscript {
+public class SConscriptParser implements BuildFileLoader {
 
 	/** Short cut to file separator */
 	public static final String FS = File.separator;
+
+	@Override
+	public void process(SrcFile file, List<BuildEntity> result, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
+		if (file.getName().equals("SConscript")) {
+			result.addAll(parse(file, scanner, builder));
+		}
+	}
 	
 	/** 
 	 * parses SConscripts and returns a set of build entities 
@@ -22,13 +37,14 @@ public class SConscript {
 	 * @param tb MakefileBuilder entity
 	 * @return set of build entities
 	 */
-	public static Collection<BuildEntity> parse(File sconscript, MakeFileBuilder tb) throws Exception {
+	public static Collection<BuildEntity> parse(SrcFile sconscript, SourceScanner sources, MakeFileBuilder tb) throws Exception {
 		List<BuildEntity> result = new ArrayList<BuildEntity>();
-		List<String> lines = Files.readLines(sconscript);
+		List<String> lines = Files.readLines(sconscript.absolute);
 
 		int curLine = 0;
 
-		if (tb.opts.DEBUG_SCONSCRIPT_PARSING) {
+		final boolean DEBUG = MakeFileBuilder.getOptions().getProperty("DEBUG_SCONSCRIPT_PARSING") != null; 
+		if (DEBUG) {
 			System.out.println(sconscript);
 		}
 
@@ -42,18 +58,17 @@ public class SConscript {
 				if (line.contains(" MCALibrary(") || line.contains(" MCAProgram(") || line.contains(" MCAPlugin(")) {
 					BuildEntity be = null;
 					if (line.contains(" MCALibrary")) {
-						be = new MCALibrary(tb);
+						be = new MCALibrary();
 					} else if (line.contains(" MCAProgram(")) {
-						be = new MCAProgram(tb);
+						be = new MCAProgram();
 					} else {
-						be = new MCAPlugin(tb);
+						be = new MCAPlugin();
 					}
 					line = line.replace('"', '\'');
 					be.name = line.substring(line.indexOf("'") + 1, line.lastIndexOf("'"));
-					be.sconsID = line.substring(0, line.indexOf("=")).trim();
-					be.rootDir = sconscript.getParentFile();
-					be.sconscript = sconscript.getAbsolutePath().substring(MakeFileBuilder.HOME.getAbsolutePath().length() + 1);
-					if (tb.opts.DEBUG_SCONSCRIPT_PARSING) {
+					String sconsID = line.substring(0, line.indexOf("=")).trim();
+					be.buildFile = sconscript;
+					if (DEBUG) {
 						System.out.println("found build task " + be.toString());
 					}
 
@@ -64,11 +79,10 @@ public class SConscript {
 							continue;
 						}
 
-						if (s.contains(be.sconsID + ".BuildIt()")) {
+						if (s.contains(sconsID + ".BuildIt()")) {
 							try {
 								checkAllFilesExist(be);
 								result.add(be);
-								processCategories(be);
 							} catch (Exception e) { 
 								tb.printErrorLine(e.getMessage());
 								//e.printStackTrace();
@@ -80,7 +94,7 @@ public class SConscript {
 							break;
 						}
 
-						if (s.contains(be.sconsID + ".AddSourceFiles(\"\"\"")) {
+						if (s.contains(sconsID + ".AddSourceFiles(\"\"\"")) {
 							while(true) {
 								s = lines.get(curLine).trim();
 								curLine++;
@@ -94,31 +108,20 @@ public class SConscript {
 								if (s.length() < 1) {
 									continue;
 								}
-								if (s.endsWith(".cpp") || s.endsWith(".C")) {
-									be.cpps.add(s);
-									//be.hs.add(s.substring(0, s.lastIndexOf(".")) + ".h");
-								} else if (s.endsWith(".c")) {
-									be.cs.add(s.trim());
-									//be.hs.add(s.substring(0, s.lastIndexOf(".")) + ".h");
-								} else if (s.endsWith(".o")) {
-									be.os.add(s.trim());
-								} else if (s.endsWith(".ui")) {
-									be.uics.add(s.trim());
-								} else if (s.endsWith(".cu")) {
-									be.cudas.add(s.trim());
-								} else {
-									throw new Exception("Unrecogized source file format " + s);
-								}
+								SrcFile sf = sources.find(be.getRootDir().relative + File.separator + s.trim());
+								be.sources.add(sf);
+								
+								//be.sources.add(be.getRootDir().s.trim());
 							}
 						}
 
-						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddCudaFiles", be.cudas);
-						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddHeaderFiles", be.hs);
-						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddLibs", be.libs);
-						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddOptionalLibs", be.optionalLibs);
-						curLine = checkFor(sconscript, s, lines, curLine, be.sconsID, "AddUicFiles", be.uics);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddCudaFiles", be.sources);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddHeaderFiles", be.sources);
+						curLine = checkFor(sconscript.absolute, s, lines, curLine, sconsID, "AddLibs", be.libs);
+						curLine = checkFor(sconscript.absolute, s, lines, curLine, sconsID, "AddOptionalLibs", be.optionalLibs);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddUicFiles", be.sources);
 
-						if (s.contains(be.sconsID + ".build_env.Append")) {
+						if (s.contains(sconsID + ".build_env.Append")) {
 							while(!s.contains(")")) {
 								s += " " + lines.get(curLine);
 								curLine++;
@@ -149,14 +152,14 @@ public class SConscript {
 										if (val.startsWith("lib")) {
 											val = val.substring(3);
 										}
-										be.opts += " -l" + val;
+										be.opts.libs.add(val);
 									}
 									if (key.equals("LIBPATH")) {
-										be.opts += " -L" + val;
+										be.opts.libPaths.add(val);
 									}
 									if (key.equals("CPPPATH")) {
-										be.addIncludes.add(val);
-										be.opts += " -I" + val;
+										//be.addIncludes.add(val);
+										be.opts.includePaths.add(val);
 									}
 								}
 							}
@@ -180,51 +183,10 @@ public class SConscript {
 	 * @param be Build entity
 	 */
 	private static void checkAllFilesExist(BuildEntity be) throws Exception {
-		checkAllFilesExist(be, be.cs);
-		checkAllFilesExist(be, be.cpps);
-		checkAllFilesExist(be, be.uics);
-		checkAllFilesExist(be, be.cudas);
-		checkAllFilesExist(be, be.os);
-	}
-
-	/**
-	 * Check that all files in build entity List exist (throws Exception otherwise)
-	 * 
-	 * @param be Buile entity
-	 * @param cs List of files
-	 */
-	private static void checkAllFilesExist(BuildEntity be, List<String> cs) throws Exception {
-		for (String s : cs) {
-			File f = new File(be.rootDir.getAbsolutePath() + FS + s);
-			if (!f.exists()) {
-				throw new Exception("Skipping '" + be.name + "' because " + s + " doesn't exist. Please check SConscript.");
+		for (SrcFile s : be.sources) {
+			if (s == null) {
+				throw new FileNotFoundException("Skipping '" + be.name + "' because some source file doesn't exist. Please check SConscript.");
 			}
-		}
-	}
-
-	/**
-	 * Assign categories/makefile targets to build entity 
-	 * 
-	 * @param be Build entity
-	 */
-	private static void processCategories(BuildEntity be) {
-		String rootDir = be.rootDir.getAbsolutePath().substring(MakeFileBuilder.HOME.getAbsolutePath().length() + 1);
-		be.categories.add("all");
-		if (rootDir.startsWith("libraries") || rootDir.startsWith("tools")) {
-			be.categories.add("libs");
-		}
-		if (rootDir.startsWith("tools")) {
-			be.categories.add("tools");
-		}
-		if (rootDir.startsWith("libraries")) {
-			be.categories.add(rootDir.substring(rootDir.lastIndexOf(FS) + 1));
-		}
-		if (rootDir.startsWith("projects") || rootDir.startsWith("tools")) {
-			String project = rootDir.substring(rootDir.indexOf(FS) + 1);
-			if (project.contains(FS)) {
-				project = project.substring(0, project.indexOf(FS));
-			}
-			be.categories.add(project);
 		}
 	}
 
@@ -238,6 +200,15 @@ public class SConscript {
 		return s.replace(" (", "(").replace(" '", "'").replace(" \"", "\"");
 	}
 
+	private static int checkFor(SourceScanner sources, SrcFile sconscript, String s, List<String> lines, int curLine, String sconsID, String methodCall, List<SrcFile> resultList) {
+		List<String> tmp = new ArrayList<String>();
+		int result = checkFor(sconscript.absolute, s, lines, curLine, sconsID, methodCall, tmp);
+		for (String s2 : tmp) {
+			resultList.add(sources.find(sconscript.dir.relative + File.separator + s2));
+		}
+		return result;
+	}
+	
 	/**
 	 * Check Sconscript for string list - possibly extract it
 	 * 

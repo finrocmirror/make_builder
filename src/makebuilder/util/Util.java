@@ -1,10 +1,13 @@
-package tools.turbobuilder;
+package makebuilder.util;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import makebuilder.MakeFileBuilder;
+import makebuilder.libdb.LibDB;
 
 /**
  * @author max
@@ -14,7 +17,7 @@ import java.util.List;
 public class Util {
 
 	/**
-	 * Read all lines from a C++/Java file and remove all comments
+	 * Read all lines from a C++/Java file and remove all comments and strings
 	 * 
 	 * @param f File
 	 * @param setLineMacro set ling macros (currently only false)

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="turbobuilder">
+<project basedir="." default="build" name="makebuilder">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.5"/>
     <property name="source" value="1.5"/>
-    <path id="turbobuilder.classpath">
+    <path id="makebuilder.classpath">
         <pathelement location="bin"/>
-        <pathelement location="lib/bsh-2.0b4.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -26,13 +25,13 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="turbobuilder.classpath"/>
-            <include name="tools/**"/>
+            <classpath refid="makebuilder.classpath"/>
+            <include name="**"/>
         </javac>
     	<echo message="Creating jar"/>
     	<jar destfile="dist/build.jar"
     	     basedir="bin"
-        	 manifest="src/turbobuilder.mf"
+        	 manifest="src/makebuilder.mf"
     		 includes="**"
     	     excludes="**/*.txt, **/*.sh, **/*.h"
              filesonly="true"
