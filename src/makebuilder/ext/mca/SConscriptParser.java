@@ -11,6 +11,7 @@ import makebuilder.BuildFileLoader;
 import makebuilder.MakeFileBuilder;
 import makebuilder.SourceScanner;
 import makebuilder.SrcFile;
+import makebuilder.handler.MakeXMLLoader;
 import makebuilder.util.Files;
 
 /**
@@ -26,7 +27,7 @@ public class SConscriptParser implements BuildFileLoader {
 	@Override
 	public void process(SrcFile file, List<BuildEntity> result, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
 		if (file.getName().equals("SConscript")) {
-			if (scanner.find(file.dir.relative + FS + "make.xml") != null) { // favour make.xml files
+			if (scanner.find(file.dir.relative + FS + MakeXMLLoader.MAKE_XML_NAME) != null) { // favour make.xml files
 				return;
 			}
 			result.addAll(parse(file, scanner, builder));

@@ -47,10 +47,13 @@ public class CCOptions {
 	 * @param options Options as string (will be parsed)
 	 */
 	public void addOptions(String options) {
-		String[] opts = options.split("\\s-");
-		for (String opt : opts) {
-			addOption(opt.startsWith("-") ? opt : "-" + opt);
-		}		
+		if (options != null) {
+			String[] opts = options.split("\\s-");
+			for (String opt : opts) {
+				opt = opt.trim();
+				addOption(opt.startsWith("-") ? opt : "-" + opt);
+			}
+		}
 	}
 	
 	/**

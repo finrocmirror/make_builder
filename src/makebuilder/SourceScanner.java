@@ -258,6 +258,16 @@ public class SourceScanner {
 		return find(dir.relative + File.separator + filename);
 	}
 
+	/**
+	 * Return all files whose relative name starts with specified string
+	 * 
+	 * @param startString Specified string
+	 * @return List of source files
+	 */
+	public Collection<SrcFile> getAllFilesStartingWith(String startString) {
+		String endString = startString.substring(0, startString.length() - 1) + (startString.charAt(startString.length() - 1) + 1);
+		return files.subMap(startString, endString).values();
+	}
 	
 //	/**
 //	 * Create and initialize h file cache
