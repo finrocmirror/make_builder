@@ -41,7 +41,7 @@ public class SrcFile implements Serializable {
 	/** True, if properties/dependencies were cached and loaded from last run and file has not changed in the mean-time */ 
 	private transient boolean infoCachedAndUpToDate = false;
 
-	/** Other source files that this file directly depends on - as parsed from file*/
+	/** Other source files that this file directly depends on - as parsed from file */
 	public final List<String> rawDependencies = new ArrayList<String>();
 	
 	/** Other source files that this file directly depends on - resolved */
@@ -233,7 +233,7 @@ public class SrcFile implements Serializable {
 
 	/**
 	 * Resolve dependencies (rawDependencies => dependencies)
-	 * (looks for them in standard include paths)
+	 * (looks for "raw dependencies" in standard include paths)
 	 * 
 	 * @param ignoreMissing Ignore dependencies that cannot be found (instead of throwing an exception) ?
 	 */

@@ -37,7 +37,7 @@ public abstract class BuildEntity {
 	/** Involved libraries */
 	public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscrip)t
 	public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript)
-	public final List<LibDB.ExtLib> extlibs = new ArrayList<LibDB.ExtLib>(); // resolved external libraries in libs (and available ones in optionalLibs)
+	public final List<LibDB.ExtLib> extlibs = new ArrayList<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs)
 	public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
 	public final List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>(); // resolved optional local (mca2) dependencies (from optionalLibs)
 
