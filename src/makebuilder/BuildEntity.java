@@ -6,9 +6,12 @@ package makebuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import makebuilder.libdb.LibDB;
 import makebuilder.util.CCOptions;
+import makebuilder.util.ToStringComparator;
 
 /**
  * @author max
@@ -37,7 +40,7 @@ public abstract class BuildEntity {
 	/** Involved libraries */
 	public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscrip)t
 	public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript)
-	public final List<LibDB.ExtLib> extlibs = new ArrayList<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs)
+	public final SortedSet<LibDB.ExtLib> extlibs = new TreeSet<LibDB.ExtLib>(ToStringComparator.instance); // resolved external libraries (from libs and available ones in optionalLibs)
 	public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
 	public final List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>(); // resolved optional local (mca2) dependencies (from optionalLibs)
 
@@ -61,6 +64,10 @@ public abstract class BuildEntity {
 		return name;
 	}
 
+	public boolean isLibrary() {
+		return getTarget().endsWith(".so");
+	}
+	
 	/**  
 	 * Determine, whether build entity can be built.
 	 * missingDep is set accordingly 
@@ -114,11 +121,7 @@ public abstract class BuildEntity {
 	 * @param extLibs2 List of external libraries
 	 */
 	private void mergeExtLibs(List<LibDB.ExtLib> extLibs2) {
-		for (LibDB.ExtLib s : extlibs) {
-			if (!extLibs2.contains(s)) {
-				extLibs2.add(s);
-			}
-		}
+		extLibs2.addAll(extlibs);
 		for (BuildEntity be : dependencies) {
 			be.mergeExtLibs(extLibs2);
 		}
@@ -192,6 +195,7 @@ public abstract class BuildEntity {
 				return;
 			}
 		}
+		
 		// not found...
 		if (!optional) {
 			missingDep = true;

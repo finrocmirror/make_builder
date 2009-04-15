@@ -168,7 +168,7 @@ public class SourceScanner {
 			System.out.print("Loading cached file info... ");
 			Object result = ois.readObject();
 			ois.close();
-			System.out.print("done");
+			System.out.println("done");
 			return (SortedMap<String, SrcFile>)result;
 		} catch (Exception e) {
 			return null;

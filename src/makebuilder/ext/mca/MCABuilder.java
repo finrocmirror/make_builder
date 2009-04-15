@@ -30,6 +30,9 @@ public class MCABuilder extends MakeFileBuilder {
 	/** Standard compiler options for MCA */
 	public static final String MCAOPTS = "-include Makefile.h -Ilibraries -Iprojects -Itools -I. ";
 
+	/** System library installation handler */
+	public final MCASystemLibLoader systemInstall;
+	
 	public MCABuilder() {
 		super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
 
@@ -57,6 +60,16 @@ public class MCABuilder extends MakeFileBuilder {
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
 				"-lm -lz -lcrypt -lpthread -lstdc++ -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
+		
+		// generate library info files?
+		if (getOptions().containsKey("generateinfo")) {
+			makefile.addVariable("TARGET_INFO=$(TARGET_DIR)/info");
+			addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
+		}
+		
+		// is MCA installed system-wide?
+		systemInstall = new MCASystemLibLoader();
+		addHandler(systemInstall);
 	}
 
 	@Override
@@ -65,6 +78,16 @@ public class MCABuilder extends MakeFileBuilder {
 		dir.defaultIncludePaths.add(sources.findDir("projects", true));
 		dir.defaultIncludePaths.add(sources.findDir("libraries", true));
 		dir.defaultIncludePaths.add(sources.findDir("tools", true));
+		
+		// add system include paths - in case MCA is installed system-wide
+		if (systemInstall.systemInstallExists) {
+			String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
+			dir.defaultIncludePaths.add(sources.findDir(p, true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/projects", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/libraries", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/tools", true));
+		}
+		
 		if (dir.relative.startsWith(tempBuildPath.relative)) {
 			return;
 		}

@@ -36,8 +36,12 @@ public class Makefile {
 
 	/** Directories that targets are built to. Will be remove with make clean command */
 	private final String[] buildDirs;
-	
+
+	/** PHONY target for building everything */
 	private final Target all = new Target("all");
+	
+	/** Dummy target - can be useful for certain non-standard stuff - will not be added to any makefile */
+	public final Target DUMMY_TARGET = new Target("dummy target");
 	
 	/**
 	 * @param buildDirs Directories that targets are built to. Will be remove with make clean command
@@ -87,6 +91,7 @@ public class Makefile {
 		for (String s : buildDirs) {
 			clean.addCommand("rm -R -f " + s, true);
 		}
+		clean.addCommand(SourceScanner.CACHE_FILE, true);
 		clean.writeTo(ps);
 		
 //		// write 'init' target
@@ -173,6 +178,9 @@ public class Makefile {
 		
 		/** Target dependencies */
 		private final TreeSet<String> dependencies = new TreeSet<String>();
+
+		/** Order-only Target dependencies */
+		private final TreeSet<String> ooDependencies = new TreeSet<String>();
 		
 		/** commands to execute in target */
 		private final List<String> commands = new ArrayList<String>();
@@ -186,6 +194,13 @@ public class Makefile {
 		private void writeTo(PrintStream ps) {
 			ps.print(name + " :");
 			for (String dep : dependencies) {
+				ps.print(" ");
+				ps.print(dep);
+			}
+			if (!ooDependencies.isEmpty()) {
+				ps.print(" |");
+			}
+			for (String dep : ooDependencies) {
 				ps.print(" ");
 				ps.print(dep);
 			}
@@ -280,6 +295,15 @@ public class Makefile {
 		 */
 		public String getName() {
 			return name;
+		}
+
+		/**
+		 * Add order-only dependency to target (see GNU-make documentation for details)
+		 * 
+		 * @param dep Name of dependency (toString() will be called on object)
+		 */
+		public void addOrderOnlyDependency(Object dep) {
+			ooDependencies.add(dep.toString());
 		}
 	}
 }

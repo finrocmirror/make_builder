@@ -1,5 +1,6 @@
 package makebuilder.util;
 
+import java.util.Comparator;
 import java.util.TreeSet;
 
 /**
@@ -7,8 +8,10 @@ import java.util.TreeSet;
  * 
  * This is a helper class to deal with calls to the C Compiler.
  * It wraps a set of GCC command line options.
+ * 
+ * (implements String comparator for better path sorting: local paths should be output first)
  */
-public class CCOptions {
+public class CCOptions implements Comparator<String> {
 
 	/** C++ Options that are only relevant for linking */
 	public final static String[] LINK_ONLY_OPTIONS = new String[]{"-shared"};
@@ -20,10 +23,10 @@ public class CCOptions {
 	public final TreeSet<String> libs = new TreeSet<String>();
 
 	/** Librariy paths */
-	public final TreeSet<String> libPaths = new TreeSet<String>();
+	public final TreeSet<String> libPaths = new TreeSet<String>(this);
 
 	/** Include paths */
-	public final TreeSet<String> includePaths = new TreeSet<String>();
+	public final TreeSet<String> includePaths = new TreeSet<String>(this);
 
 	/** Common options for compiling and linking */
 	public final TreeSet<String> options = new TreeSet<String>();
@@ -197,6 +200,16 @@ public class CCOptions {
 	public static String cleanCommand(String s) {
 		s = s.replace("  ", " ");
 		return s;
+	}
+
+	@Override
+	public int compare(String s1, String s2) {
+		if (s1.startsWith("/") && (!s2.startsWith("/"))) {
+			return 1;
+		} else if (!s1.startsWith("/") && s2.startsWith("/")) {
+			return -1;
+		}
+		return s1.compareTo(s2);
 	}
 }
 
