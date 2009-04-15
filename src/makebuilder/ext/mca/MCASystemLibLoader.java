@@ -45,8 +45,8 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
 		File i2 = new File("/usr/local" + MCA_SYSTEM_INFO_DIR);
 		MCA_SYSTEM_INCLUDE = h1.exists() ? h1 : (h2.exists() ? h2 : null);
 		MCA_SYSTEM_INFO = i1.exists() ? i1 : (i2.exists() ? i2 : null);
-		MCA_SYSTEM_LIB = new File(MCA_SYSTEM_INFO.getParentFile().getParent() + "/lib");
 		systemInstallExists = (MCA_SYSTEM_INCLUDE != null && MCA_SYSTEM_INFO != null);
+		MCA_SYSTEM_LIB = systemInstallExists ? new File(MCA_SYSTEM_INFO.getParentFile().getParent() + "/lib") : null;
 	}
 	
 	@Override
