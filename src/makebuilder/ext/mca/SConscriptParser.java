@@ -113,17 +113,20 @@ public class SConscriptParser implements BuildFileLoader {
 									continue;
 								}
 								SrcFile sf = sources.find(be.getRootDir().relative + File.separator + s.trim());
+								if (sf == null) {
+									tb.printErrorLine(sconscript.relative + ": Cannot find " + s.trim());
+								}
 								be.sources.add(sf);
 								
 								//be.sources.add(be.getRootDir().s.trim());
 							}
 						}
 
-						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddCudaFiles", be.sources);
-						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddHeaderFiles", be.sources);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddCudaFiles", be.sources, tb);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddHeaderFiles", be.sources, tb);
 						curLine = checkFor(sconscript.absolute, s, lines, curLine, sconsID, "AddLibs", be.libs);
 						curLine = checkFor(sconscript.absolute, s, lines, curLine, sconsID, "AddOptionalLibs", be.optionalLibs);
-						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddUicFiles", be.sources);
+						curLine = checkFor(sources, sconscript, s, lines, curLine, sconsID, "AddUicFiles", be.sources, tb);
 
 						if (s.contains(sconsID + ".build_env.Append")) {
 							while(!s.contains(")")) {
@@ -204,11 +207,15 @@ public class SConscriptParser implements BuildFileLoader {
 		return s.replace(" (", "(").replace(" '", "'").replace(" \"", "\"");
 	}
 
-	private static int checkFor(SourceScanner sources, SrcFile sconscript, String s, List<String> lines, int curLine, String sconsID, String methodCall, List<SrcFile> resultList) {
+	private static int checkFor(SourceScanner sources, SrcFile sconscript, String s, List<String> lines, int curLine, String sconsID, String methodCall, List<SrcFile> resultList, MakeFileBuilder tb) {
 		List<String> tmp = new ArrayList<String>();
 		int result = checkFor(sconscript.absolute, s, lines, curLine, sconsID, methodCall, tmp);
 		for (String s2 : tmp) {
-			resultList.add(sources.find(sconscript.dir.relative + File.separator + s2));
+			SrcFile sf = sources.find(sconscript.dir.relative + File.separator + s2);
+			if (sf == null) {
+				tb.printErrorLine(sconscript.relative + ": Cannot find " + s2.trim());
+			}
+			resultList.add(sf);
 		}
 		return result;
 	}

@@ -56,7 +56,7 @@ public class Qt4Handler extends SourceFileHandler.Impl {
 			if (file.hasMark("moc")) {  
 				BuildEntity be = file.getOwner();
 				if (be == null) { // we don't know where generated code belongs
-					System.out.println("warning: found qt macros in " + file.relative + " but don't know which build entity it belongs to => won't process it");
+					//System.out.println("warning: found qt macros in " + file.relative + " but don't know which build entity it belongs to => won't process it");
 					return;
 				}
 

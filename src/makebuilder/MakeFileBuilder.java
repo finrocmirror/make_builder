@@ -49,7 +49,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 	public final SrcDir tempPath;
 	
 	/** Makefile */
-	protected final Makefile makefile;
+	public final Makefile makefile;
 
 //	/** Categorization of make targets (Target/Category => dependencies) */
 //	private final SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
@@ -134,7 +134,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 		
 		// read/process/cache source files
 		System.out.println("Caching and processing local source files...");
-		sources.scan(makefile, buildFileLoaders, contentHandlers, getSourceDirs());
+		sources.scan(makefile, buildFileLoaders, contentHandlers, true, getSourceDirs());
 		
 		// find local dependencies in "external libraries"
 		LibDB.findLocalDependencies(buildEntities);

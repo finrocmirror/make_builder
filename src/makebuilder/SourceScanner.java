@@ -74,9 +74,10 @@ public class SourceScanner {
 	 * @param makefile Makefile - to add entries for descriptionbuilder, uic etc.
 	 * @param loaders List of BuildFileLoaders to execute
 	 * @param handler List of SourceFileHandlers to execute
+	 * @param useCache Use cache for file information?
 	 * @param sourceDirs Relative source directories
 	 */
-	public void scan(Makefile makefile, Collection<BuildFileLoader> loaders, Collection<SourceFileHandler> handlers, String... sourceDirs) {
+	public void scan(Makefile makefile, Collection<BuildFileLoader> loaders, Collection<SourceFileHandler> handlers, boolean useCache, String... sourceDirs) {
 	
 		// find/register all source directories and files
 		LinkedList<SrcDir> dirsToScan = new LinkedList<SrcDir>();
@@ -106,10 +107,12 @@ public class SourceScanner {
 		needIncludePaths = null;
 		
 		// load and apply cached information about files
-		SortedMap<String, SrcFile> cachedFileInfo = loadCachedInfo();
-		if (cachedFileInfo != null) {
-			for (SrcFile sf : files.values()) {
-				sf.applyCachedInfo(cachedFileInfo.get(sf.relative));
+		if (useCache) {
+			SortedMap<String, SrcFile> cachedFileInfo = loadCachedInfo();
+			if (cachedFileInfo != null) {
+				for (SrcFile sf : files.values()) {
+					sf.applyCachedInfo(cachedFileInfo.get(sf.relative));
+				}
 			}
 		}
 		
@@ -151,9 +154,11 @@ public class SourceScanner {
 		}
 		
 		// save cached info
-		System.out.print("Saving cache... ");
-		saveCachedInfo();
-		System.out.println("done");
+		if (useCache) {
+			System.out.print("Saving cache... ");
+			saveCachedInfo();
+			System.out.println("done");
+		}
 	}
 	
 	/** 
@@ -267,6 +272,20 @@ public class SourceScanner {
 	public Collection<SrcFile> getAllFilesStartingWith(String startString) {
 		String endString = startString.substring(0, startString.length() - 1) + (startString.charAt(startString.length() - 1) + 1);
 		return files.subMap(startString, endString).values();
+	}
+
+	/**
+	 * @return Collection of all source files
+	 */
+	public Collection<SrcFile> getAllFiles() {
+		return files.values();
+	}
+
+	/**
+	 * @return Collection of all processed directories
+	 */
+	public Collection<SrcDir> getAllDirs() {
+		return dirs.values();
 	}
 	
 //	/**

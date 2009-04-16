@@ -51,7 +51,7 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
 			} else if (file.hasMark("DESCR")) {
 				BuildEntity be = file.getOwner();
 				if (be == null) { // we don't know where generated code belongs
-					System.out.println("warning: found DESCR macros in " + file.relative + " but don't know which build entity it belongs to => won't process it");
+					//System.out.println("warning: found DESCR macros in " + file.relative + " but don't know which build entity it belongs to => won't process it");
 					return;
 				}
 
