@@ -129,7 +129,7 @@ public class SrcFile implements Serializable {
 	 */
 	public String getExtension() {
 		String n = absolute.getName();
-		return n.contains(".") ? n.substring(n.indexOf(".") + 1) : n;
+		return n.contains(".") ? n.substring(n.lastIndexOf(".") + 1) : n;
 	}
 	
 	/**
