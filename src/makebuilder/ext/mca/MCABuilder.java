@@ -60,16 +60,20 @@ public class MCABuilder extends MakeFileBuilder {
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
 				"-lm -lz -lcrypt -lpthread -lstdc++ -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
-		
-		// generate library info files?
-		if (getOptions().containsKey("generateinfo")) {
-			makefile.addVariable("TARGET_INFO=$(TARGET_DIR)/info");
-			addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
-		}
-		
+
 		// is MCA installed system-wide?
 		systemInstall = new MCASystemLibLoader();
 		addHandler(systemInstall);
+		
+		// generate library info files?
+		if (getOptions().containsKey("systeminstall")) {
+			makefile.addVariable("TARGET_INFO=$(TARGET_DIR)/info");
+			makefile.addVariable("TARGET_INCLUDE=$(TARGET_DIR)/include");
+			makefile.addVariable("TARGET_ETC=$(TARGET_DIR)/etc");
+			addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
+			addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
+			addHandler(new EtcDirCopier("$(TARGET_ETC)"));
+		}
 	}
 
 	@Override

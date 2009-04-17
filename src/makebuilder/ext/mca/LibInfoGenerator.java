@@ -19,6 +19,8 @@ import makebuilder.util.ToStringComparator;
  * This information currently includes the required closures for compiling this library 
  * (and using its headers!).
  * Output is one file per .so: <target-name> + ".info"
+ * 
+ * (MCA-specific; only needed for system-installs) 
  */
 public class LibInfoGenerator extends SourceFileHandler.Impl {
 
