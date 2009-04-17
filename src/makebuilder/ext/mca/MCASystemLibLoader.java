@@ -33,10 +33,10 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
 	public final boolean systemInstallExists;
 	
 	/** relative mca system-include path */
-	public static final String MCA_SYSTEM_INCLUDE_DIR = "/include/mca";
+	public static final String MCA_SYSTEM_INCLUDE_DIR = "/include/mca2";
 
 	/** relative mca system-lib-info path */
-	public static final String MCA_SYSTEM_INFO_DIR = "/share/mca";
+	public static final String MCA_SYSTEM_INFO_DIR = "/share/mca2/info";
 
 	public MCASystemLibLoader() {
 		File h1 = new File("/usr" + MCA_SYSTEM_INCLUDE_DIR);
@@ -46,7 +46,7 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
 		MCA_SYSTEM_INCLUDE = h1.exists() ? h1 : (h2.exists() ? h2 : null);
 		MCA_SYSTEM_INFO = i1.exists() ? i1 : (i2.exists() ? i2 : null);
 		systemInstallExists = (MCA_SYSTEM_INCLUDE != null && MCA_SYSTEM_INFO != null);
-		MCA_SYSTEM_LIB = systemInstallExists ? new File(MCA_SYSTEM_INFO.getParentFile().getParent() + "/lib") : null;
+		MCA_SYSTEM_LIB = systemInstallExists ? new File(MCA_SYSTEM_INCLUDE.getParentFile().getParent() + "/lib") : null;
 	}
 	
 	@Override
