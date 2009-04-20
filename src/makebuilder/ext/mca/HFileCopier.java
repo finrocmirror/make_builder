@@ -33,7 +33,7 @@ public class HFileCopier extends SourceFileHandler.Impl {
 		copied = true;
 		
 		for (SrcFile sf : builder.getSources().getAllFiles()) {
-			if (sf.hasExtension("h", "hpp")) {
+			if (sf.hasExtension("h", "hpp", "cc", "inl")) { // .cc and .inl because we have such headers in the mca repositories :-/
 				String tmp = sf.relative;
 				if (tmp.startsWith(builder.tempBuildPath.relative)) {
 					tmp = tmp.substring(builder.tempBuildPath.relative.length() + 1);
