@@ -43,7 +43,7 @@ public class HFileCopier extends SourceFileHandler.Impl {
 					Makefile.Target t = makefile.addTarget(target, false);
 					t.addDependency(sf);
 					t.addCommand("cp " + sf.relative + " " + target, true);
-					t.addToPhony("sysinstall", "libs", "tools");
+					t.addToPhony("sysinstall");
 				}
 			}
 		}

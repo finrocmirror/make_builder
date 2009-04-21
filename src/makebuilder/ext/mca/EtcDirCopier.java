@@ -29,7 +29,7 @@ public class EtcDirCopier extends SourceFileHandler.Impl {
 				Makefile.Target t = makefile.addTarget(target, false);
 				t.addDependency(file);
 				t.addCommand("cp " + file.relative + " " + target, true);
-				t.addToPhony("sysinstall", "libs", "tools");
+				t.addToPhony("sysinstall");
 			}
 		}
 	}

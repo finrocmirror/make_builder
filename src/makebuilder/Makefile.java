@@ -129,12 +129,13 @@ public class Makefile {
 	 * @param name Target Name
 	 * @param dependencies Dependencies
 	 */
-	public void addPhonyTarget(String name, String... dependencies) {
+	public Target addPhonyTarget(String name, String... dependencies) {
 		Target t = new Target(name);
 		for (String s : dependencies) {
 			t.dependencies.add(s);
 		}
 		phonyTargets.put(name, t);
+		return t;
 	}
 	
 	/**

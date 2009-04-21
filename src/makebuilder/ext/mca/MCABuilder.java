@@ -7,6 +7,7 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
+import makebuilder.Makefile.Target;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.CppMerger;
 import makebuilder.handler.MakeXMLLoader;
@@ -73,6 +74,8 @@ public class MCABuilder extends MakeFileBuilder {
 			addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
 			addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
 			addHandler(new EtcDirCopier("$(TARGET_ETC)"));
+			Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools");
+			t.addCommand("echo success > $(TARGET_DIR)/success", true);
 		}
 	}
 
