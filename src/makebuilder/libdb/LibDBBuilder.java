@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import makebuilder.MakeFileBuilder;
 import makebuilder.util.Files;
 import makebuilder.util.GCC;
 import makebuilder.util.Util;
@@ -25,6 +26,9 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 
 	/** Current working directory - should be $MCAHOME */
 	static final File HOME = new File(".").getAbsoluteFile().getParentFile();
+
+	/** List with preferred paths for libraries */
+	static final List<String> preferredPaths = new ArrayList<String>();
 	
 	public void run() {
 		try {
@@ -41,6 +45,15 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 
         System.out.println("Found GCC version: " + GCC_VERSION);
 
+        // parse preferred paths
+        String[] preferred = MakeFileBuilder.getOptions().getProperty("prefer", "").split("\\s");
+        for (String pref : preferred) {
+        	pref = pref.trim();
+        	if (pref.length() > 0) {
+        		preferredPaths.add(pref);
+        	}
+        }
+        
 		// read raw db
 		List<String> rawLibDB = Files.readLines(Util.getFileInEtcDir("libdb.raw"));
 		String searchDirString = rawLibDB.remove(0);
@@ -230,6 +243,12 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 		boolean allInGCCDir = true;
 		boolean someInGCCDir = true;
 		for (File dir : candidateDirs) {
+			for (String pref : preferredPaths) {
+				if (dir.getAbsolutePath().startsWith(pref)) {
+					return pref;
+				}
+			}
+			
 			if (dir.getAbsolutePath().equals(defaultDir1) || dir.getAbsolutePath().equals(defaultDir2)) {
 				return null;
 			}
