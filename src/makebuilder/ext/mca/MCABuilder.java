@@ -63,8 +63,12 @@ public class MCABuilder extends MakeFileBuilder {
 				!opts.combineCppFiles));
 
 		// is MCA installed system-wide?
-		systemInstall = new MCASystemLibLoader();
-		addHandler(systemInstall);
+		if (getOptions().containsKey("usesysteminstall")) {
+			systemInstall = new MCASystemLibLoader();
+			addHandler(systemInstall);
+		} else {
+			systemInstall = null;
+		}
 		
 		// generate library info files?
 		if (getOptions().containsKey("systeminstall")) {
@@ -87,7 +91,7 @@ public class MCABuilder extends MakeFileBuilder {
 		dir.defaultIncludePaths.add(sources.findDir("tools", true));
 		
 		// add system include paths - in case MCA is installed system-wide
-		if (systemInstall.systemInstallExists) {
+		if (systemInstall != null && systemInstall.systemInstallExists) {
 			String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
 			dir.defaultIncludePaths.add(sources.findDir(p, true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/projects", true));
