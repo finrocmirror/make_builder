@@ -35,7 +35,8 @@ public class NvccHandler extends SourceFileHandler.Impl {
 
 	@Override
 	public void init(Makefile makefile) {
-		makefile.addVariable("NVCC_OPTS=" + compileOptions);
+		makefile.addVariable("NVCC_FLAGS=" + compileOptions);
+		makefile.addVariable("NVCC=nvcc");
 	}
 	
 	@Override
@@ -54,7 +55,7 @@ public class NvccHandler extends SourceFileHandler.Impl {
 		// create nvcc compiler options
 		CCOptions options = new CCOptions();
 		options.merge(be.opts);
-		options.compileOptions.add("$(NVCC_OPTS)");
+		options.compileOptions.add("$(NVCC_FLAGS)");
 		for (SrcDir path : be.getRootDir().defaultIncludePaths) {
 			options.includePaths.add(path.relative);
 		}
@@ -69,7 +70,7 @@ public class NvccHandler extends SourceFileHandler.Impl {
 				be.sources.add(ofile);
 				dependencyBuffer.clear();
 				target.addDependencies(sf.getAllDependencies(dependencyBuffer));
-				target.addCommand("nvcc -c -o " + ofile.relative + " " + sf.relative + " " + options.createCudaString(), true);
+				target.addCommand("$(NVCC) -c -o " + ofile.relative + " " + sf.relative + " " + options.createCudaString(), true);
 			}
 		}
 	}

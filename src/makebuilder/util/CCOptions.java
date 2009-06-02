@@ -148,7 +148,7 @@ public class CCOptions implements Comparator<String> {
 	public String createCudaString() {
 		String result = "";
 		for (String s : compileOptions) {
-			if (s.startsWith("-D")) {
+			if (s.startsWith("-D") || s.startsWith("$")) {
 				result += " " + s;
 			}
 		}

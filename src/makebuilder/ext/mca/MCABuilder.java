@@ -53,7 +53,7 @@ public class MCABuilder extends MakeFileBuilder {
 		addLoader(new SConscriptParser());
 		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class));
 		addHandler(new Qt4Handler());
-		addHandler(new NvccHandler("-include Makefile.h"));
+		addHandler(new NvccHandler(""/*"-include Makefile.h"*/));
 		addHandler(new DescriptionBuilderHandler());
 		if (getOptions().combineCppFiles) {
 			addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
