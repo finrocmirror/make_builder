@@ -88,18 +88,23 @@ public class CppHandler implements SourceFileHandler {
 	 */
 	public static void processIncludes(SrcFile file, SourceScanner sources) {
 		for (String line : file.getCppLines()) {
+			String orgLine = line;
 			if (line.trim().startsWith("#")) {
 				line = line.substring(1).trim();
-				if (line.startsWith("include")) {
-					line = line.substring(7).trim();
-					if (line.startsWith("\"")) {
-						line = line.substring(1, line.lastIndexOf("\""));
-					} else if (line.startsWith("<")) {
-						line = line.substring(1, line.indexOf(">"));
-					} else {
-						throw new RuntimeException("Error getting include string");
+				try {
+					if (line.startsWith("include")) {
+						line = line.substring(7).trim();
+						if (line.startsWith("\"")) {
+							line = line.substring(1, line.lastIndexOf("\""));
+						} else if (line.startsWith("<")) {
+							line = line.substring(1, line.indexOf(">"));
+						} else {
+							throw new RuntimeException("Error getting include string");
+						}
+						file.rawDependencies.add(line);
 					}
-					file.rawDependencies.add(line);
+				} catch (Exception e) {
+					throw new RuntimeException("Error while parsing include file. Line was: " + orgLine);
 				}
 			}
 		}	
