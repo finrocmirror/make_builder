@@ -58,7 +58,7 @@ qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -I<QtWebKit/
 qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
 qt4_no_debug: -D QT_NO_DEBUG_OUTPUT
 qt4_no_warning: -D QT_NO_WARNING_OUTPUT
-quarter:    -lQuarter
+quarter:    -I<Quarter/QtCoinCompatibility.h> -lQuarter
 qwt:        -lqwt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 sndfile:    -I<sndfile.h> -lsndfile
