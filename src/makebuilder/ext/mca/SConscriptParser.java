@@ -167,7 +167,11 @@ public class SConscriptParser implements BuildFileLoader {
 									} else {
 										values = value.split(",");
 										for (int j = 0; j < values.length; j++) {
-											values[j] = values[j].substring(values[j].indexOf("'") + 1, values[j].lastIndexOf("'"));
+											if (values[j].contains("'")) {
+												values[j] = values[j].substring(values[j].indexOf("'") + 1, values[j].lastIndexOf("'"));
+											} else if (values[j].contains("\"")) {
+												values[j] = values[j].substring(values[j].indexOf("\"") + 1, values[j].lastIndexOf("\""));
+											}
 										}
 									}
 								} else {
@@ -187,10 +191,27 @@ public class SConscriptParser implements BuildFileLoader {
 									}
 									if (key.equals("CPPPATH")) {
 										//be.addIncludes.add(val);
-										be.opts.includePaths.add(val);
+										be.opts.includePaths.add(sconscript.dir.relative + FS + val);
 									}
 								}
 							}
+						} else if (s.contains(sconsID + ".build_env")) { // maybe something like  sopas_com.build_env ['CPPPATH'] = "../../Include/"
+							String[] s2 = s.split("=");
+							String key = s2[0].substring(s2[0].indexOf("'") + 1, s2[0].lastIndexOf("'"));
+							String val = s2[1].substring(s2[1].indexOf("\"") + 1, s2[1].lastIndexOf("\""));
+							if (key.equals("LIBS")) {
+								if (val.startsWith("lib")) {
+									val = val.substring(3);
+								}
+								be.opts.libs.add(val);
+							}
+							if (key.equals("LIBPATH")) {
+								be.opts.libPaths.add(val);
+							}
+							if (key.equals("CPPPATH")) {
+								//be.addIncludes.add(val);
+								be.opts.includePaths.add(sconscript.dir.relative + FS + val);
+							}							
 						}
 					}
 				}
