@@ -185,13 +185,14 @@ public class SConscriptParser implements BuildFileLoader {
 											val = val.substring(3);
 										}
 										be.opts.libs.add(val);
-									}
-									if (key.equals("LIBPATH")) {
-										be.opts.libPaths.add(val);
-									}
-									if (key.equals("CPPPATH")) {
-										//be.addIncludes.add(val);
-										be.opts.includePaths.add(sconscript.dir.relative + FS + val);
+									} else {
+										val = processPath(sconscript, val);
+										if (key.equals("LIBPATH")) {
+											be.opts.libPaths.add(val);
+										}
+										if (key.equals("CPPPATH")) {
+											be.opts.includePaths.add(val);
+										}
 									}
 								}
 							}
@@ -204,14 +205,15 @@ public class SConscriptParser implements BuildFileLoader {
 									val = val.substring(3);
 								}
 								be.opts.libs.add(val);
+							} else {
+								val = processPath(sconscript, val);
+								if (key.equals("LIBPATH")) {
+									be.opts.libPaths.add(val);
+								}
+								if (key.equals("CPPPATH")) {
+									be.opts.includePaths.add(val);
+								}
 							}
-							if (key.equals("LIBPATH")) {
-								be.opts.libPaths.add(val);
-							}
-							if (key.equals("CPPPATH")) {
-								//be.addIncludes.add(val);
-								be.opts.includePaths.add(sconscript.dir.relative + FS + val);
-							}							
 						}
 					}
 				}
@@ -224,6 +226,22 @@ public class SConscriptParser implements BuildFileLoader {
 		}
 		
 		return result;
+	}
+
+	/**
+	 * Process path specified in SConscript
+	 * (possibly prepends location of SConscript)
+	 * 
+	 * @param sconscript Sconscript
+	 * @param path Path specified in SConscript
+	 * @return Processed path
+	 */
+	private static String processPath(SrcFile sconscript, String path) {
+		if (path.startsWith(File.separator)) {
+			return path;
+		} else {
+			return sconscript.dir.relative + FS + path;
+		}
 	}
 
 	/**
