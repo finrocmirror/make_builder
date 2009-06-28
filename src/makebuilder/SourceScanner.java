@@ -281,7 +281,18 @@ public class SourceScanner {
 	 * @return SrcFile instance if file exists - otherwise null
 	 */
 	public SrcFile find(SrcDir dir, String filename) {
-		return find(dir.relative + File.separator + filename);
+		String s = dir.relative.equals(".") ? filename : dir.relative + File.separator + filename; // string we're looking for
+		s.replace("/./", "/");
+		
+		// eliminate any ".." in filename
+		while(s.contains("/../")) {
+			int i = s.indexOf("/../");
+			String part1 = s.substring(0, i);
+			String part2 = s.substring(i + 4);
+			s = (part1.contains("/") ? part1.substring(0, part1.lastIndexOf("/") + 1) : "") + part2;
+		}
+		
+		return find(s);
 	}
 
 	/**
