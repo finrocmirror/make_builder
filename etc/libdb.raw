@@ -35,7 +35,6 @@ loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -l
 lxrt:       N/A
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -lNewton
-newton2:    -lNewton2
 nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h','FEDM_Functions.h','FEDM_ISCReader.h','FEDM_ISCReaderID_LRU1000.h','FEDM_ISOTabItem.h','fefu.h','FEDM_Base.h','FEDM.h','FEDM_ISCReaderID.h','FEDM_ISCReaderID_LRU2000.h','FEDM_XmlBase.h','feisc.h','FEDM_BRMTabItem.h','FEDM_ISCFunctionUnit.h','FEDM_ISCReaderID_LR2000.h','FEDM_ISCReaderID_MR200.h','FEDM_Xml.h','fetcp.h','FEDM_DataBase.h','FEDM_ISCFunctionUnitID.h','FEDM_ISCReaderID_LR200.h','FEDM_ISCReaderModule.h','FEDM_XmlReaderCfgDataModul.h','feusb.h'>
 ode:        -I<ode/ode.h> -lode
