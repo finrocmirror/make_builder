@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import makebuilder.MakeFileBuilder;
 import makebuilder.util.Files;
@@ -105,7 +108,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 		}
 
 		// create new db
-		List<String> newLibDB = new ArrayList<String>();
+		SortedMap<String, String> newLibDB = new TreeMap<String, String>();
 
 		// make replacements in raw db
 		List<String> furtherLibDirs = new ArrayList<String>();
@@ -200,7 +203,23 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 			}
 
 			System.out.println(missing == null ? "yes" : "no (missing " + missing + ")");
-			newLibDB.add(name + ": " + (missing == null ? result : "N/A"));
+			
+			String oldEntry = newLibDB.get(name);
+			String newEntry = (missing == null ? result : "N/A");
+			if (oldEntry == null) {
+				newLibDB.put(name, newEntry);
+			} else { // we already have an entry... "merge" it 
+				//(TODO: to avoid duplicate options, we might need to make merging more sophisticated using CCOptions class) 
+				String entry = "";
+				if (oldEntry.equals("N/A")) {
+					entry = newEntry;
+				} else if (newEntry.equals("N/A")){
+					entry = oldEntry;
+				} else { // merge
+					entry = newEntry + " " + oldEntry;
+				}
+				newLibDB.put(name, entry);
+			}
 		}
 
 		// find correct moc and uic commands
@@ -211,10 +230,15 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 				mocqt4 = moc;
 			}
 		}
-		newLibDB.add("moc-qt4: " + (mocqt4 != null ? mocqt4.getAbsolutePath() : "N/A"));
-		newLibDB.add("uic-qt4: " + (mocqt4 != null ? mocqt4.getParentFile().getAbsolutePath() + FS + "uic" : "N/A"));
+		newLibDB.put("moc-qt4", (mocqt4 != null ? mocqt4.getAbsolutePath() : "N/A"));
+		newLibDB.put("uic-qt4", (mocqt4 != null ? mocqt4.getParentFile().getAbsolutePath() + FS + "uic" : "N/A"));
 
-		Files.writeLines(Util.getFileInEtcDir("libdb.txt"), newLibDB);
+		// write entries to libdb.txt
+		List<String> lines = new ArrayList<String>();
+		for (Map.Entry<String, String> en : newLibDB.entrySet()) {
+			lines.add(en.getKey() + ": " + en.getValue());
+		}
+		Files.writeLines(Util.getFileInEtcDir("libdb.txt"), lines);
 	}
 
 	/**

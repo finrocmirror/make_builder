@@ -13,6 +13,7 @@ boost:      -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can:        -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
+can:        -I<cccan_public.h> -D _MCA_CC_CAN_
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
