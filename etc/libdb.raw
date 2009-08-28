@@ -19,7 +19,7 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
-cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/usr/local/include/cuda
+cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/opt/cuda/sdk/common/inc
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
@@ -48,6 +48,8 @@ OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
 Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL: -lpq -I<pg_config.h,postgres.h>
+phonon:     -I<phonon/phononnamespace.h> -lphonon
+phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 pwc:        -I<pwc-ioctl.h>
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
 qt4core:    -D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
