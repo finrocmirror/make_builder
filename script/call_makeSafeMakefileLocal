@@ -1,0 +1,7 @@
+#!/bin/sh
+
+source script/mcasetenv
+make -C make_builder
+makeSafeMakefileLocal
+
+exit 0;
