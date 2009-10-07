@@ -65,8 +65,13 @@ public class CppHandler implements SourceFileHandler {
 	public void init(Makefile makefile) {
 		// add variables to makefile
 		makefile.addVariable("CFLAGS=-g2");
-		makefile.addVariable("CC=gcc");
-		makefile.addVariable("CXX_OPTS=$(CFLAGS) " + compileOptions);
+		makefile.addVariable("GCC_VERSION=");
+		makefile.addVariable("CC=gcc$(GCC_VERSION)");
+		makefile.addVariable("CCFLAGS=$(CFLAGS)");
+		makefile.addVariable("CC_OPTS=$(CCFLAGS) " + compileOptions);
+		makefile.addVariable("CXX=g++$(GCC_VERSION)");
+		makefile.addVariable("CXXFLAGS=$(CFLAGS)");
+		makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + compileOptions);
 		makefile.addVariable("LINK_OPTS=" + linkOptions);
 	}
 	
@@ -113,10 +118,9 @@ public class CppHandler implements SourceFileHandler {
 	@Override
 	public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
 
-		// create C++ compiler options
+		// create C compiler options
 		CCOptions options = new CCOptions();
 		options.merge(be.opts);
-		options.compileOptions.add("$(CXX_OPTS)");
 		options.linkOptions.add("$(LINK_OPTS)");
 		
 		// find/prepare include paths
@@ -128,6 +132,14 @@ public class CppHandler implements SourceFileHandler {
 				options.includePaths.add(sf.dir.relative);
 			}
 		}
+
+		// create/clone C++ compiler options
+		CCOptions cxxOptions = new CCOptions(); // C++ options
+		cxxOptions.merge(options);
+
+		// C and C++ specific options
+		options.compileOptions.add("$(CC_OPTS)");
+		cxxOptions.compileOptions.add("$(CXX_OPTS)");
 		
 		if (separateCompileAndLink) {
 			ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
@@ -141,7 +153,9 @@ public class CppHandler implements SourceFileHandler {
 					be.sources.add(ofile);
 					dependencyBuffer.clear();
 					target.addDependencies(sf.getAllDependencies(dependencyBuffer));
-					target.addCommand(options.createCompileCommand(sf.relative, ofile.relative), true);
+					boolean cxx = sf.hasExtension("cpp");
+					CCOptions opts = cxx ? cxxOptions : options;
+					target.addCommand(opts.createCompileCommand(sf.relative, ofile.relative, cxx), true);
 				}
 			}
 			
@@ -163,15 +177,39 @@ public class CppHandler implements SourceFileHandler {
 			dependencyBuffer.clear();
 			
 			String sources = "";
+			String cxxSources = "";
+			SrcFile cfile = null;
 			for (SrcFile sf : copy) {
 				if (sf.hasExtension("c", "cpp", "o", "os")) {
 					be.sources.remove(sf);
 					be.target.addDependency(sf);
-					sources += " " + sf.relative;
+					if (sf.hasExtension("c")) {
+						sources += " " + sf.relative;
+						cfile = sf;
+					} else {
+						cxxSources += " " + sf.relative;
+					}
 					sf.getAllDependencies(dependencyBuffer);
 				}
 			}
-			be.target.addCommand(options.createCompileAndLinkCommand(sources, be.getTarget()), true);
+			
+			if (sources.length() == 0 || cxxSources.length() == 0) {
+				boolean cxx = cxxSources.length() > 0;
+				CCOptions opts = cxx ? cxxOptions : options;
+				be.target.addCommand(opts.createCompileAndLinkCommand(cxx ? cxxSources : sources, be.getTarget(), cxx), true);
+			} else {
+				// we need to compile c files and then link them into compiled c++ files
+				
+				// Create .o for c file
+				SrcFile ofile = builder.getTempBuildArtifact(cfile, "o");
+				Makefile.Target target = makefile.addTarget(ofile.relative, true);
+				target.addDependencies(dependencyBuffer);
+				target.addCommand(options.createCompileCommand(sources, ofile.relative, false), true);
+				
+				// Compile and link c++ files
+				be.target.addDependency(ofile.relative);
+				be.target.addCommand(cxxOptions.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true), true);
+			}
 			be.target.addDependencies(dependencyBuffer);
 		}
 	}

@@ -81,7 +81,7 @@ public class MCABuilder extends MakeFileBuilder {
 			addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
 		}
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
-				"-lm -lz -lcrypt -lpthread -lstdc++ -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
+				"-lm -lz -lcrypt -lpthread -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
 		addHandler(new CakeHandler());
 

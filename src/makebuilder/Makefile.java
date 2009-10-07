@@ -99,6 +99,7 @@ public class Makefile {
 		for (Target t : phonyTargets.values()) {
 			if (!t.name.startsWith(".")) {
 				ps.print(" " + t.name);
+				ps.print(" clean-" + t.name);
 			}
 		}
 		ps.println("\n");
@@ -125,6 +126,18 @@ public class Makefile {
 		// write other PHONY targets
 		for (Target t : phonyTargets.values()) {
 			t.writeTo(ps);
+			
+			// write clean-targets
+			if (t.name.startsWith(".")) {
+				continue;
+			}
+			ps.println("clean-" + t.name + ":");
+			for (String s : t.dependencies) {
+				if (!phonyTargets.containsKey(s)) {
+					ps.println("\trm -f " + s);
+				}
+			}
+			ps.println();
 		}
 		
 		// write ordinary targets
