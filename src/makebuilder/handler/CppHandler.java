@@ -143,6 +143,7 @@ public class CppHandler implements SourceFileHandler {
 		
 		if (separateCompileAndLink) {
 			ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
+			boolean atLeastOneCxx = false;			
 			
 			// compile...
 			for (SrcFile sf : copy) {
@@ -154,6 +155,7 @@ public class CppHandler implements SourceFileHandler {
 					dependencyBuffer.clear();
 					target.addDependencies(sf.getAllDependencies(dependencyBuffer));
 					boolean cxx = sf.hasExtension("cpp");
+					atLeastOneCxx |= cxx;
 					CCOptions opts = cxx ? cxxOptions : options;
 					target.addCommand(opts.createCompileCommand(sf.relative, ofile.relative, cxx), true);
 				}
@@ -170,7 +172,7 @@ public class CppHandler implements SourceFileHandler {
 					sources += " " + sf.relative; 
 				}
 			}
-			be.target.addCommand(options.createLinkCommand(sources, be.getTarget()), true);
+			be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
 			
 		} else { // compiling and linking in one step
 			ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);

@@ -184,10 +184,11 @@ public class CCOptions implements Comparator<String> {
 	 * 
 	 * @param inputs Input files (divided by whitespace)
 	 * @param output Output file
+	 * @param cxx Use C++ compiler? (instead of c)
 	 * @return GCC Compilter call for makefile
 	 */
-	public String createLinkCommand(String inputs, String output) {
-		return cleanCommand("$(CC) -o " + output + " " + inputs + " " + createOptionString(false, true));
+	public String createLinkCommand(String inputs, String output, boolean cxx) {
+		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true));
 	}
 	
 	/**
