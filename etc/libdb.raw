@@ -20,6 +20,7 @@ cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
 cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/opt/cuda/sdk/common/inc
+crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
@@ -42,7 +43,6 @@ ode:        -I<ode/ode.h> -lode
 oiv:        -I<Inventor/SoDB.h> -lCoin
 opencv:     -I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h> -lcv -lcxcore -lcvaux
 opencl:	    -I<CL/cl.h> -lOpenCL -D _LIB_OPENCL_PRESENT_	
-openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
@@ -51,6 +51,7 @@ PostgreSQL: -lpq -I<pg_config.h,postgres.h>
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 pwc:        -I<pwc-ioctl.h>
+pthread:	-I<pthread.h> -lpthread
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
 qt4core:    -D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
 qt4gui:     -D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -I<QtGui/qapplication.h> -lQtCore -lQtGui
