@@ -72,7 +72,7 @@ public class CppHandler implements SourceFileHandler {
 		makefile.addVariable("CXX=g++$(GCC_VERSION)");
 		makefile.addVariable("CXXFLAGS=$(CFLAGS)");
 		makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + compileOptions);
-		makefile.addVariable("LINK_OPTS=" + linkOptions);
+		makefile.addVariable("LINK_OPTS=$(LDFLAGS) " + linkOptions);
 	}
 	
 	@Override
