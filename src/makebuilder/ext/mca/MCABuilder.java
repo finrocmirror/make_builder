@@ -25,6 +25,7 @@ import java.io.File;
 
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
+import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
@@ -56,6 +57,9 @@ public class MCABuilder extends MakeFileBuilder {
 	/** System library installation handler */
 	public final MCASystemLibLoader systemInstall;
 	
+	/** Done message with warning for quick builds */
+	public static final String QUICK_BUILD_DONE_MSG = "done \\(reminder: This is a \\\"quick \\& dirty\\\" build. Please check with makeSafe*** whether your code is actually correct C/C++, before committing to the svn repositories.\\)";
+	
 	public MCABuilder() {
 		super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
 
@@ -79,6 +83,7 @@ public class MCABuilder extends MakeFileBuilder {
 		addHandler(new DescriptionBuilderHandler());
 		if (getOptions().combineCppFiles) {
 			addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
+			makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
 		}
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
 				"-lm -lz -lcrypt -lpthread -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 

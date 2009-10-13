@@ -52,8 +52,8 @@ public class Makefile {
 	/** List of targets */
 	private final List<Target> targets = new ArrayList<Target>();
 	
-	/** Done message at the end of build process */
-	private static final String DONE_MSG = "echo done";
+	/** Variable name of message that is displayed, when build process finishes successfully */
+	public static final String DONE_MSG_VAR = "DONE_MSG";
 
 	/** Directories that targets are built to. Will be remove with make clean command */
 	private final String[] buildDirs;
@@ -65,10 +65,11 @@ public class Makefile {
 	public final Target DUMMY_TARGET = new Target("dummy target");
 	
 	/**
-	 * @param buildDirs Directories that targets are built to. Will be remove with make clean command
+	 * @param buildDirs Directories that targets are built to. Will be removed with make clean command
 	 */
 	public Makefile(String... buildDirs) {
 		this.buildDirs = buildDirs;
+		addVariable(DONE_MSG_VAR + "=done");
 	}
 	
 	/**
@@ -105,7 +106,7 @@ public class Makefile {
 		ps.println("\n");
 		
 		// write/create 'all' target (which is default)
-		all.addCommand(DONE_MSG, false);
+		all.addCommand("echo $(" + DONE_MSG_VAR + ")", false);
 		all.writeTo(ps);
 		
 		// write 'clean' target
@@ -155,6 +156,23 @@ public class Makefile {
 	 */
 	public void addVariable(String variable) {
 		variables.add(variable);
+	}
+	
+	/**
+	 * Change variable at beginning of makefile
+	 * 
+	 * @param variable Variable to add
+	 */
+	public void changeVariable(String newVariable) {
+		String varname = newVariable.substring(0, newVariable.indexOf('=') + 1);
+		for (int i = 0; i < variables.size(); i++) {
+			if (variables.get(i).startsWith(varname)) {
+				variables.set(i, newVariable);
+				return;
+			}
+		}
+		System.out.println("attempt to change non-existing variable " + newVariable + "; adding instead");
+		addVariable(newVariable);
 	}
 	
 	/**
@@ -301,7 +319,7 @@ public class Makefile {
 			Target phony = phonyTargets.get(phonyName);
 			if (phony == null) {
 				phony = new Target(phonyName);
-				phony.addCommand(DONE_MSG, false);
+				phony.addCommand("echo $(" + DONE_MSG_VAR + ")", false);
 				for (String s : phonyDefaultDependencies) {
 					phony.addDependency(s);
 				}
