@@ -27,6 +27,7 @@ easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
 festival:   -lFestival -lestools -lestbase -lesd -leststring -lncurses -I<festival.h> -I<EST_SingleChannelWave.h>
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
+flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 gsl:        -lgsl -lgslcblas
