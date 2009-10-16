@@ -270,7 +270,13 @@ public class SourceScanner {
 	 * @return SrcFile instance if file exists - otherwise null
 	 */
 	public SrcFile find(String relFileName) {
-		return files.get(relFileName);
+		SrcFile result = files.get(relFileName);
+		if (result != null) {
+			return result;
+		} else if (relFileName.startsWith(".")) {
+			return files.get(relFileName.substring(2));
+		}
+		return null;
 	}
 	
 	/**

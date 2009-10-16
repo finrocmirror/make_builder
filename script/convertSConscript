@@ -1,0 +1,2 @@
+#!/bin/bash
+java -jar $MCAHOME/make_builder/dist/build.jar makebuilder.ext.mca.SConscriptConverter

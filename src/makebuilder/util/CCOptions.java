@@ -132,7 +132,7 @@ public class CCOptions implements Comparator<String> {
 	 * @param link Is this a linking operation?
 	 * @return String with options
 	 */
-	private String createOptionString(boolean compile, boolean link) {
+	public String createOptionString(boolean compile, boolean link) {
 		String result = "";
 		for (String s : options) {
 			result += " " + s;
