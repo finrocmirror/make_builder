@@ -4,7 +4,7 @@ cd make_builder
 make
 cd ..
 rm Makefile
-java -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --combine
+java -Xmx256M -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --combine
 makeCall "$@"
 
 
