@@ -190,7 +190,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 		}
 		
 		// Write makefile
-		makefile.writeTo(new File("Makefile"));
+		writeMakefile();
 
 		// print error messages at the end... so nobody will miss them
 		for (String err : errorMessages) {
@@ -199,6 +199,14 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 		
 		// completed
 		System.out.println("Creating Makefile successful.");
+	}
+	
+	/** 
+	 * Writes makefile to disk (may be overridden for custom adjustments)
+	 */
+	protected void writeMakefile() throws Exception {
+
+		makefile.writeTo(new File("Makefile"));
 	}
 	
 	/**

@@ -37,6 +37,7 @@ import makebuilder.handler.MakeXMLLoader;
 import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.util.CodeBlock;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -109,6 +110,22 @@ public class MCABuilder extends MakeFileBuilder {
 			Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools");
 			t.addCommand("echo success > $(TARGET_DIR)/success", true);
 		}
+	}
+	
+	@Override
+	protected void writeMakefile() throws Exception {
+		
+		// apply options for specific target?
+		String target = System.getenv("MCATARGET");
+		if (target != null) {
+			File targetFile = Util.getFileInEtcDir("../targets/" + target);
+			if (targetFile.exists()) {
+				System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
+				makefile.applyVariablesFromFile(targetFile);
+			}
+		}
+		
+		super.writeMakefile();
 	}
 
 	@Override

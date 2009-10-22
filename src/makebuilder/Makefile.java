@@ -32,6 +32,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import makebuilder.util.Files;
+
 /**
  * @author max
  *
@@ -171,7 +173,7 @@ public class Makefile {
 				return;
 			}
 		}
-		System.out.println("attempt to change non-existing variable " + newVariable + "; adding instead");
+		//System.out.println("attempt to change non-existing variable " + newVariable + "; adding instead");
 		addVariable(newVariable);
 	}
 	
@@ -216,6 +218,19 @@ public class Makefile {
 //	public void addInitCommand(String cmd) {
 //		initCommands.add(cmd);
 //	}
+	
+	public void applyVariablesFromFile(File targetFile) {
+		try {
+			for (String s : Files.readLines(targetFile)) {
+				if (s.trim().length() > 0 && s.contains("=")) {
+					changeVariable(s);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	/**
 	 * Single makefile target
