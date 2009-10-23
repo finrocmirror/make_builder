@@ -21,8 +21,6 @@
  */
 package makebuilder.ext.mca;
 
-import makebuilder.libdb.LibDB;
-
 /**
  * @author max
  *
@@ -32,7 +30,8 @@ public class MCAPlugin extends MCABuildEntity {
 
 	public MCAPlugin() {
 		try {
-			this.extlibs.add(LibDB.getLib("ltdl"));
+			//this.extlibs.add(LibDB.getLib("ltdl"));
+			libs.add("ltdl");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
