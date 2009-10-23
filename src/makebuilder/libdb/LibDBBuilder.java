@@ -370,7 +370,8 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 			return;
 		}
 		if (level >= 20) {
-			throw new Exception("level too deep: " + path.getAbsolutePath());
+			System.out.println("directory tree rather deep - ignoring: " + path.getAbsolutePath());
+			return;
 		}
 		File[] fs = path.listFiles(this);
 		if (fs == null) {
