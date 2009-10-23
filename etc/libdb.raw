@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include /usr/src/linux-headers-2.6.26-2-common/include/media/ /usr/local/NVIDIA_CUDA_SDK/common/inc
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
 
 
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
@@ -8,7 +8,7 @@ asn:        -Ilibraries/asn -lmca2_asn
 asr:        -Ilibraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:    -I<AX10420.h>
 bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.6/ -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
-bfl:        -I<filter/filter.h> -lpthread -lcrypt -lorocos-bfl -lginac
+bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 boost:      -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread-mt
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system-mt
@@ -19,7 +19,7 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
-cutil:      -I<cutil.h> -lcutil -L/usr/local/NVIDIA_CUDA_SDK/common/lib/linux -I/usr/local/NVIDIA_CUDA_SDK/common/inc
+cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/opt/cuda/sdk/common/inc
 crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
