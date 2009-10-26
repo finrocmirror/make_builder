@@ -53,9 +53,11 @@ public abstract class MCABuildEntity extends BuildEntity {
 		if (project || tool) {
 			String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);
 			if (projectx.contains(FS)) {
+				target.addToPhony(projectx, "tools");
 				projectx = projectx.substring(0, projectx.indexOf(FS));
 			}
 			target.addToPhony(projectx, "tools");
 		}
+		target.addToPhony(name + (isLibrary() ? ".so" : "-bin"));
 	}
 }
