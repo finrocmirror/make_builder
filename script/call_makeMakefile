@@ -1,7 +1,0 @@
-#!/bin/sh
-
-source script/mcasetenv
-make -C make_builder
-makeMakefile
-
-exit 0;

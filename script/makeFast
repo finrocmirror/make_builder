@@ -1,10 +1,9 @@
 #!/bin/bash
-cd $MCAHOME
-cd make_builder
-make
-cd ..
+source script/mcasetenv ''
+make -C make_builder
 rm Makefile
-java -Xmx256M -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --combine --usesysteminstall
-makeCall "$@"
+[ "x$MCALOCAL" == "xno" ] && USE_SYSTEM_INSTALL=--usesysteminstall
+echo java -Xmx256M -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --combine $USE_SYSTEM_INSTALL
+echo makeCall "$@"
 
 
