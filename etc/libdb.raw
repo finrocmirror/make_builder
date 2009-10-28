@@ -31,7 +31,6 @@ flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 gsl:        -lgsl -lgslcblas
-opencv_with_highgui: -lcv -lcxcore -lcvaux -lhighgui -I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h>
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util
@@ -42,7 +41,8 @@ nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h','FEDM_Functions.h','FEDM_ISCReader.h','FEDM_ISCReaderID_LRU1000.h','FEDM_ISOTabItem.h','fefu.h','FEDM_Base.h','FEDM.h','FEDM_ISCReaderID.h','FEDM_ISCReaderID_LRU2000.h','FEDM_XmlBase.h','feisc.h','FEDM_BRMTabItem.h','FEDM_ISCFunctionUnit.h','FEDM_ISCReaderID_LR2000.h','FEDM_ISCReaderID_MR200.h','FEDM_Xml.h','fetcp.h','FEDM_DataBase.h','FEDM_ISCFunctionUnitID.h','FEDM_ISCReaderID_LR200.h','FEDM_ISCReaderModule.h','FEDM_XmlReaderCfgDataModul.h','feusb.h'>
 ode:        -I<ode/ode.h> -lode
 oiv:        -I<Inventor/SoDB.h> -lCoin
-opencv:     -I<cv.h,cxmisc.h,cvaux.h,cxcore.h,cxtypes.h,highgui.h> -lcv -lcxcore -lcvaux
+opencv_core:-I<cxcore.h,cxtypes.h,cxmisc.h,cv.h> -lcxcore -lcv
+opencv_all: -I<cxcore.h,cxtypes.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui
 opencl:	    -I<CL/cl.h> -lOpenCL -D _LIB_OPENCL_PRESENT_
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
