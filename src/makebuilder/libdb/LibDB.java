@@ -58,7 +58,7 @@ public class LibDB {
 	public static void reinit() {
 		libs.clear();
 		try {
-			File f = Util.getFileInEtcDir("libdb.txt");
+			File f = Util.getFileInEtcDir(LibDBBuilder.LIBDB_TXT);
 			List<String> lines = Files.readLines(f);
 			for (String s : lines) {
 				if (s.trim().length() <= 1) {

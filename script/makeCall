@@ -1,4 +1,9 @@
 #!/bin/bash
-pmake "$@"
+if test -n "$MAKEBIN" ; then
+    test
+else
+    MAKEBIN=pmake
+fi
+$MAKEBIN "$@"
 
 

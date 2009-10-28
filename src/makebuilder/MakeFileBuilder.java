@@ -193,6 +193,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 		writeMakefile();
 
 		// print error messages at the end... so nobody will miss them
+		//Collections.sort(errorMessages);
 		for (String err : errorMessages) {
 			System.err.println(err);
 		}

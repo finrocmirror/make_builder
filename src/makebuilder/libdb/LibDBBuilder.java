@@ -50,9 +50,14 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 
 	/** Current working directory - should be $MCAHOME */
 	static final File HOME = new File(".").getAbsoluteFile().getParentFile();
-
+	
 	/** List with preferred paths for libraries */
 	static final List<String> preferredPaths = new ArrayList<String>();
+	
+	/** File names of files to process */
+	static final String LIBDB_RAW = "libdb.raw",
+	                    LIBDB_TXT = "libdb.txt",
+	                    LIBDB_RAW_LOCAL = "libdb.raw.local";
 	
 	public void run() {
 		try {
@@ -79,9 +84,42 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
         }
         
 		// read raw db
-		List<String> rawLibDB = Files.readLines(Util.getFileInEtcDir("libdb.raw"));
+		List<String> rawLibDB = Files.readLines(Util.getFileInEtcDir(LIBDB_RAW));
 		String searchDirString = rawLibDB.remove(0);
 		searchDirString = searchDirString.substring(searchDirString.indexOf(":") + 1);
+		removeIrrelevantLines(rawLibDB);
+		
+		// read raw local db if it exists and merge it 
+		File localDb = Util.getFileInEtcDir(LIBDB_RAW_LOCAL);
+		if (localDb.exists()) {
+			List<String> rawLibDBLocal = Files.readLines(localDb);
+
+			// merge search dirs
+			String searchDirStringLocal = rawLibDBLocal.remove(0).trim();
+			searchDirStringLocal = searchDirStringLocal.substring(searchDirStringLocal.indexOf(":") + 1);
+			searchDirString = searchDirStringLocal + " " + searchDirString;
+			
+			// remove empty lines
+			removeIrrelevantLines(rawLibDBLocal);
+			
+			// replace library entries
+			for (String localEntry : rawLibDBLocal) {
+				boolean found = false;
+				for (int i = 0; i < rawLibDB.size(); i++) {
+					String entry = rawLibDB.get(i);
+					if (getLibName(entry).equals(getLibName(localEntry))) {
+						rawLibDB.set(i, localEntry);
+						found = true;
+						break;
+					}
+				}
+				if (!found) { // if we couldn't find lib in libdb.raw => append entry
+					rawLibDB.add(localEntry);
+				}
+			}
+		}
+		
+		// process directory search string
 		String[] searchDirsTmp = searchDirString.split(" ");
 		List<String> searchDirs = new ArrayList<String>();
 		List<String> excludes = new ArrayList<String>();
@@ -113,6 +151,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 		// make replacements in raw db
 		List<String> furtherLibDirs = new ArrayList<String>();
 		for (String line : rawLibDB) {
+			boolean foundSeveral = false; // Did we find several possible paths for this entry?
 			furtherLibDirs.clear();
 			if (line.trim().length() == 0) {
 				continue;
@@ -143,6 +182,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 					}
 					try {
 						if (candidateDirs.size() > 0) {
+							foundSeveral |= candidateDirs.size() > 1; 
 							String dir = mostLikelyIncludeDir(candidateDirs);
 							if (dir != null) {
 								result += "-I" + dir + " ";
@@ -178,6 +218,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 						}
 						try {
 							if (candidateDirs.size() > 0) {
+								foundSeveral |= candidateDirs.size() > 1; 
 								String dir = mostLikelyLibDir(candidateDirs);
 								if (dir != null) {
 									result += "-L" + dir + " ";
@@ -202,7 +243,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 				}
 			}
 
-			System.out.println(missing == null ? "yes" : "no (missing " + missing + ")");
+			System.out.println(missing == null ? ("yes" + (foundSeveral ? " - found multiple" : "")) : "no (missing " + missing + ")");
 			
 			String oldEntry = newLibDB.get(name);
 			String newEntry = (missing == null ? result : "N/A");
@@ -238,7 +279,31 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 		for (Map.Entry<String, String> en : newLibDB.entrySet()) {
 			lines.add(en.getKey() + ": " + en.getValue());
 		}
-		Files.writeLines(Util.getFileInEtcDir("libdb.txt"), lines);
+		Files.writeLines(Util.getFileInEtcDir(LIBDB_TXT), lines);
+	}
+	
+	/**
+	 * removes irrelevant lines (the ones not containing a library) from libdb.raw 
+	 * 
+	 * @param rawLibDB
+	 */
+	private void removeIrrelevantLines(List<String> rawLibDB) {
+		for (int i = 0; i < rawLibDB.size(); i++) {
+			if (!rawLibDB.get(i).contains(":")) {
+				rawLibDB.remove(i);
+				i--;
+			}
+		}
+	}
+
+	/**
+	 * Extracts library name from line/entry in libdb.raw
+	 * 
+	 * @param line Line to parts
+	 * @return library name
+	 */
+	public String getLibName(String line) {
+		return line.substring(0, line.indexOf(":")).trim();
 	}
 
 	/**
@@ -284,6 +349,14 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 	
 	/** Helper for above two functions */
 	private String mostLikelyDir(List<File> candidateDirs, String defaultDir1, String defaultDir2) throws Exception {
+		
+		// prefer libraries in user's home directory
+		for (File dir : candidateDirs) {
+			if (dir.getAbsolutePath().startsWith("/home/")) {
+				return dir.getAbsolutePath();
+			}
+		}
+		
 		String best = candidateDirs.get(0).getAbsolutePath();
 		boolean allInGCCDir = true;
 		boolean someInGCCDir = true;
