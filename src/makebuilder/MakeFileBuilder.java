@@ -79,7 +79,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 	protected final SourceScanner sources;
 
 	/** Temporary directory for merged files */
-	private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami();
+	private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami() + "_" + Math.abs(HOME.getAbsolutePath().hashCode());
 
 	/** Error message for console - are collected and presented at the end */
 	private final List<String> errorMessages = new ArrayList<String>();
