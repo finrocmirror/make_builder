@@ -21,7 +21,10 @@
  */
 package makebuilder.ext.mca;
 
+import java.io.File;
+
 import makebuilder.BuildEntity;
+import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 
 /**
@@ -41,6 +44,7 @@ public abstract class MCABuildEntity extends BuildEntity {
 		boolean project = rootDir2.startsWith("projects");
 		boolean lib = rootDir2.startsWith("libraries");
 		boolean tool = rootDir2.startsWith("tools");
+		boolean sysInstall = MakeFileBuilder.getOptions().containsKey("usesysteminstall");
 		if (lib || tool) {
 			target.addToPhony("libs");
 		}
@@ -48,16 +52,30 @@ public abstract class MCABuildEntity extends BuildEntity {
 			target.addToPhony("tools");
 		}
 		if (lib) {
-			target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
+			if (sysInstall) {
+				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1));
+			} else {
+				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
+			}
 		}
 		if (project || tool) {
 			String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);
 			if (projectx.contains(FS)) {
-				target.addToPhony(projectx, "tools");
+				if (sysInstall) {
+					target.addToPhony(projectx);
+				} else {
+					target.addToPhony(projectx, "tools");
+				}
 				projectx = projectx.substring(0, projectx.indexOf(FS));
 			}
-			target.addToPhony(projectx, "tools");
+			if (sysInstall) {
+				target.addToPhony(projectx);
+			} else {
+				target.addToPhony(projectx, "tools");
+			}
 		}
-		target.addToPhony(name + (isLibrary() ? ".so" : "-bin"));
+		String targetFile = getTarget();
+		targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
+		target.addToPhony(targetFile + (isLibrary() ? "" : "-bin"));
 	}
 }

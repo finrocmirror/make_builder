@@ -1,4 +1,2 @@
 #!/bin/bash
-cd $MCAHOME
-java -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --combine --usesysteminstall "$@"
-
+makeSafeMakefile
