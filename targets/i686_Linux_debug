@@ -1,0 +1,2 @@
+CFLAGS=-g2 
+NVCC_FLAGS=
