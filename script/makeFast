@@ -1,5 +1,5 @@
 #!/bin/bash
-source script/mcasetenv ''
+source script/mcasetenv '' &> /dev/null
 make -C make_builder
 rm Makefile
 [ "x$MCALOCAL" == "xno" ] && USE_SYSTEM_INSTALL=--usesysteminstall
