@@ -19,7 +19,7 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
-cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/opt/cuda/sdk/common/inc
+cutil:      -I<cutil.h> -lcutil
 crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
