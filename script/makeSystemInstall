@@ -5,5 +5,5 @@ make
 cd ..
 rm Makefile
 java -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET --systeminstall
-make sysinstall "$@"
+pmake sysinstall "$@"
 
