@@ -33,7 +33,7 @@ glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 gsl:        -lgsl -lgslcblas
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lo:         -I<lo/lo.h> -llo
-loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util
+loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
 lxrt:       N/A
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -lNewton
