@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 source script/mcasetenv '' &> /dev/null
 make -C make_builder
 rm Makefile
