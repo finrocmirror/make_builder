@@ -1,6 +1,5 @@
 search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
 
-
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:        -I<'ANN/ANN.h'> -lANN
 aria:       -I<Aria.h> -lAria -ldl
@@ -20,12 +19,13 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGALcore++
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
+curses:    -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil
 crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
-festival:   -lFestival -lestools -lestbase -lesd -leststring -lncurses -I<festival.h> -I<EST_SingleChannelWave.h>
+festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -lesd -leststring -lestools -lcurses 
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 flycap:     -lflycapture -I<FlyCapture2.h>
@@ -81,3 +81,4 @@ tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2 -I/usr/include/libxml2 -I/usr/include
 xml++:      -lxml++-1.0 -I<libxml++/libxml++.h>
+z:          -I<zlib.h> -lz 
