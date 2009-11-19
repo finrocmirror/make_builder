@@ -21,6 +21,7 @@
  */
 package makebuilder.util;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeSet;
 
@@ -41,9 +42,9 @@ public class CCOptions implements Comparator<String> {
 	public final static String[] COMPILE_ONLY_OPTIONS = new String[]{"-fpermissive"};
 
 	/** Libraries for linking */
-	public final TreeSet<String> libs = new TreeSet<String>();
+	public final ArrayList<String> libs = new ArrayList<String>();
 
-	/** Librariy paths */
+	/** Library paths */
 	public final TreeSet<String> libPaths = new TreeSet<String>(this);
 
 	/** Include paths */
@@ -88,7 +89,7 @@ public class CCOptions implements Comparator<String> {
 	public void addOption(String opt) {
 		opt = opt.trim();
 		if (opt.startsWith("-l")) {
-			libs.add(opt.substring(2));
+			addLib(opt.substring(2));
 		} else if (opt.startsWith("-L")) {
 			libPaths.add(opt.substring(2));
 		} else if (opt.startsWith("-I")) {
@@ -115,12 +116,25 @@ public class CCOptions implements Comparator<String> {
 		}
 	}
 	
+	/**
+	 * Add library to "Libraries for linking" (if it doesn't contain this yet)
+	 * 
+	 * @param lib
+	 */
+	private void addLib(String lib) {
+		if (!libs.contains(lib)) {
+			libs.add(lib);
+		}
+	}
+
 	/** Merge options with other options */
 	public void merge(CCOptions other) {
 		compileOptions.addAll(other.compileOptions);
 		includePaths.addAll(other.includePaths);
 		libPaths.addAll(other.libPaths);
-		libs.addAll(other.libs);
+		for (String lib : other.libs) {
+			addLib(lib);
+		}
 		linkOptions.addAll(other.linkOptions);
 		options.addAll(other.options);
 	}
