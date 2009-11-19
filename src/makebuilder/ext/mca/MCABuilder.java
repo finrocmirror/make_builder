@@ -87,7 +87,7 @@ public class MCABuilder extends MakeFileBuilder {
 			makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
 		}
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
-				"-lm -lz -lcrypt -lpthread -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
+				"-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
 		addHandler(new CakeHandler());
 
