@@ -118,10 +118,12 @@ public class CppHandler implements SourceFileHandler {
 	@Override
 	public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
 
-		// create C compiler options
+		// create compiler options
 		CCOptions options = new CCOptions();
 		options.merge(be.opts);
 		options.linkOptions.add("$(LINK_OPTS)");
+		options.cCompileOptions.add("$(CC_OPTS)");
+		options.cxxCompileOptions.add("$(CXX_OPTS)");
 		
 		// find/prepare include paths
 		for (SrcDir path : be.getRootDir().defaultIncludePaths) {
@@ -132,14 +134,6 @@ public class CppHandler implements SourceFileHandler {
 				options.includePaths.add(sf.dir.relative);
 			}
 		}
-
-		// create/clone C++ compiler options
-		CCOptions cxxOptions = new CCOptions(); // C++ options
-		cxxOptions.merge(options);
-
-		// C and C++ specific options
-		options.compileOptions.add("$(CC_OPTS)");
-		cxxOptions.compileOptions.add("$(CXX_OPTS)");
 		
 		if (separateCompileAndLink) {
 			ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
@@ -156,8 +150,7 @@ public class CppHandler implements SourceFileHandler {
 					target.addDependencies(sf.getAllDependencies(dependencyBuffer));
 					boolean cxx = sf.hasExtension("cpp");
 					atLeastOneCxx |= cxx;
-					CCOptions opts = cxx ? cxxOptions : options;
-					target.addCommand(opts.createCompileCommand(sf.relative, ofile.relative, cxx), true);
+					target.addCommand(options.createCompileCommand(sf.relative, ofile.relative, cxx), true);
 				}
 			}
 			
@@ -197,8 +190,7 @@ public class CppHandler implements SourceFileHandler {
 			
 			if (sources.length() == 0 || cxxSources.length() == 0) {
 				boolean cxx = cxxSources.length() > 0;
-				CCOptions opts = cxx ? cxxOptions : options;
-				be.target.addCommand(opts.createCompileAndLinkCommand(cxx ? cxxSources : sources, be.getTarget(), cxx), true);
+				be.target.addCommand(options.createCompileAndLinkCommand(cxx ? cxxSources : sources, be.getTarget(), cxx), true);
 			} else {
 				// we need to compile c files and then link them into compiled c++ files
 				
@@ -210,7 +202,7 @@ public class CppHandler implements SourceFileHandler {
 				
 				// Compile and link c++ files
 				be.target.addDependency(ofile.relative);
-				be.target.addCommand(cxxOptions.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true), true);
+				be.target.addCommand(options.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true), true);
 			}
 			be.target.addDependencies(dependencyBuffer);
 		}

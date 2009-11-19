@@ -87,11 +87,9 @@ public class SConscriptConverter extends MakeFileBuilder {
 			}
 
 			// add CC options
-			String opts = be.opts.createOptionString(true, true);
-			opts = opts.replace("-fPIC", "").replace("-shared", "").trim();
-			if (opts.length() > 0) {
-				ps.print("\n        ccoptions=\"" + opts + "\"");
-			}
+			addOptions("cxxflags", be.opts.createOptionString(true, false, true), ps);
+			addOptions("cflags", be.opts.createOptionString(true, false, false), ps);
+			addOptions("ldflags", be.opts.createOptionString(false, true, true), ps);
 
 			ps.println(">");
 
@@ -108,6 +106,18 @@ public class SConscriptConverter extends MakeFileBuilder {
 		}
 		ps.println("</targets>");
 		ps.close();
+	}
+
+	/**
+	 * @param attribute XML attribute to set
+	 * @param opts String with options
+	 * @param ps Stream to write to
+	 */
+	private void addOptions(String attribute, String opts, PrintStream ps) {
+		opts = opts.replace("-fPIC", "").replace("-shared", "").trim();
+		if (opts.length() > 0) {
+			ps.print("\n        " + attribute + "=\"" + opts + "\"");
+		}
 	}
 
 }

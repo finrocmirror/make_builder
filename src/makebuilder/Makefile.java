@@ -116,7 +116,7 @@ public class Makefile {
 		for (String s : buildDirs) {
 			clean.addCommand("rm -R -f " + s, true);
 		}
-		clean.addCommand("rm " + SourceScanner.CACHE_FILE, true);
+		clean.addCommand("rm -f " + SourceScanner.CACHE_FILE, true);
 		clean.writeTo(ps);
 		
 //		// write 'init' target

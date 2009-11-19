@@ -22,6 +22,7 @@
 package makebuilder.util;
 
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -49,33 +50,44 @@ public class CCOptions implements Comparator<String> {
 	/** Include paths */
 	public final TreeSet<String> includePaths = new TreeSet<String>(this);
 
-	/** Common options for compiling and linking */
-	public final TreeSet<String> options = new TreeSet<String>();
-
 	/** Options only for linking */
 	public final TreeSet<String> linkOptions = new TreeSet<String>();
 
-	/** Options only for compiling */
-	public final TreeSet<String> compileOptions = new TreeSet<String>();
+	/** Options only for c++ compiling */
+	public final TreeSet<String> cxxCompileOptions = new TreeSet<String>();
+
+	/** Options only for c compiling */
+	public final TreeSet<String> cCompileOptions = new TreeSet<String>();
 	
 	public CCOptions() {}
 	
 	/** Parse C compiler options from string */
 	public CCOptions(String options) {
-		addOptions(options);
+		addOptions(options, null);
 	}
-
+	
 	/**
 	 * Add a set of options
 	 * 
 	 * @param options Options as string (will be parsed)
 	 */
 	public void addOptions(String options) {
+		addOptions(options, null);
+	}
+
+	
+	/**
+	 * Add a set of options
+	 * 
+	 * @param options Options as string (will be parsed)
+	 * @param optionType (optional - may be null) specify what kind of option this is (should be) 
+	 */
+	public void addOptions(String options, Set<String> optionType) {
 		if (options != null) {
 			String[] opts = options.split("\\s-");
 			for (String opt : opts) {
 				opt = opt.trim();
-				addOption(opt.startsWith("-") ? opt : "-" + opt);
+				addOption(opt.startsWith("-") ? opt : "-" + opt, optionType);
 			}
 		}
 	}
@@ -85,19 +97,31 @@ public class CCOptions implements Comparator<String> {
 	 * 	
 	 * @param opt Options a string (will be parsed)
 	 */
-	public void addOption(String opt) {
+	@SuppressWarnings("unchecked")
+	public void addOption(String opt, Set<String> type) {
 		opt = opt.trim();
 		if (opt.startsWith("-l")) {
+			check("link", opt, type, libs, linkOptions);
 			libs.add(opt.substring(2));
 		} else if (opt.startsWith("-L")) {
+			check("link", opt, type, libPaths, linkOptions);
 			libPaths.add(opt.substring(2));
 		} else if (opt.startsWith("-I")) {
+			check("compile", opt, type, libs);
 			includePaths.add(opt.substring(2));
 		} else if (opt.startsWith("-Wl")) {
+			check("link", opt, type, libs);
 			linkOptions.add(opt);
-		} else if (opt.startsWith("-D")) {
-			compileOptions.add(opt);
+		} else if (opt.startsWith("-D") || opt.startsWith("-f")) {
+			check("compile", opt, type, libs);
+			cxxCompileOptions.add(opt);
+			cCompileOptions.add(opt);
 		} else {
+			if (type != null) {
+				type.add(opt);
+				return;
+			}
+			
 			// some other option
 			for (String s : LINK_ONLY_OPTIONS) {
 				if (s.equals(opt)) {
@@ -107,22 +131,46 @@ public class CCOptions implements Comparator<String> {
 			}
 			for (String s : COMPILE_ONLY_OPTIONS) {
 				if (s.equals(opt)) {
-					compileOptions.add(opt);
 					return;
 				}
 			}
-			options.add(opt);
+			
+			//System.out.println("Considering a common option: " + opt);
+			linkOptions.add(opt);
+			cxxCompileOptions.add(opt);
+			cCompileOptions.add(opt);
 		}
 	}
-	
+
+	/**
+	 * Check whether type can be correct (throws Exception otherwise)
+	 * 
+	 * @param expectString Valid types as string
+	 * @param opt Option that is checked
+	 * @param requested Type requested from user
+	 * @param expected Valid types in this case
+	 */
+	private void check(String expectString, String opt, Set<String> requested, Set<String>... expected) {
+		if (requested == null) {
+			return;
+		}
+		
+		for (Set<String> exp : expected) {
+			if (exp == requested) {
+				return;
+			}
+		}
+		throw new RuntimeException("Invalid " + expectString + " option: " + opt);
+	}
+
 	/** Merge options with other options */
 	public void merge(CCOptions other) {
-		compileOptions.addAll(other.compileOptions);
+		cCompileOptions.addAll(other.cCompileOptions);
+		cxxCompileOptions.addAll(other.cxxCompileOptions);
 		includePaths.addAll(other.includePaths);
 		libPaths.addAll(other.libPaths);
 		libs.addAll(other.libs);
 		linkOptions.addAll(other.linkOptions);
-		options.addAll(other.options);
 	}
 	
 	/**
@@ -130,15 +178,13 @@ public class CCOptions implements Comparator<String> {
 	 * 
 	 * @param compile Is this a compiling operation?
 	 * @param link Is this a linking operation?
+	 * @param cpp C++ options? (rather than C)
 	 * @return String with options
 	 */
-	public String createOptionString(boolean compile, boolean link) {
+	public String createOptionString(boolean compile, boolean link, boolean cpp) {
 		String result = "";
-		for (String s : options) {
-			result += " " + s;
-		}
 		if (compile) {
-			for (String s : compileOptions) {
+			for (String s : cpp ? cxxCompileOptions : cCompileOptions) {
 				result += " " + s;
 			}
 		}
@@ -168,7 +214,7 @@ public class CCOptions implements Comparator<String> {
 	 */
 	public String createCudaString() {
 		String result = "";
-		for (String s : compileOptions) {
+		for (String s : cxxCompileOptions) {
 			if (s.startsWith("-D") || s.startsWith("$")) {
 				result += " " + s;
 			}
@@ -188,7 +234,7 @@ public class CCOptions implements Comparator<String> {
 	 * @return GCC Compilter call for makefile
 	 */
 	public String createLinkCommand(String inputs, String output, boolean cxx) {
-		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true));
+		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx));
 	}
 	
 	/**
@@ -200,7 +246,7 @@ public class CCOptions implements Comparator<String> {
 	 * @return GCC Compilter call for makefile
 	 */
 	public String createCompileCommand(String inputs, String output, boolean cxx) {
-		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c -o " + output + " " + inputs + " " + createOptionString(true, false));
+		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c -o " + output + " " + inputs + " " + createOptionString(true, false, cxx));
 	}
 	
 	/**
@@ -212,7 +258,7 @@ public class CCOptions implements Comparator<String> {
 	 * @return GCC Compilter call for makefile
 	 */
 	public String createCompileAndLinkCommand(String inputs, String output, boolean cxx) {
-		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(true, true));
+		return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(true, true, cxx));
 	}
 	
 	/**

@@ -76,7 +76,8 @@ public class NvccHandler extends SourceFileHandler.Impl {
 		// create nvcc compiler options
 		CCOptions options = new CCOptions();
 		options.merge(be.opts);
-		options.compileOptions.add("$(NVCC_FLAGS)");
+		options.cxxCompileOptions.add("$(NVCC_FLAGS)");
+		options.cCompileOptions.add("$(NVCC_FLAGS)");
 		for (SrcDir path : be.getRootDir().defaultIncludePaths) {
 			options.includePaths.add(path.relative);
 		}
