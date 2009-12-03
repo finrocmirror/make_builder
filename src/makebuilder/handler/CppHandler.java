@@ -120,7 +120,7 @@ public class CppHandler implements SourceFileHandler {
 
 		// create compiler options
 		CCOptions options = new CCOptions();
-		options.merge(be.opts);
+		options.merge(be.opts, true);
 		options.linkOptions.add("$(LINK_OPTS)");
 		options.cCompileOptions.add("$(CC_OPTS)");
 		options.cxxCompileOptions.add("$(CXX_OPTS)");

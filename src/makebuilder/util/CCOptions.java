@@ -163,13 +163,19 @@ public class CCOptions implements Comparator<String> {
 		throw new RuntimeException("Invalid " + expectString + " option: " + opt);
 	}
 
-	/** Merge options with other options */
-	public void merge(CCOptions other) {
+	/** 
+	 * Merge options with other options 
+	 * 
+	 * @param mergeLibs Merge library/linker options also? 
+	 */
+	public void merge(CCOptions other, boolean mergeLibs) {
 		cCompileOptions.addAll(other.cCompileOptions);
 		cxxCompileOptions.addAll(other.cxxCompileOptions);
 		includePaths.addAll(other.includePaths);
-		libPaths.addAll(other.libPaths);
-		libs.addAll(other.libs);
+		if (mergeLibs) {
+			libPaths.addAll(other.libPaths);
+			libs.addAll(other.libs);
+		}
 		linkOptions.addAll(other.linkOptions);
 	}
 	

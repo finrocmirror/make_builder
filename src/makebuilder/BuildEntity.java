@@ -24,6 +24,7 @@ package makebuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import makebuilder.libdb.LibDB;
 import makebuilder.util.AddOrderSet;
@@ -56,7 +57,8 @@ public abstract class BuildEntity {
 	/** Involved libraries */
 	public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscrip)t
 	public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript)
-	public final AddOrderSet<LibDB.ExtLib> extlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs)
+	public final AddOrderSet<LibDB.ExtLib> extlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
+	public final AddOrderSet<LibDB.ExtLib> directExtlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; only from build entity itself)
 	public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
 	public final List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>(); // resolved optional local (mca2) dependencies (from optionalLibs)
 
@@ -110,18 +112,18 @@ public abstract class BuildEntity {
 	 * Their options are added to opts
 	 */
 	public void mergeExtLibs() {
-		List<LibDB.ExtLib> extLibs2 = new ArrayList<LibDB.ExtLib>();
-		mergeExtLibs(extLibs2);
-		extlibs.clear();
-		extlibs.addAll(extLibs2);
+		mergeExtLibs(extlibs);
 	}
 	
 	/**
 	 * Compute the set of options to build this build entity with a C/C++ compiler
 	 */
 	public void computeOptions() {
+		for (LibDB.ExtLib el : directExtlibs) {
+			opts.merge(el.ccOptions, true);
+		}		
 		for (LibDB.ExtLib el : extlibs) {
-			opts.merge(el.ccOptions);
+			opts.merge(el.ccOptions, false);
 		}
 		for (BuildEntity be : dependencies) {
 			String s = be.getTarget();
@@ -136,8 +138,8 @@ public abstract class BuildEntity {
 	 * 
 	 * @param extLibs2 List of external libraries
 	 */
-	private void mergeExtLibs(List<LibDB.ExtLib> extLibs2) {
-		extLibs2.addAll(extlibs);
+	private void mergeExtLibs(Set<LibDB.ExtLib> extLibs2) {
+		extLibs2.addAll(directExtlibs);
 		for (BuildEntity be : dependencies) {
 			be.mergeExtLibs(extLibs2);
 		}
@@ -196,7 +198,7 @@ public abstract class BuildEntity {
 	private void resolveDependency(boolean optional, List<BuildEntity> buildEntities, String dep, MakeFileBuilder builder) throws Exception {
 		if (LibDB.available(dep)) { // External library dependency?
 			LibDB.ExtLib xl = LibDB.getLib(dep); 
-			extlibs.add(xl);
+			directExtlibs.add(xl);
 			dependencies.addAll(xl.dependencies);
 			return;
 		}
