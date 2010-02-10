@@ -61,6 +61,9 @@ public class MCABuilder extends MakeFileBuilder {
 	/** Done message with warning for quick builds */
 	public static final String QUICK_BUILD_DONE_MSG = "done \\(reminder: This is a \\\"quick \\& dirty\\\" build. Please check with makeSafe*** whether your code is actually correct C/C++, before committing to the svn repositories.\\)";
 	
+	/** Optional dependency handler */
+	private DependencyHandler dependencyHandler;
+	
 	public MCABuilder() {
 		super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
 
@@ -110,10 +113,21 @@ public class MCABuilder extends MakeFileBuilder {
 			Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools");
 			t.addCommand("echo success > $(TARGET_DIR)/success", true);
 		}
+		
+		// Calculate dependencies option?
+		if (getOptions().calculateDependencies) {
+			addHandler((dependencyHandler = new DependencyHandler()));
+		}
 	}
 	
 	@Override
 	protected void writeMakefile() throws Exception {
+		
+		if (getOptions().calculateDependencies) {
+			Object print = getOptions().get("print");
+			dependencyHandler.writeFiles(print == null ? null : print.toString());
+			return;
+		}
 		
 		// apply options for specific target?
 		String target = System.getenv("MCATARGET");
