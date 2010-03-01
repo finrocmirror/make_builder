@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include
+search-dirs: /usr/include /usr/local !/usr/local/attic /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include /home/norbert/usr/local
 
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:        -I<'ANN/ANN.h'> -lANN
@@ -34,7 +34,7 @@ flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 gsl:        -lgsl -lgslcblas
-jack:       -I<jack/jack.h>
+jack:       -I<jack/jack.h> -ljack
 jni:		-I<jni.h>
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lo:         -I<lo/lo.h> -llo
