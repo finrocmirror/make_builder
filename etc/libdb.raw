@@ -4,6 +4,7 @@ amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplIn
 ann:        -I<'ANN/ANN.h'> -lANN
 aria:       -I<Aria.h> -lAria -ldl
 asn:        -Ilibraries/asn -lmca2_asn
+asound:     -I<alsa/asoundlib.h>
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:    -I<AX10420.h>
 bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.6/ -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
@@ -25,6 +26,7 @@ crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
+esd:        -l<esd>
 festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -lesd -leststring -lestools -lcurses 
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
