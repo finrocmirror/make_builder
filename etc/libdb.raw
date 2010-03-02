@@ -21,7 +21,7 @@ cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
 curl:       -I<curl/curl.h> -lcurl
 curses:    -I<curses.h> -lcurses
-cutil:      -I<cutil.h> -lcutil -L/opt/cuda/sdk/lib/ -I/opt/cuda/sdk/C/common/inc
+cutil:      -I<cutil.h> -lcutil
 crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
@@ -82,6 +82,6 @@ soqt:       -I<Inventor/Qt/SoQt.h> -lSoQt
 speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
-xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2 -I/usr/include/libxml2 -I/usr/include
+xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
 xml++:      -lxml++-1.0 -I<libxml++/libxml++.h>
 z:          -I<zlib.h> -lz 
