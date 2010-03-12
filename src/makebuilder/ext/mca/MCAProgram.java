@@ -30,6 +30,19 @@ public class MCAProgram extends MCABuildEntity {
 
 	@Override
 	public String getTarget() {
+		if (this.getRootDir().relative.startsWith("libraries")) {
+			String[] parts = this.getRootDir().relative.split("/");
+			if (parts.length >= 2) {
+				String prefix = "mcal_" + parts[1];
+				if (!name.startsWith(prefix)) {
+					String n = name;
+					if (n.startsWith("mcal_")) {
+						n = n.substring(5);
+					}
+					return "$(TARGET_BIN)/" + prefix + "_" + n;
+				}
+			}
+		}
 		return "$(TARGET_BIN)/" + name;
 	}
 }
