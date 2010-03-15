@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic !/usr/local/ptc /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include ~/usr/local
+search-dirs: /usr/include /usr/local !/usr/local/attic !/usr/local/ptc /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include ~/usr/local 
 
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:        -I<'ANN/ANN.h'> -lANN
@@ -50,7 +50,7 @@ ode:        -I<ode/ode.h> -lode
 oiv:        -I<Inventor/SoDB.h> -lCoin
 opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxtypes.h,cxmisc.h,cv.h> -lcxcore -lcv 
 opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxtypes.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
-opencl:	    -I<CL/cl.h> -lOpenCL -D _LIB_OPENCL_PRESENT_
+opencl:	    -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -D _LIB_OPENCL_PRESENT_ -lshrutil -loclUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
