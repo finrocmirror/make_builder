@@ -38,8 +38,10 @@ public class MCAProgram extends MCABuildEntity {
 					String n = name;
 					if (n.startsWith("mcal_")) {
 						n = n.substring(5);
+					} else if (n.startsWith(parts[1])) {
+						n = n.substring(parts[1].length());
 					}
-					return "$(TARGET_BIN)/" + prefix + "_" + n;
+					return "$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "");
 				}
 			}
 		}
