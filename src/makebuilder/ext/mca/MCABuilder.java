@@ -75,8 +75,8 @@ public class MCABuilder extends MakeFileBuilder {
 		
 		// init global defines
 		globalDefine.add("#define _MCA_VERSION_ \"2.4.1\"");
-		globalDefine.add("#define _MCA_DEBUG_");
-		globalDefine.add("#define _MCA_PROFILING_");
+		//globalDefine.add("#define _MCA_DEBUG_");
+		//globalDefine.add("#define _MCA_PROFILING_");
 		globalDefine.add("#define _MCA_LINUX_");
 		
 		// init handlers
