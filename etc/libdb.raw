@@ -35,7 +35,10 @@ glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 gsl:        -lgsl -lgslcblas
 jack:       -I<jack/jack.h> -ljack
-jni:		-I<jni.h>
+java:       -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h> -ljava
+java:       -I<jni.h,jawt.h,jni_md.h> -ljava
+jni:        -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h>
+jni:        -I<jni.h,jawt.h,jni_md.h>
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_

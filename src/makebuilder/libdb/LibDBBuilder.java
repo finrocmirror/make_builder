@@ -247,19 +247,10 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 			
 			String oldEntry = newLibDB.get(name);
 			String newEntry = (missing == null ? result : "N/A");
-			if (oldEntry == null) {
+			if (oldEntry == null || oldEntry.equals("N/A")) {
 				newLibDB.put(name, newEntry);
-			} else { // we already have an entry... "merge" it 
-				//(TODO: to avoid duplicate options, we might need to make merging more sophisticated using CCOptions class) 
-				String entry = "";
-				if (oldEntry.equals("N/A")) {
-					entry = newEntry;
-				} else if (newEntry.equals("N/A")){
-					entry = oldEntry;
-				} else { // merge
-					entry = newEntry + " " + oldEntry;
-				}
-				newLibDB.put(name, entry);
+			} else {
+				// we already have an entry... in this case: skip new one (new behaviour since April 2010)
 			}
 		}
 
