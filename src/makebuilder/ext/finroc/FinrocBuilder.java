@@ -85,7 +85,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 		
 		// init handlers
 		addLoader(new SConscriptParser());
-		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, RRLib.class));
+		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, RRLib.class, FinrocProgram.class));
 		addHandler(new Qt4Handler());
 		addHandler(new NvccHandler(""/*"-include Makefile.h"*/));
 		//addHandler(new DescriptionBuilderHandler());
@@ -150,6 +150,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 	public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
 		dir.defaultIncludePaths.add(sources.findDir(".", true));
 		dir.defaultIncludePaths.add(sources.findDir("projects", true));
+		dir.defaultIncludePaths.add(sources.findDir("core", true));
 		dir.defaultIncludePaths.add(sources.findDir("libraries", true));
 		dir.defaultIncludePaths.add(sources.findDir("tools", true));
 		dir.defaultIncludePaths.add(sources.findDir("rrlib", true));
@@ -160,6 +161,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 			String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
 			dir.defaultIncludePaths.add(sources.findDir(p, true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/projects", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/core", true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/libraries", true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/tools", true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/rrlib", true));
@@ -185,7 +187,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
 	@Override
 	public String[] getSourceDirs() {
-		return new String[]{"libraries", "projects", "tools", "plugins", "rrlib"};
+		return new String[]{"core", "libraries", "projects", "tools", "plugins", "rrlib"};
 	}
 	
 	public void run() {
