@@ -1,4 +1,4 @@
-search-dirs: /usr/include /usr/local !/usr/local/attic !/usr/local/ptc /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include ~/usr/local 
+search-dirs: /usr/include /usr/local !/usr/local/.bfin !/usr/local/attic !/usr/local/ptc /opt /usr/qt /usr/share/qt4/bin /usr/bin /usr/src/linux/include /usr/lib /usr/X11R6/lib /usr/X11R6/include ~/usr/local 
 
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface -lmca2_amicom
 ann:        -I<'ANN/ANN.h'> -lANN
