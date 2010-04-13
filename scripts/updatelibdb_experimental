@@ -95,6 +95,8 @@ my @files = `$LIBDB_SEARCH | grep '/moc\$\\|[.]jar\$$ex'`;
 
 # process each line
 my %libs = (); # will contain mapping "libname => line" of all available libraries
+my $statusok = ""; # find status for each lib
+my $statusfail = ""; # find status for each lib
 foreach my $line (@lines) {
 
     # basic line parsing
@@ -109,7 +111,9 @@ foreach my $line (@lines) {
     if (exists $libs { $libname } && $libs { $libname } ne "N/A") {
         next; 
     }
-    #print "processing $libname: $opts\n";
+    print "$libname: "; #$opts\n";
+    $statusok = "";
+    $statusfail = "";
 
     # process includes
     while ($opts =~ /(\s|^)(-I<(\S+)>)(\s|$)/) {
@@ -127,21 +131,37 @@ foreach my $line (@lines) {
     }
 
     # process libraries
+    my @exlpaths = (); # existing -L entries
+    while ($line =~ /(\s|:)-L(\S+)/g) {
+        push @exlpaths, $2;
+    }
     my $lpaths = "";
     while ($opts =~ /(\s|^)-l(\S+)/g) {
         my $lb = $2;
-        my $s = "lib" . $lb . ".so";
-        my $path = findPath($s);
-        if ($path eq "") {
-            $s = "lib" . $lb . ".a";
-            $path = findPath($s);
-            if ($path eq "") {
-                $opts = "";
+        my $so = "lib" . $lb . ".so";
+        my $a = "lib" . $lb . ".a";
+        my $skip = 0;
+        foreach (@exlpaths) { # if library is available in existing -L path... continue
+            if (-e "$_/$so" || -e "$_/$a") {
+                $skip = 1;
                 last;
             }
         }
-        unless ($path eq "/usr/lib" || $path =~ /\/gcc\//) {
-            $lpaths .= "-L" . $path . " ";
+        unless ($skip == 1) {
+            my $path = findPath($so);
+            if ($path eq "") {
+                $path = findPath($a);
+                if ($path eq "") {
+                    $opts = "";
+                    last;
+                }
+            }
+            unless ($path eq "/usr/lib" || $path eq "/usr/local/lib" || $path =~ /\/gcc\//) {
+                my $newPath = "-L" . $path . " ";
+                unless ($lpaths =~ /\Q$newPath\E/) {
+                    $lpaths .= $newPath;
+                }
+            }
         }
     }
     unless ($opts eq "" || $lpaths eq "") {
@@ -154,10 +174,12 @@ foreach my $line (@lines) {
     # create entry
     if ($opts eq "") {
         $libs { $libname } = "N/A";
+        print "no (missing $statusfail)\n";
     } else {
         $opts =~ s/  / /g; # remove any double spaces
         $opts =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace
         $libs { $libname } = $opts;
+        print "yes $statusok\n";
     }
 }
 
@@ -214,17 +236,20 @@ close $out or die "$in: $!";
 sub findPath(@) {
 
     # search for directories containing all files
-    my @look4 = shift;
+    my @look4 = @_;
     my @candidates = ();
     my $look4first = $look4[0];
     $look4first =~ /^('?)(.*)\1$/; # remove quotes
+    $look4first = $2; # remove quotes
     #print "searching $look4first\n";
+    $statusfail = $look4first;
     foreach (@files) {
         #print "matching $look4first and $_\n";
         if ($_ =~ /(.*)\Q$look4first\E$/) {
-            #print "found $look4first in $1\n";
+            my $size = @look4;
+            #print "found $look4first in $1 " . "$size\n";
             $curPath = $1;
-            if (@look4 == 1 || allInPath(@look4[1..$#look4])) {
+            if ((@look4 == 1) || (allInPath(@look4[1..$#look4]) == 1)) {
                 push @candidates, $curPath;
             }
         }
@@ -233,6 +258,9 @@ sub findPath(@) {
     # find best candidate
     my $best = "";
     my $bestScore = -100000000;
+    if (@candidates > 1) {
+        $statusok = "(multiple)";
+    }
     foreach my $c (@candidates) {
         my $score = scorePath($c);
         if ($score > $bestScore) {
@@ -246,21 +274,29 @@ sub findPath(@) {
 
 # are all files (argument) available in $curPath
 sub allInPath(@) {
-    my @fs = shift;
+    my @fs = @_;
+    #print "allinpath $curPath ";
     foreach my $file (@fs) {
-        print "inPath? $file - $curPath\n";
-        unless (inPath($file)) {
+        $statusfail = $file;
+        #print "inPath? $file ";
+        unless (inPath($file) == 1) {
+            #print "no\n";
             return 0;
         }
     }
+    #print "yes\n";
     return 1;
 }
 
 # is file (arg) in $curPath
 sub inPath($) {
     my $file = shift;
+    $file =~ /^('?)(.*)\1$/; # remove quotes
+    $file = $2; # remove quotes
+    my $search4 = $curPath . $file . "\n";
+    #print "inPath s4 $search4 ";
     foreach (@files) {
-        if ($curPath . $file eq $_) {
+        if ($search4 eq $_) {
             return 1;
         }
     }
