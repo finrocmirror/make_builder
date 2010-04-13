@@ -26,6 +26,8 @@ import java.io.File;
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
+import makebuilder.SourceFileHandler;
+import makebuilder.handler.CppHandler;
 
 /**
  * @author max
@@ -77,5 +79,10 @@ public abstract class MCABuildEntity extends BuildEntity {
 		String targetFile = getTarget();
 		targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
 		target.addToPhony(targetFile + (isLibrary() ? "" : "-bin"));
+	}
+
+	@Override
+	public Class<? extends SourceFileHandler> getFinalHandler() {
+		return CppHandler.class;
 	}
 }

@@ -122,6 +122,7 @@ public class MakeXMLLoader implements BuildFileLoader {
         		be.opts.addOptions(params.get("cxxflags"), be.opts.cxxCompileOptions);
         		be.opts.addOptions(params.get("cflags"), be.opts.cCompileOptions);
         		be.opts.addOptions(params.get("ldflags"), be.opts.linkOptions);
+        		be.params = params;
 
         		// Source files are a little more complicated
         		for (String s : asStringList(params.get("sources"))) {

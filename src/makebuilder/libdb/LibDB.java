@@ -22,6 +22,7 @@
 package makebuilder.libdb;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import makebuilder.BuildEntity;
-import makebuilder.MakeFileBuilder;
 import makebuilder.util.CCOptions;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
@@ -45,7 +45,7 @@ public class LibDB {
 
 	/** Mapping: Library name => library */
 	private static Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
-
+	
 	/** Load libdb.txt at the beginning */
 	static {
 		reinit();
@@ -58,20 +58,35 @@ public class LibDB {
 	public static void reinit() {
 		libs.clear();
 		try {
-			File f = Util.getFileInEtcDir(LibDBBuilder.LIBDB_TXT);
-			List<String> lines = Files.readLines(f);
-			for (String s : lines) {
-				if (s.trim().length() <= 1) {
-					continue;
-				}
-				s = s.replace("$MCAHOME$", MakeFileBuilder.HOME.getAbsolutePath());
-				int split = s.indexOf(":");
-				String name =  s.substring(0, split).trim();
-				String flags = s.substring(split + 1).trim();
-				libs.put(name, new ExtLib(name, flags));
+			loadLibDb(LibDBBuilder.LIBDB_TXT, true);
+			if (new File(LibDBBuilder.LIBDB_JAVA).exists()) {
+				loadLibDb(LibDBBuilder.LIBDB_JAVA, false);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Loads libdb file
+	 * 
+	 * @param libdbTxt file name (relative to make_builder/etc directory)
+	 * @param cpp c/c++ library?
+	 */
+	private static void loadLibDb(String libdbTxt, boolean cpp) throws IOException {
+		
+		// external libraries
+		File f = Util.getFileInEtcDir(libdbTxt);
+		List<String> lines = Files.readLines(f);
+		for (String s : lines) {
+			if (s.trim().length() <= 1) {
+				continue;
+			}
+			//s = s.replace("$MCAHOME$", MakeFileBuilder.HOME.getAbsolutePath());
+			int split = s.indexOf(":");
+			String name =  s.substring(0, split).trim();
+			String flags = s.substring(split + 1).trim();
+			libs.put(name, new ExtLib(name, flags, cpp));
 		}
 	}
 
@@ -150,11 +165,12 @@ public class LibDB {
 		/**
 		 * @param name Library name
 		 * @param options libdb.txt line
+		 * @param cpp C/C++ external library?
 		 */
-		public ExtLib(String name, String options) {
+		public ExtLib(String name, String options, boolean cpp) {
 			this.name = name;
 			this.options = options;
-			ccOptions = new CCOptions(options);
+			ccOptions = new CCOptions(cpp ? options : "");
 		}
 		
 		/**

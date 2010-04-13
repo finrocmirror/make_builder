@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedMap;
 
 import makebuilder.libdb.LibDB;
 import makebuilder.util.AddOrderSet;
@@ -68,6 +69,9 @@ public abstract class BuildEntity {
 	/** Final target in makefile for this build entity - will create library or executable */
 	public Makefile.Target target;
 	
+	/** All attributes/parameters/tags that were set in make.xml for this target */ 
+	public SortedMap<String, String> params;
+	
 	/**
 	 * @param tb Reference to main builder instance
 	 */
@@ -78,12 +82,28 @@ public abstract class BuildEntity {
 	 */
 	public abstract String getTarget();
 	
+	/**
+	 * @return Target file name (without path)
+	 */
+	public String getTargetFilename() {
+		String s = getTarget();
+		return s.substring(s.lastIndexOf("/") + 1);
+	}
+	
+	/**
+	 * @return Target path
+	 */
+	public String getTargetPath() {
+		String s = getTarget();
+		return s.substring(0, s.lastIndexOf("/"));
+	}
+	
 	public String toString() {
 		return name;
 	}
 
 	public boolean isLibrary() {
-		return getTarget().endsWith(".so");
+		return getTarget().endsWith(".so") || getTarget().endsWith(".jar");
 	}
 	
 	/**  
@@ -203,8 +223,7 @@ public abstract class BuildEntity {
 			return;
 		}
 		for (BuildEntity be : buildEntities) { // local dependency?
-			String dep2 = "/lib" + dep + ".so";
-			if (be.getTarget().endsWith(dep2)) {
+			if (be.getReferenceName().equals(dep)) {
 				if (optional) {
 					optionalDependencies.add(be);
 				} else {
@@ -231,4 +250,30 @@ public abstract class BuildEntity {
 		//target.addDependency("init");
 		target.addDependency(buildFile.relative); // to ensure (e.g. after makeMakefile) that changes to build structure will be considered 
 	}
+	
+	/**
+	 * @return name that entity can be referenced with (e.g. in make.xml dependencies) 
+	 */
+	public String getReferenceName() {
+		String s = getTargetFilename(); // file name
+		if (s.startsWith("lib") && s.endsWith(".so")) {
+			return s.substring(3, s.length() - 3);
+		}
+		return s;
+	}
+	
+	/**
+	 * Get custom attribute/parameter/tag that was set in make.xml for this target
+	 * 
+	 * @param key Key
+	 * @return Value (null if it wasn't set)
+	 */
+	public String getParameter(String key) {
+		return params == null ? null : params.get(key);
+	}
+	
+	/** 
+	 * @return Handler that will finally create this target 
+	 */
+	public abstract Class<? extends SourceFileHandler> getFinalHandler();
 }

@@ -21,6 +21,9 @@
  */
 package makebuilder.ext.finroc;
 
+import makebuilder.SourceFileHandler;
+import makebuilder.handler.CppHandler;
+
 /**
  * @author max
  *
@@ -41,4 +44,8 @@ public class RRLib extends FinrocBuildEntity {
 		return "$(TARGET_LIB)/librrlib_" + name + ".so";
 	}
 	
+	@Override
+	public Class<? extends SourceFileHandler> getFinalHandler() {
+		return CppHandler.class;
+	}
 }

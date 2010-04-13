@@ -87,7 +87,9 @@ public class CCOptions implements Comparator<String> {
 			String[] opts = options.split("\\s-");
 			for (String opt : opts) {
 				opt = opt.trim();
-				addOption(opt.startsWith("-") ? opt : "-" + opt, optionType);
+				if (opt.length() > 0) {
+					addOption(opt.startsWith("-") ? opt : "-" + opt, optionType);
+				}
 			}
 		}
 	}

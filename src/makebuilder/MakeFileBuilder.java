@@ -274,6 +274,18 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 		return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS +	source.name + "_" + suggestedPrefix + "." + targetExtension);
 	}
 	
+	/** 
+	 * Get directory (normally in persistent temporary building directory) for build files
+	 * (can be overridden to perform custom naming)
+	 * 
+	 * @param be Build Entity
+	 * @return Directory
+	 */
+	public String getTempBuildDir(BuildEntity source) {
+		String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
+		return tempBuildPath.relative + FS + srcDir;
+	}
+	
 	/**
 	 * Print error line deferred (when tool exits)
 	 *

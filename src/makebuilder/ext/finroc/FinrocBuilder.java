@@ -42,6 +42,7 @@ import makebuilder.ext.mca.MCASystemLibLoader;
 import makebuilder.ext.mca.SConscriptParser;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.CppMerger;
+import makebuilder.handler.JavaHandler;
 import makebuilder.handler.MakeXMLLoader;
 import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
@@ -62,7 +63,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 	public final SrcDir targetLib, targetBin;
 
 	/** Standard compiler options for MCA */
-	public static final String MCAOPTS = "-include Makefile.h -Ilibraries -Iprojects -Itools -Iplugins -Irrlib -I. ";
+	public static final String MCAOPTS = "-include libinfo.h -Ilibraries -Iprojects -Itools -Iplugins -Irrlib -I. ";
 
 	/** System library installation handler */
 	public final MCASystemLibLoader systemInstall;
@@ -81,21 +82,26 @@ public class FinrocBuilder extends MakeFileBuilder {
 		targetLib = buildPath.getSubDir("lib");
 		makefile.addVariable("TARGET_BIN=$(TARGET_DIR)/bin");
 		makefile.addVariable("TARGET_LIB=$(TARGET_DIR)/lib");
+		makefile.addVariable("TARGET_JAVA=export/java");
+		makefile.addBuildDir("build/java");
+		makefile.addBuildDir("export/java");
 		//makefile.addVariable("TARGET_PLUGIN=$(TARGET_DIR)/plugin");
 		
 		// init handlers
 		addLoader(new SConscriptParser());
-		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, RRLib.class, FinrocProgram.class));
+		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, 
+				RRLib.class, FinrocProgram.class, RRJavaLib.class, FinrocJavaProgram.class, FinrocJavaLibrary.class, FinrocJavaPlugin.class));
 		addHandler(new Qt4Handler());
-		addHandler(new NvccHandler(""/*"-include Makefile.h"*/));
+		addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
 		//addHandler(new DescriptionBuilderHandler());
 		if (getOptions().combineCppFiles) {
 			addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
 			makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
 		}
-		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h", 
+		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h", 
 				"-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
+		addHandler(new JavaHandler("$(TARGET_JAVA)", "../../java"));
 		addHandler(new CakeHandler());
 
 		// is MCA installed system-wide?
@@ -212,10 +218,10 @@ public class FinrocBuilder extends MakeFileBuilder {
 			}
 		}
 		
-		// write defines to makefile.h
+		// write defines to libinfo.h
 		globalDefine.add("");
 		try {
-			globalDefine.writeTo(new File("Makefile.h"));
+			globalDefine.writeTo(new File("libinfo.h"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -232,8 +238,21 @@ public class FinrocBuilder extends MakeFileBuilder {
 		return sources.registerBuildProduct(targetDir.relative + FS + source.getRawName() + "." + targetExtension);
 	}
 	
+	@Override
 	public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
+		if (targetExtension.equals("mf")) {
+			return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTarget().replaceAll("[.]jar$", ".mf"));
+		}
 		return sources.registerBuildProduct(tempPath + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+	}
+	
+	@Override
+	public String getTempBuildDir(BuildEntity source) {
+		if (source.getFinalHandler() == JavaHandler.class) {
+			String srcDir = source.getRootDir().relative;
+			return tempBuildPath.getParent().getSubDir("java") + FS + srcDir;
+		}
+		return super.getTempBuildDir(source);
 	}
 
 }

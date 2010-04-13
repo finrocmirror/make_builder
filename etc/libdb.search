@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# This script should print all system files that might be headers or libraries (.so/.a)
+# relevant to entries in libdb.raw to std.out (absolute file names)
+# 
+# If necessary, this script may be modified for the local system 
+# (any changes shouldn't be committed though)
+
+echo $0
+if [ -f /etc/make_builder/libdb.search ] 
+  then
+    /etc/make_builder/libdb.search
+  else
+    $0.default  
+fi
+

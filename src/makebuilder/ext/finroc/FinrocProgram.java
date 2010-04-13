@@ -21,6 +21,9 @@
  */
 package makebuilder.ext.finroc;
 
+import makebuilder.SourceFileHandler;
+import makebuilder.handler.CppHandler;
+
 /**
  * @author max
  *
@@ -49,11 +52,16 @@ public class FinrocProgram extends FinrocBuildEntity {
 				if (n.startsWith(prefixBase)) {
 					n = n.substring(prefixBase.length());
 				} else if (n.startsWith(parts[1])) {
-					n = n.substring(parts[1].length());
+					n = n.substring(parts[1].length() + 1);
 				}
-				return "$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "");
+				return ("$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "")).replace("__", "_");
 			}
 		}
 		return "$(TARGET_BIN)/" + name;
+	}
+	
+	@Override
+	public Class<? extends SourceFileHandler> getFinalHandler() {
+		return CppHandler.class;
 	}
 }

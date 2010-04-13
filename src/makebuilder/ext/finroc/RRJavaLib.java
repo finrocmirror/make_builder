@@ -22,26 +22,23 @@
 package makebuilder.ext.finroc;
 
 import makebuilder.SourceFileHandler;
-import makebuilder.handler.CppHandler;
+import makebuilder.handler.JavaHandler;
 
 /**
  * @author max
  *
- * Finroc library
+ * Java RRLib
  */
-public class FinrocLibrary extends FinrocBuildEntity {
+public class RRJavaLib extends FinrocBuildEntity {
 
-	public FinrocLibrary() {
-		opts.addOptions("-shared -fPIC");
+	@Override
+	public Class<? extends SourceFileHandler> getFinalHandler() {
+		return JavaHandler.class;
 	}
 
 	@Override
 	public String getTarget() {
-		return "$(TARGET_LIB)/libfinroc_" + name + ".so";
+		return "$(TARGET_JAVA)/rrlib_" + name + ".jar";
 	}
-	
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+
 }

@@ -42,8 +42,9 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 		boolean project = rootDir2.startsWith("projects");
 		boolean lib = rootDir2.startsWith("libraries");
 		boolean tool = rootDir2.startsWith("tools");
-		boolean plugin = rootDir2.startsWith("tools");
+		boolean plugin = rootDir2.startsWith("plugins");
 		boolean rrlib = rootDir2.startsWith("rrlib");
+		boolean core = rootDir2.startsWith("core") || rootDir2.startsWith("jcore");
 		boolean sysInstall = MakeFileBuilder.getOptions().containsKey("usesysteminstall");
 		if (lib || rrlib || plugin) {
 			target.addToPhony("libs");
@@ -54,12 +55,15 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 		if (plugin) {
 			target.addToPhony("plugins");
 		}
-		if (lib) {
+		if (lib || plugin || rrlib) {
 			if (sysInstall) {
 				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1));
 			} else {
 				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
 			}
+		}
+		if (core) {
+			target.addToPhony(rootDir2);
 		}
 		if (project || tool) {
 			String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);

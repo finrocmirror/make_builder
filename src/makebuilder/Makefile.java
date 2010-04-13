@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
@@ -57,8 +58,8 @@ public class Makefile {
 	/** Variable name of message that is displayed, when build process finishes successfully */
 	public static final String DONE_MSG_VAR = "DONE_MSG";
 
-	/** Directories that targets are built to. Will be remove with make clean command */
-	private final String[] buildDirs;
+	/** Directories that targets are built to. Will be removed with make clean command */
+	private final ArrayList<String> buildDirs;
 
 	/** PHONY target for building everything */
 	private final Target all = new Target("all");
@@ -70,7 +71,7 @@ public class Makefile {
 	 * @param buildDirs Directories that targets are built to. Will be removed with make clean command
 	 */
 	public Makefile(String... buildDirs) {
-		this.buildDirs = buildDirs;
+		this.buildDirs =  new ArrayList<String>(Arrays.asList(buildDirs));
 		addVariable(DONE_MSG_VAR + "=done");
 	}
 	
@@ -78,7 +79,7 @@ public class Makefile {
 	 * @param other Makefile to copy initial values from 
 	 */
 	public Makefile(Makefile other) {
-		buildDirs = other.buildDirs;
+		buildDirs = new ArrayList<String>(other.buildDirs);
 		variables.addAll(other.variables);
 		phonyTargets.putAll(other.phonyTargets);
 		targets.addAll(other.targets);
@@ -230,6 +231,15 @@ public class Makefile {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	/**
+	 * Add build directory (will be deleted with make clean)
+	 * 
+	 * @param dir Directory to add
+	 */
+	public void addBuildDir(String dir) {
+		buildDirs.add(dir);
 	}
 	
 	/**

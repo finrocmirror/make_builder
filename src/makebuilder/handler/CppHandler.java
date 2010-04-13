@@ -119,6 +119,11 @@ public class CppHandler implements SourceFileHandler {
 	@Override
 	public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
 
+		// build it?
+		if (!(be.getFinalHandler().equals(CppHandler.class))) {
+			return;
+		}
+		
 		// create compiler options
 		CCOptions options = new CCOptions();
 		options.merge(be.opts, true);

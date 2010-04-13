@@ -39,7 +39,7 @@ public class MCAProgram extends MCABuildEntity {
 					if (n.startsWith("mcal_")) {
 						n = n.substring(5);
 					} else if (n.startsWith(parts[1])) {
-						n = n.substring(parts[1].length());
+						n = n.substring(parts[1].length() + 1);
 					}
 					return "$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "");
 				}

@@ -57,7 +57,8 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 	/** File names of files to process */
 	static final String LIBDB_RAW = "libdb.raw",
 	                    LIBDB_TXT = "libdb.txt",
-	                    LIBDB_RAW_LOCAL = "libdb.raw.local";
+	                    LIBDB_RAW_LOCAL = "libdb.raw.local",
+						LIBDB_JAVA = "libdb.java";
 	
 	public void run() {
 		try {
@@ -268,7 +269,7 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 		// write entries to libdb.txt
 		List<String> lines = new ArrayList<String>();
 		for (Map.Entry<String, String> en : newLibDB.entrySet()) {
-			lines.add(en.getKey() + ": " + en.getValue());
+			lines.add(en.getKey() + ": " + en.getValue().trim());
 		}
 		Files.writeLines(Util.getFileInEtcDir(LIBDB_TXT), lines);
 	}
