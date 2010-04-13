@@ -101,7 +101,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h", 
 				"-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
-		addHandler(new JavaHandler("$(TARGET_JAVA)", "../../java"));
+		addHandler(new JavaHandler("$(TARGET_JAVA)", "$$FINROC_HOME/$(TARGET_JAVA)"));
 		addHandler(new CakeHandler());
 
 		// is MCA installed system-wide?
@@ -193,7 +193,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
 	@Override
 	public String[] getSourceDirs() {
-		return new String[]{"core", "libraries", "projects", "tools", "plugins", "rrlib"};
+		return new String[]{"core", "jcore", "libraries", "projects", "tools", "plugins", "rrlib"};
 	}
 	
 	public void run() {
@@ -241,7 +241,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 	@Override
 	public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
 		if (targetExtension.equals("mf")) {
-			return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTarget().replaceAll("[.]jar$", ".mf"));
+			return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "") + ".mf");
 		}
 		return sources.registerBuildProduct(tempPath + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
 	}
@@ -249,8 +249,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 	@Override
 	public String getTempBuildDir(BuildEntity source) {
 		if (source.getFinalHandler() == JavaHandler.class) {
-			String srcDir = source.getRootDir().relative;
-			return tempBuildPath.getParent().getSubDir("java") + FS + srcDir;
+			return tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "");
 		}
 		return super.getTempBuildDir(source);
 	}

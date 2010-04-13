@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
+import makebuilder.handler.CppHandler;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.AddOrderSet;
 import makebuilder.util.CCOptions;
@@ -139,6 +140,9 @@ public abstract class BuildEntity {
 	 * Compute the set of options to build this build entity with a C/C++ compiler
 	 */
 	public void computeOptions() {
+		if (getFinalHandler() != CppHandler.class) {
+			return;
+		}
 		for (LibDB.ExtLib el : directExtlibs) {
 			opts.merge(el.ccOptions, true);
 		}		

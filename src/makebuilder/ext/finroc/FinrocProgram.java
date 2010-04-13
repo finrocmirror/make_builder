@@ -39,6 +39,8 @@ public class FinrocProgram extends FinrocBuildEntity {
 			return prefix("finroc_plugin_");
 		} else if (this.getRootDir().relative.startsWith("core")) {
 			return "$(TARGET_BIN)/finroc_core_" + name;
+		} else if (this.getRootDir().relative.startsWith("jcore")) {
+			return "$(TARGET_BIN)/finroc_jcore_" + name;
 		}
 		return "$(TARGET_BIN)/" + name;
 	}

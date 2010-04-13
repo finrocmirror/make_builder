@@ -122,23 +122,26 @@ public class JavaHandler implements SourceFileHandler {
 			mainTarget = makefile.addTarget(jarDir + "/" + jar, false);
 			
 			Makefile.Target startScript = be.target;
-			startScript.addCommand("echo #!/bin/bash > " + startScript.getName(), false);
-			startScript.addCommand("echo java -jar " + jarDirFromBin + "/" + be.getTarget() + " \\\"\\$@\\\" > " + startScript.getName(), false);
+			startScript.addCommand("echo '#!/bin/bash' > " + startScript.getName(), false);
+			startScript.addCommand("echo 'java -jar " + jarDirFromBin + "/" + jar + " \"$$@\"' >> " + startScript.getName(), true);
+			startScript.addCommand("chmod +x " + startScript.getName(), false);
 			startScript.addDependency(mainTarget.getName());
 		} else {
 			mainTarget = be.target;
 		}
 		
 		// collect .jar files and copy .jar files to export/java
-		String jars = "";
+		String jars = ""; // line in manifest
+		String cpJars = ""; // class path
 		ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
 		for (SrcFile sf : copy) {
 			if (sf.hasExtension("jar")) {
 				be.sources.remove(sf);
+				String name = be.getTargetPath() + "/lib/" + sf.getName();
 				jars += " lib/" + sf.getName();
+				cpJars += ":" + name;
 				
 				// create .jar copy target in makefile
-				String name = be.getTargetPath() + "/lib/" + sf.getName(); 
 				Makefile.Target jar = makefile.addTarget(name, false);
 				jar.addCommand("cp ", false);
 				mainTarget.addDependency(jar);
@@ -149,35 +152,43 @@ public class JavaHandler implements SourceFileHandler {
 		for (LibDB.ExtLib el : be.extlibs) {
 			if (el.name.endsWith(".jar")) { // C++ dependencies are only relevant at runtime
 				jars += " " + el.options;
+				cpJars += ":" + el.options;
 			}
 		}
 		for (BuildEntity dep : be.dependencies) {
 			if (dep.getTarget().endsWith(".jar")) { // C++ dependencies are only relevant at runtime
 				jars += " " + dep.getTargetFilename();
+				cpJars += ":" + dep.getTarget();
 				mainTarget.addDependency(dep.getTarget());
 			}
 		}
+
+		String srcPath = findSourceRoot(be.getRootDir(), builder);
 		
 		// create manifest
 		SrcFile mf = builder.getTempBuildArtifact(be, "mf", "");
 		Makefile.Target mfTarget = makefile.addTarget(mf.relative, true);
 		mainTarget.addDependency(mfTarget);
-		mfTarget.addCommand("echo Manifest-Version: 1.0 > " + mfTarget.getName(), false);
+		mfTarget.addCommand("echo 'Manifest-Version: 1.0' > " + mfTarget.getName(), false);
 		String main = be.getParameter("main-class");
+		if (main == null && be.sources.size() == 1 && be.sources.get(0).hasExtension("java") && (!be.isLibrary())) {
+			main = be.sources.get(0).relative;
+			main = main.substring(srcPath.length() + 1);
+			main = main.substring(0, main.length() - 5).replace('/', '.');
+		}
 		if (main != null) {
-			mfTarget.addCommand("echo Main-Class: " + main + " > " + mfTarget.getName(), false);
+			mfTarget.addCommand("echo 'Main-Class: " + main + "' >> " + mfTarget.getName(), false);
 		}
 		String plugin = be.getParameter("plugin-class");
 		if (plugin != null) {
-			mfTarget.addCommand("echo Plugin-Class: " + plugin + " > " + mfTarget.getName(), false);
+			mfTarget.addCommand("echo 'Plugin-Class: " + plugin + "' >> " + mfTarget.getName(), false);
 		}
 		if (jars.length() > 0) {
-			mfTarget.addCommand("echo Class-Path:" + jars + " > " + mfTarget.getName(), false);
+			mfTarget.addCommand("echo 'Class-Path:" + jars + "' >> " + mfTarget.getName(), false);
 		}
 		
 		// compile java files
 		String buildDir = builder.getTempBuildDir(be) + "/bin";
-		String srcPath = findSourceRoot(be.getRootDir(), builder);
 		copy = new ArrayList<SrcFile>(be.sources);
 		String javaFiles = "";
 		for (SrcFile javaFile : copy) {
@@ -185,9 +196,9 @@ public class JavaHandler implements SourceFileHandler {
 			be.sources.remove(javaFile);
 			mainTarget.addDependency(javaFile);
 		}
-		jars += " " + buildDir;
+		cpJars = buildDir + cpJars;
 		mainTarget.addCommand("mkdir -p " + buildDir, false);
-		mainTarget.addCommand("javac -sourcepath " + srcPath + " -d " + buildDir + " -cp " + jars.trim().replace(".jar ", ".jar:") + javaFiles, true);
+		mainTarget.addCommand("javac -sourcepath " + srcPath + " -d " + buildDir + " -cp " + cpJars + javaFiles, true);
 		
 		// copy any other files
 		for (SrcFile other : be.sources) {
