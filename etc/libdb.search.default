@@ -1,8 +1,11 @@
 #!/bin/bash
 
+set -o verbose #echo on
+
 find -L /usr/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /usr/local/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /usr/local/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /opt -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/qt -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/share/qt4/bin -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
@@ -11,4 +14,7 @@ find -L /usr/src/linux/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/X11R6/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/X11R6/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/share/java -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+
+set +o verbose #echo off
+
 
