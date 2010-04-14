@@ -19,6 +19,7 @@ cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda -lcudart
+cufft:      -I<cufft.h> -lcufft
 curl:       -I<curl/curl.h> -lcurl
 curses:    -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil

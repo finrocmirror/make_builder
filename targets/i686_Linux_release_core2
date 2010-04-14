@@ -1,2 +1,3 @@
 CFLAGS=-O3 -D NDEBUG -march=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3
 NVCC_FLAGS=
+NVCC=/usr/local/cuda/bin/nvcc
