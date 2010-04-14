@@ -137,13 +137,14 @@ public class JavaHandler implements SourceFileHandler {
 		for (SrcFile sf : copy) {
 			if (sf.hasExtension("jar")) {
 				be.sources.remove(sf);
-				String name = be.getTargetPath() + "/lib/" + sf.getName();
+				String name = jarDir + "/lib/" + sf.getName();
 				jars += " lib/" + sf.getName();
 				cpJars += ":" + name;
 				
 				// create .jar copy target in makefile
 				Makefile.Target jar = makefile.addTarget(name, false);
-				jar.addCommand("cp ", false);
+				jar.addCommand("cp " + sf.relative + " " + jar.getName(), false);
+				jar.addDependency(sf.relative);
 				mainTarget.addDependency(jar);
 			}
 		}
@@ -168,6 +169,7 @@ public class JavaHandler implements SourceFileHandler {
 		// create manifest
 		SrcFile mf = builder.getTempBuildArtifact(be, "mf", "");
 		Makefile.Target mfTarget = makefile.addTarget(mf.relative, true);
+		mfTarget.addDependency(be.buildFile);
 		mainTarget.addDependency(mfTarget);
 		mfTarget.addCommand("echo 'Manifest-Version: 1.0' > " + mfTarget.getName(), false);
 		String main = be.getParameter("main-class");
@@ -192,9 +194,11 @@ public class JavaHandler implements SourceFileHandler {
 		copy = new ArrayList<SrcFile>(be.sources);
 		String javaFiles = "";
 		for (SrcFile javaFile : copy) {
-			javaFiles += " " + javaFile.relative;
-			be.sources.remove(javaFile);
-			mainTarget.addDependency(javaFile);
+			if (javaFile.hasExtension("java")) {
+				javaFiles += " " + javaFile.relative;
+				be.sources.remove(javaFile);
+				mainTarget.addDependency(javaFile);
+			}
 		}
 		cpJars = buildDir + cpJars;
 		mainTarget.addCommand("mkdir -p " + buildDir, false);
@@ -202,10 +206,11 @@ public class JavaHandler implements SourceFileHandler {
 		
 		// copy any other files
 		for (SrcFile other : be.sources) {
-			String o = buildDir + "/bin/" + other.relative.substring(srcPath.length() + 1); 
+			String o = buildDir + "/" + other.relative.substring(srcPath.length() + 1); 
 			Makefile.Target t = makefile.addTarget(o, false);
 			t.addDependency(other.relative);
 			t.addCommand("cp " + other.relative + " " + o, false);
+			mainTarget.addDependency(t);
 		}
 		
 		// jar java files
