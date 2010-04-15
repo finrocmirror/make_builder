@@ -2,7 +2,7 @@
  * You received this file as part of an experimental
  * build tool ('makebuilder') - originally developed for MCA2.
  *
- * Copyright (C) 2008-2009 Max Reichardt,
+ * Copyright (C) 2008-2010 Max Reichardt,
  *   Robotics Research Lab, University of Kaiserslautern
  *
  * This program is free software; you can redistribute it and/or
