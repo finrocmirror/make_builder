@@ -21,7 +21,9 @@
  */
 package makebuilder.ext.finroc;
 
+import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
+import makebuilder.StartScript;
 import makebuilder.handler.JavaHandler;
 
 /**
@@ -38,5 +40,18 @@ public class FinrocJavaProgram extends FinrocProgram {
 	
 	public boolean isLibrary() {
 		return false;
+	}
+
+	@Override
+	public String getTarget() {
+		return super.getTarget().replace("$(TARGET_BIN)", "$(TARGET_JAVA)") + ".jar";
+	}
+	
+	@Override
+	public void initTarget(Makefile makefile) {
+		if (startScripts.size() == 0 && params.containsKey("main-class")) {
+			startScripts.add(new StartScript(getTargetFilename().replaceAll("[.]jar$", ""), null));
+		}
+		super.initTarget(makefile);
 	}
 }

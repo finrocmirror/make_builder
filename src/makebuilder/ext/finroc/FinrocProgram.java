@@ -30,36 +30,32 @@ import makebuilder.handler.CppHandler;
  * Finroc library
  */
 public class FinrocProgram extends FinrocBuildEntity {
-
+	
+	@Override
+	public String getTargetPrefix() {
+		if (this.getRootDir().relative.startsWith("libraries")) {
+			return "finroc_library_" + getSecondDir() + "_";
+		} else if (this.getRootDir().relative.startsWith("plugins")) {
+			return "finroc_plugin_" + getSecondDir() + "_";
+		} else if (this.getRootDir().relative.startsWith("core")) {
+			return "finroc_core_";
+		} else if (this.getRootDir().relative.startsWith("jcore")) {
+			return "finroc_jcore_";
+		}
+		return "";
+	}
+	
 	@Override
 	public String getTarget() {
-		if (this.getRootDir().relative.startsWith("libraries")) {
-			return prefix("finroc_library_");
-		} else if (this.getRootDir().relative.startsWith("plugins")) {
-			return prefix("finroc_plugin_");
-		} else if (this.getRootDir().relative.startsWith("core")) {
-			return "$(TARGET_BIN)/finroc_core_" + name;
-		} else if (this.getRootDir().relative.startsWith("jcore")) {
-			return "$(TARGET_BIN)/finroc_jcore_" + name;
-		}
-		return "$(TARGET_BIN)/" + name;
+		return "$(TARGET_BIN)/" + getTargetPrefix() + name;
 	}
 
-	private String prefix(String prefixBase) {
+	private String getSecondDir() {
 		String[] parts = this.getRootDir().relative.split("/");
 		if (parts.length >= 2) {
-			String prefix = prefixBase + parts[1];
-			if (!name.startsWith(prefix)) {
-				String n = name;
-				if (n.startsWith(prefixBase)) {
-					n = n.substring(prefixBase.length());
-				} else if (n.startsWith(parts[1])) {
-					n = n.substring(parts[1].length() + 1);
-				}
-				return ("$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "")).replace("__", "_");
-			}
+			return parts[1];
 		}
-		return "$(TARGET_BIN)/" + name;
+		return "";
 	}
 	
 	@Override

@@ -69,18 +69,7 @@ public class JavaHandler implements SourceFileHandler {
 //		this.separateCompileAndLink = separateCompileAndLink;
 //	}
 	
-	/** Directory to place built jar files (for applications) in */
-	private final String jarDir; 
-
-	/** Directory name of jarDir from binDir */
-	private final String jarDirFromBin; 
-
 	private static final Pattern packagePattern = Pattern.compile("\\s*package\\s+(.*)\\s*;");
-	
-	public JavaHandler(String jarDir, String jarDirFromBin) {
-		this.jarDir = jarDir;
-		this.jarDirFromBin = jarDirFromBin;
-	}
 	
 	@Override
 	public void init(Makefile makefile) {
@@ -114,21 +103,7 @@ public class JavaHandler implements SourceFileHandler {
 		}
 		
 		// main target (.jar file)
-		Makefile.Target mainTarget = null;
-		
-		// shell script to start it
-		if (!be.isLibrary()) {
-			String jar = be.getTargetFilename() + ".jar";
-			mainTarget = makefile.addTarget(jarDir + "/" + jar, false);
-			
-			Makefile.Target startScript = be.target;
-			startScript.addCommand("echo '#!/bin/bash' > " + startScript.getName(), false);
-			startScript.addCommand("echo 'java -jar " + jarDirFromBin + "/" + jar + " \"$$@\"' >> " + startScript.getName(), true);
-			startScript.addCommand("chmod +x " + startScript.getName(), false);
-			startScript.addDependency(mainTarget.getName());
-		} else {
-			mainTarget = be.target;
-		}
+		Makefile.Target mainTarget = be.target;
 		
 		// collect .jar files and copy .jar files to export/java
 		String jars = ""; // line in manifest
@@ -137,7 +112,7 @@ public class JavaHandler implements SourceFileHandler {
 		for (SrcFile sf : copy) {
 			if (sf.hasExtension("jar")) {
 				be.sources.remove(sf);
-				String name = jarDir + "/lib/" + sf.getName();
+				String name = be.getTargetPath() + "/lib/" + sf.getName();
 				jars += " lib/" + sf.getName();
 				cpJars += ":" + name;
 				
@@ -226,6 +201,16 @@ public class JavaHandler implements SourceFileHandler {
 	private String findSourceRoot(SrcDir dir, MakeFileBuilder builder) {
 		List<File> files = Files.getAllFiles(dir.absolute, new String[]{"java"}, false, false);
 		for (File f : files) {
+			
+			// is it in a sub-repository?
+			File makeXMLPath = f;
+			do {
+				makeXMLPath = makeXMLPath.getParentFile();
+			} while(!new File(makeXMLPath.getAbsolutePath() + "/make.xml").exists());
+			if (!makeXMLPath.equals(dir.absolute)) {
+				continue;
+			}
+			
 			try {
 				for (String line : Files.readLines(f)) {
 					Matcher m = packagePattern.matcher(line);

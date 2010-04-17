@@ -57,8 +57,8 @@ public abstract class BuildEntity {
 	public CCOptions opts = new CCOptions();
 	
 	/** Involved libraries */
-	public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscrip)t
-	public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript)
+	public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscript/make.xml)
+	public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript/make.xml)
 	public final AddOrderSet<LibDB.ExtLib> extlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
 	public final AddOrderSet<LibDB.ExtLib> directExtlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; only from build entity itself)
 	public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
@@ -72,6 +72,9 @@ public abstract class BuildEntity {
 	
 	/** All attributes/parameters/tags that were set in make.xml for this target */ 
 	public SortedMap<String, String> params;
+	
+	/** Start scripts for this build entity */
+	public List<StartScript> startScripts = new ArrayList<StartScript>();
 	
 	/**
 	 * @param tb Reference to main builder instance
@@ -251,6 +254,11 @@ public abstract class BuildEntity {
 	 */
 	public void initTarget(Makefile makefile) {
 		target = makefile.addTarget(getTarget(), false);
+		for (StartScript scr : startScripts) {
+			scr.initTarget(makefile, getTargetPrefix());
+			scr.getTarget().addDependency(buildFile.relative);
+			scr.getTarget().addDependency(target);
+		}
 		//target.addDependency("init");
 		target.addDependency(buildFile.relative); // to ensure (e.g. after makeMakefile) that changes to build structure will be considered 
 	}
@@ -280,4 +288,11 @@ public abstract class BuildEntity {
 	 * @return Handler that will finally create this target 
 	 */
 	public abstract Class<? extends SourceFileHandler> getFinalHandler();
+	
+	/**
+	 * @return Prefix for target filename and scripts ("" if none)
+	 */
+	public String getTargetPrefix() {
+		return "";
+	}
 }

@@ -42,6 +42,7 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
+import makebuilder.StartScript;
 
 /**
  * @author max
@@ -92,20 +93,24 @@ public class MakeXMLLoader implements BuildFileLoader {
         		result.add(be);
         		
         		// collect parameters - first attributes, then subtags
-        		SortedMap<String, String> params = new TreeMap<String, String>();
-        		NamedNodeMap nnm = n.getAttributes();
-        		for (int j = 0; j < nnm.getLength(); j++) {
-        			Node it = nnm.item(j);
-        			params.put(it.getNodeName(), it.getNodeValue().trim());
-        		}
+        		SortedMap<String, String> params = getAllAttributes(n);
         		NodeList children = n.getChildNodes();
         		for (int j = 0; j < children.getLength(); j++) {
         			Node child = children.item(j);
-        			params.put(child.getNodeName(), child.getTextContent().trim());
-        			if (child.getNodeName().equals("sources")) {
-        				Node ex = child.getAttributes().getNamedItem("exclude");
-        				if (ex != null) {
-            				params.put("exclude", ex.getNodeValue());
+        			if (child.getNodeName().equals("script")) {
+                		SortedMap<String, String> sparams = getAllAttributes(child);
+                		if (sparams.containsKey("name")) {
+               				be.startScripts.add(new StartScript(sparams.get("name"), sparams));
+                		} else {
+                			System.err.println("warning: start script with no name in " + file.relative);
+                		}
+        			} else {
+        				params.put(child.getNodeName(), child.getTextContent().trim());
+        				if (child.getNodeName().equals("sources")) {
+        					Node ex = child.getAttributes().getNamedItem("exclude");
+        					if (ex != null) {
+        						params.put("exclude", ex.getNodeValue());
+        					}
         				}
         			}
         		}
@@ -135,6 +140,20 @@ public class MakeXMLLoader implements BuildFileLoader {
         }
 	}
 
+	/**
+	 * @param n XML node
+	 * @return All attributes of XML node in map
+	 */
+	private static SortedMap<String, String> getAllAttributes(Node n) {
+		SortedMap<String, String> params = new TreeMap<String, String>();
+		NamedNodeMap nnm = n.getAttributes();
+		for (int j = 0; j < nnm.getLength(); j++) {
+			Node it = nnm.item(j);
+			params.put(it.getNodeName(), it.getNodeValue().trim());
+		}
+		return params;
+	}
+	
 	/**
 	 * Divide string at whitespaces - and return fragments in list
 	 * 

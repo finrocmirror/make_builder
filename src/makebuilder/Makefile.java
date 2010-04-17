@@ -377,6 +377,7 @@ public class Makefile {
 
 		/**
 		 * Add order-only dependency to target (see GNU-make documentation for details)
+		 * (THIS IS NOT SUPPORTED BY pmake)
 		 * 
 		 * @param dep Name of dependency (toString() will be called on object)
 		 */

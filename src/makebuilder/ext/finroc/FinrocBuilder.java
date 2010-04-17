@@ -46,6 +46,7 @@ import makebuilder.handler.JavaHandler;
 import makebuilder.handler.MakeXMLLoader;
 import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
+import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
 import makebuilder.util.Util;
 
@@ -101,8 +102,9 @@ public class FinrocBuilder extends MakeFileBuilder {
 		addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h", 
 				"-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative, 
 				!opts.combineCppFiles));
-		addHandler(new JavaHandler("$(TARGET_JAVA)", "$$FINROC_HOME/$(TARGET_JAVA)"));
+		addHandler(new JavaHandler());
 		addHandler(new CakeHandler());
+		addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
 
 		// is MCA installed system-wide?
 		if (getOptions().containsKey("usesysteminstall")) {
