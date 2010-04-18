@@ -39,7 +39,7 @@ import makebuilder.SrcFile;
 public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
 
 	/** Description builder script */
-	public final static String DESCRIPTION_BUILDER_BIN = "script/description_builder.pl ";
+	public static String DESCRIPTION_BUILDER_BIN = "script/description_builder.pl ";
 
 	/** Contains a makefile target for each build entity with files to call description build upon */
 	private Map<BuildEntity, Makefile.Target> descrTargets = new HashMap<BuildEntity, Makefile.Target>();

@@ -59,7 +59,7 @@ public class LibDB {
 		libs.clear();
 		try {
 			loadLibDb(LibDBBuilder.LIBDB_TXT, true);
-			if (new File(LibDBBuilder.LIBDB_JAVA).exists()) {
+			if (Util.getFileInEtcDir(LibDBBuilder.LIBDB_JAVA).exists()) {
 				loadLibDb(LibDBBuilder.LIBDB_JAVA, false);
 			}
 		} catch (Exception e) {

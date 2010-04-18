@@ -32,6 +32,7 @@ import makebuilder.SrcFile;
 import makebuilder.Makefile.Target;
 import makebuilder.ext.CakeHandler;
 import makebuilder.ext.mca.DependencyHandler;
+import makebuilder.ext.mca.DescriptionBuilderHandler;
 import makebuilder.ext.mca.EtcDirCopier;
 import makebuilder.ext.mca.HFileCopier;
 import makebuilder.ext.mca.LibInfoGenerator;
@@ -48,7 +49,6 @@ import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
-import makebuilder.util.Util;
 
 /**
  * @author max
@@ -88,13 +88,21 @@ public class FinrocBuilder extends MakeFileBuilder {
 		makefile.addBuildDir("export/java");
 		//makefile.addVariable("TARGET_PLUGIN=$(TARGET_DIR)/plugin");
 		
+		// init global defines
+		globalDefine.add("#define _MCA_VERSION_ \"2.4.1\"");
+		//globalDefine.add("#define _MCA_DEBUG_");
+		//globalDefine.add("#define _MCA_PROFILING_");
+		globalDefine.add("#define _MCA_LINUX_");
+
+		
 		// init handlers
 		addLoader(new SConscriptParser());
 		addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, 
 				RRLib.class, FinrocProgram.class, RRJavaLib.class, FinrocJavaProgram.class, FinrocJavaLibrary.class, FinrocJavaPlugin.class));
 		addHandler(new Qt4Handler());
 		addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
-		//addHandler(new DescriptionBuilderHandler());
+		addHandler(new DescriptionBuilderHandler());
+		DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
 		if (getOptions().combineCppFiles) {
 			addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
 			makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
@@ -142,12 +150,14 @@ public class FinrocBuilder extends MakeFileBuilder {
 		}
 		
 		// apply options for specific target?
-		String target = System.getenv("MCATARGET");
+		String target = System.getenv("FINROC_TARGET");
 		if (target != null) {
-			File targetFile = Util.getFileInEtcDir("../../etc/targets/" + target);
+			File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
 			if (targetFile.exists()) {
 				System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
 				makefile.applyVariablesFromFile(targetFile);
+			} else {
+				System.out.println("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")");
 			}
 		}
 		
@@ -163,6 +173,9 @@ public class FinrocBuilder extends MakeFileBuilder {
 		dir.defaultIncludePaths.add(sources.findDir("tools", true));
 		dir.defaultIncludePaths.add(sources.findDir("rrlib", true));
 		dir.defaultIncludePaths.add(sources.findDir("plugins", true));
+		dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/libraries", true));
+		dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/projects", true));
+		dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/tools", true));
 		
 		// add system include paths - in case MCA is installed system-wide
 		if (systemInstall != null && systemInstall.systemInstallExists) {
@@ -174,6 +187,9 @@ public class FinrocBuilder extends MakeFileBuilder {
 			dir.defaultIncludePaths.add(sources.findDir(p + "/tools", true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/rrlib", true));
 			dir.defaultIncludePaths.add(sources.findDir(p + "/plugins", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/libraries", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/projects", true));
+			dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/tools", true));
 		}
 		
 		if (dir.relative.startsWith(tempBuildPath.relative)) {
@@ -195,7 +211,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
 	@Override
 	public String[] getSourceDirs() {
-		return new String[]{"core", "jcore", "libraries", "projects", "tools", "plugins", "rrlib"};
+		return new String[]{"core", "jcore", "libraries", "projects", "tools", "plugins", "rrlib", "mca2-legacy"};
 	}
 	
 	public void run() {
