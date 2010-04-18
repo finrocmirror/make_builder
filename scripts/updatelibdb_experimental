@@ -31,6 +31,7 @@ sub inPath($);
 sub allInPath(@);
 sub findPath(@);
 sub scorePath($);
+sub inFinrocRepository($);
 my $curPath = "";
 
 # constants
@@ -147,6 +148,9 @@ foreach my $line (@lines) {
                 last;
             }
         }
+        if ($lb =~ /\$/) { # skip any libraries with a makefile variable
+            $skip = 1;
+        }
         unless ($skip == 1) {
             my $path = findPath($so);
             if ($path eq "") {
@@ -226,7 +230,9 @@ foreach my $file (@files) {
 # write libdb.java
 open($out, ">", $LIBDB_JAVA) or die "Can't open $LIBDB_JAVA: $!";
 foreach my $libname (sort keys %jars) {
-    print $out "$libname: ", $jars { $libname }, "\n";
+    unless (inFinrocRepository($jars { $libname }) == 1) {
+        print $out "$libname: ", $jars { $libname }, "\n";
+    }
 }
 close $out or die "$in: $!";
 
@@ -319,4 +325,18 @@ sub scorePath($) {
        $score += 500;
     }
     $score -= length($path); #heuristic: shorter paths are typically better
+}
+
+# Is this file in a finroc repository?
+sub inFinrocRepository($) {
+    my $file = shift;
+    my @paths = split('/', $file);
+    for (my $i = 2; $i < @paths; $i++) {
+        my $check = join('/', @paths[0..$i]) . "/scripts/finroc_get";
+        #print("checking $check $file\n");
+        if (-e $check) {
+            return 1;
+        }
+    }
+    return 0;
 }
