@@ -211,6 +211,10 @@ public class LibDBBuilder implements FilenameFilter, Runnable {
 							break;
 						}
 					}
+					if (reqLib.contains("$")) {
+						found = true;
+						result += arg + " ";
+					}
 					
 					if (!found) { // usual case
 						List<File> candidateDirs = getCandidateDirs("lib" + reqLib + ".so", libs);
