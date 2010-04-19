@@ -49,6 +49,7 @@ import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -152,7 +153,8 @@ public class FinrocBuilder extends MakeFileBuilder {
 		// apply options for specific target?
 		String target = System.getenv("FINROC_TARGET");
 		if (target != null) {
-			File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
+			//File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
+			File targetFile = Util.getFileInEtcDir("../targets/" + target);
 			if (targetFile.exists()) {
 				System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
 				makefile.applyVariablesFromFile(targetFile);
@@ -197,6 +199,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 		}
 		dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "projects", true));
 		dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "libraries", true));
+		dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/libraries", true));
 		
 		// add all parent directories (in source and build paths)... not nice but somehow required :-/
 		SrcDir parent = dir;
