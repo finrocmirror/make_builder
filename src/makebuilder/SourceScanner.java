@@ -104,8 +104,10 @@ public class SourceScanner {
 		LinkedList<SrcDir> dirsToScan = new LinkedList<SrcDir>();
 		for (String dir : sourceDirs) {
 			SrcDir sd = homeDir.getSubDir(dir);
-			dirsToScan.add(sd);
-			sd.srcRoot = true;
+			if (sd.absolute.exists()) {
+			    dirsToScan.add(sd);
+			    sd.srcRoot = true;
+			}
 		}
 		while(!dirsToScan.isEmpty()) {
 			SrcDir dir = dirsToScan.removeFirst();
