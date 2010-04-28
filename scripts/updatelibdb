@@ -1,3 +1,346 @@
-#!/bin/bash
-cd $MCAHOME
-java -jar make_builder/dist/build.jar makebuilder.libdb.LibDBBuilder "$@"
+#!/usr/bin/perl -w
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+#----------------------------------------------------------------------
+# \file    updatelibdb_experimental
+#
+# \author  Max Reichardt
+#
+# \date    2010-04-11
+#
+# Experimental perl version of updatelibdb
+#
+#----------------------------------------------------------------------
+
+use strict;
+
+sub inPath($);
+sub allInPath(@);
+sub findPath(@);
+sub scorePath($);
+sub inFinrocRepository($);
+my $curPath = "";
+
+# etc dir
+my $MAKE_BUILDER_DIR = "";
+unless (-e "etc/libdb.raw") {
+    $MAKE_BUILDER_DIR = "make_builder/";
+}
+
+# constants
+my $LIBDB_RAW = $MAKE_BUILDER_DIR . "etc/libdb.raw";
+my $LIBDB_RAW_LOCAL = $MAKE_BUILDER_DIR . "etc/libdb.raw.local";
+my $LIBDB_TXT = $MAKE_BUILDER_DIR . "etc/libdb.txt";
+my $LIBDB_JAVA = $MAKE_BUILDER_DIR . "etc/libdb.java";
+my $LIBDB_SEARCH = $MAKE_BUILDER_DIR . "etc/libdb.search";
+
+# read libdb.raw.local
+my @lines = ();
+if (-e $LIBDB_RAW_LOCAL) {
+    open(my $in, "<", $LIBDB_RAW_LOCAL) or die "Can't open $LIBDB_RAW_LOCAL: $!";
+    while (<$in>) {
+        $_ =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace (from http://en.wikipedia.org/wiki/Trim_(programming))
+        push @lines, $_;
+    }
+    close $in or die "$in: $!";
+}
+
+# read libdb.raw
+open(my $in, "<", $LIBDB_RAW) or die "Can't open $LIBDB_RAW: $!";
+while (<$in>) {
+    $_ =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace (from http://en.wikipedia.org/wiki/Trim_(programming))
+    push @lines, $_;
+}
+close $in or die "$in: $!";
+
+# determine which files we're looking for...
+my %look4files = (); # set
+foreach my $line (@lines) {
+    my $incs = $line;
+    while ($incs =~ /(\s|:)-I<(\S+)>/g) {
+        #print "looking for includes: $2\n";
+        foreach my $inc1 (split(',', $2)) {
+            $inc1 =~ /^('?)(.*)\1$/; # remove quotes
+            #print "looking for include: $2\n";
+            $look4files{ $2 } = $2;
+        }
+    }
+    while ($line =~ /(\s|:)-l(\S+)/g) {
+        #print "looking for lib: $2\n";
+        my $s1 = "lib" . $2 . ".so";
+        my $s2 = "lib" . $2 . ".a";
+        $look4files{ $s1 } = $s1;
+        $look4files{ $s2 } = $s2;
+    }
+}
+
+# find these files using a grep on the output of the libdb.search script 
+# (complex regular expressions only in find are awfully slow for some reason)
+my $ex = "";
+foreach my $file (keys %look4files) {
+    $ex .= "\\|/$file\$";
+}
+my @files = `$LIBDB_SEARCH | grep '/moc\$\\|[.]jar\$$ex'`;
+#foreach (@files) {
+#    print "relevant file: $_";
+#}
+
+# process each line
+my %libs = (); # will contain mapping "libname => line" of all available libraries
+my $statusok = ""; # find status for each lib
+my $statusfail = ""; # find status for each lib
+foreach my $line (@lines) {
+
+    # basic line parsing
+    unless ($line =~ /^\s*(\S*)\s*:(.+)$/) {
+        next;
+    }
+    my $libname = $1;
+    my $opts = $2;
+    $opts =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace
+
+    # skip, if we already have an entry for this lib
+    if (exists $libs { $libname } && $libs { $libname } ne "N/A") {
+        next; 
+    }
+    print "$libname: "; #$opts\n";
+    $statusok = "";
+    $statusfail = "";
+
+    # process includes
+    while ($opts =~ /(\s|^)(-I<(\S+)>)(\s|$)/) {
+        #print " processing $2\n";
+        my $old = $2;
+        my $path = findPath(split(',', $3));
+        #print " path $path\n";
+        if ($path eq "") {
+            $opts = "";
+        } elsif ($path eq "/usr/include" || $path =~ /\/gcc\//) {
+            $opts =~ s/\Q$old\E//;
+        } else {
+            $opts =~ s/\Q$old\E/-I$path/;
+        }
+    }
+
+    # process libraries
+    my @exlpaths = (); # existing -L entries
+    while ($line =~ /(\s|:)-L(\S+)/g) {
+        push @exlpaths, $2;
+    }
+    my $lpaths = "";
+    while ($opts =~ /(\s|^)-l(\S+)/g) {
+        my $lb = $2;
+        my $so = "lib" . $lb . ".so";
+        my $a = "lib" . $lb . ".a";
+        my $skip = 0;
+        foreach (@exlpaths) { # if library is available in existing -L path... continue
+            if (-e "$_/$so" || -e "$_/$a") {
+                $skip = 1;
+                last;
+            }
+        }
+        if ($lb =~ /\$/) { # skip any libraries with a makefile variable
+            $skip = 1;
+        }
+        unless ($skip == 1) {
+            my $path = findPath($so);
+            if ($path eq "") {
+                $path = findPath($a);
+                if ($path eq "") {
+                    $opts = "";
+                    last;
+                }
+            }
+            unless ($path eq "/usr/lib" || $path eq "/usr/local/lib" || $path =~ /\/gcc\//) {
+                my $newPath = "-L" . $path . " ";
+                unless ($lpaths =~ /\Q$newPath\E/) {
+                    $lpaths .= $newPath;
+                }
+            }
+        }
+    }
+    unless ($opts eq "" || $lpaths eq "") {
+        $opts =~ /(\s|^)(-l\S+)(\s|$)/;
+        my $tmp2 = $2;
+        $lpaths .= $2;
+        $opts =~ s/\Q$tmp2\E/$lpaths/;
+    }
+
+    # create entry
+    if ($opts eq "") {
+        $libs { $libname } = "N/A";
+        print "no (missing $statusfail)\n";
+    } else {
+        $opts =~ s/  / /g; # remove any double spaces
+        $opts =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace
+        $libs { $libname } = $opts;
+        print "yes $statusok\n";
+    }
+}
+
+# add qt4 moc and oic
+$libs { "moc-qt4" } = "N/A";
+$libs { "uic-qt4" } = "N/A";
+my $moc = "";
+foreach my $moc_cand (@files) {
+    if ($moc_cand =~ /.*moc$/) { # moc command
+        $moc_cand =~ s/\n//;     # remove line change
+        #print "calling $moc_cand -v\n";
+        my @output = `$moc_cand -v 2>&1`;
+        #print "called $moc_cand -v\n";
+        foreach (@output) { # call and iterate over output
+            if ($_ =~ / 4[.]/) {
+                $libs { "moc-qt4" } = $moc_cand;
+                $moc_cand =~ s/moc$/uic/;
+                $libs { "uic-qt4" } = $moc_cand;
+                last;
+            }
+        }
+    }
+}
+
+# write libdb.txt
+open(my $out, ">", $LIBDB_TXT) or die "Can't open $LIBDB_TXT: $!";
+foreach my $libname (sort keys %libs) {
+    print $out "$libname: ", $libs { $libname }, "\n";
+}
+close $out or die "$in: $!";
+
+# sort jars
+my %jars = ();
+foreach my $file (@files) {
+    if ($file =~ /.*\/([\S]+[.]jar)$/) {
+        my $libname = $1;
+        unless (exists $jars { $libname } && (length $jars { $libname }) < (length $file)) {
+            $file =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace
+            $jars { $libname } = $file;
+        }
+    }
+}
+
+# write libdb.java
+open($out, ">", $LIBDB_JAVA) or die "Can't open $LIBDB_JAVA: $!";
+foreach my $libname (sort keys %jars) {
+    unless (inFinrocRepository($jars { $libname }) == 1) {
+        print $out "$libname: ", $jars { $libname }, "\n";
+    }
+}
+close $out or die "$in: $!";
+
+# Returns path that contains all files passed to this function
+# If there are multiple paths, the one with the highest score is chosen
+# If there is no path, "" is returned
+sub findPath(@) {
+
+    # search for directories containing all files
+    my @look4 = @_;
+    my @candidates = ();
+    my $look4first = $look4[0];
+    $look4first =~ /^('?)(.*)\1$/; # remove quotes
+    $look4first = $2; # remove quotes
+    #print "searching $look4first\n";
+    $statusfail = $look4first;
+    foreach (@files) {
+        #print "matching $look4first and $_\n";
+        if ($_ =~ /(.*)\Q$look4first\E$/) {
+            my $size = @look4;
+            #print "found $look4first in $1 " . "$size\n";
+            $curPath = $1;
+            if ((@look4 == 1) || (allInPath(@look4[1..$#look4]) == 1)) {
+                push @candidates, $curPath;
+            }
+        }
+    }
+
+    # find best candidate
+    my $best = "";
+    my $bestScore = -100000000;
+    if (@candidates > 1) {
+        $statusok = "(multiple)";
+    }
+    foreach my $c (@candidates) {
+        my $score = scorePath($c);
+        if ($score > $bestScore) {
+            $best = $c;
+            $bestScore = $score;
+        }
+    }
+    $best =~ s/\/$//; # remove slash at end of line
+    return $best;
+}
+
+# are all files (argument) available in $curPath
+sub allInPath(@) {
+    my @fs = @_;
+    #print "allinpath $curPath ";
+    foreach my $file (@fs) {
+        $statusfail = $file;
+        #print "inPath? $file ";
+        unless (inPath($file) == 1) {
+            #print "no\n";
+            return 0;
+        }
+    }
+    #print "yes\n";
+    return 1;
+}
+
+# is file (arg) in $curPath
+sub inPath($) {
+    my $file = shift;
+    $file =~ /^('?)(.*)\1$/; # remove quotes
+    $file = $2; # remove quotes
+    my $search4 = $curPath . $file . "\n";
+    #print "inPath s4 $search4 ";
+    foreach (@files) {
+        if ($search4 eq $_) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+# calculate score for path (higher is better)
+# TODO maybe move to external customizable script (?)
+sub scorePath($) {
+    my $path = shift;
+    my $path2 = $path;
+    my $score = 0;
+    if ($path =~ /^\/home\//) {
+        $score += 10000;
+    }
+    if ($path =~ /^\/usr\/local\/include\// || $path2 =~ /^\/usr\/local\/lib\//) {
+        $score += 1000;
+    }
+    if ($path =~ /^\/usr\/include\// || $path2 =~ /^\/usr\/lib\//) {
+       $score += 500;
+    }
+    $score -= length($path); #heuristic: shorter paths are typically better
+}
+
+# Is this file in a finroc repository?
+sub inFinrocRepository($) {
+    my $file = shift;
+    my @paths = split('/', $file);
+    for (my $i = 2; $i < @paths; $i++) {
+        my $check = join('/', @paths[0..$i]) . "/scripts/finroc_get";
+        #print("checking $check $file\n");
+        if (-e $check) {
+            return 1;
+        }
+    }
+    return 0;
+}

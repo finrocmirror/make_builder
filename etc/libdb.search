@@ -15,3 +15,8 @@ if [ -f /etc/make_builder/libdb.search ]
     /etc/make_builder/libdb.search
 fi
 
+if [ -f $0.local ] 
+  then
+    $0.local
+fi
+
