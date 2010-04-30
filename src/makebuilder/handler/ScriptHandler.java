@@ -34,47 +34,51 @@ import makebuilder.StartScript;
  */
 public class ScriptHandler extends SourceFileHandler.Impl {
 
-	/** Home/root directory relative to script dir */
-	private final String homeDirFromScriptDir;
-	
-	/** Directory to place scripts in */
-	private final String scriptDir;
-	
-	/** Makefile variable name for script dir */
-	public final static String SCRIPT_DIR_VAR = "SCRIPT_DIR";
-	
-	/**
-	 * @param scriptDir Directory to place scripts in
-	 * @param homeDirFromScriptDir Home/root directory relative to script dir
-	 */
-	public ScriptHandler(String scriptDir, String homeDirFromScriptDir) {
-		this.scriptDir = scriptDir;
-		this.homeDirFromScriptDir = homeDirFromScriptDir;
-	}
-	
-	@Override
-	public void init(Makefile makefile) {
-		makefile.addVariable(SCRIPT_DIR_VAR + "=" + scriptDir);
-	}
+    /** Home/root directory relative to script dir */
+    private final String homeDirFromScriptDir;
 
-	@Override
-	public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
-		for (StartScript scr : be.startScripts) {
-			String file = scr.getTarget().getName();
-			scr.getTarget().addCommand("echo Creating start script " + file, false);
-			scr.getTarget().addCommand("echo '#!/bin/bash' > " + file, false);
-			if (be.getFinalHandler() == JavaHandler.class) {
-				String mainClass = scr.getParameter("main-class");
-				if (mainClass == null) {
-					scr.getTarget().addCommand("echo 'java -jar " + homeDirFromScriptDir + "/" + be.getTarget() + " \"$$@\"' >> " + file, false);
-				} else {
-					scr.getTarget().addCommand("echo 'java -cp " + homeDirFromScriptDir + "/" + be.getTarget() + " " + mainClass + " \"$$@\"' >> " + file, false);
-				}
-			} else {
-				// normal executable
-				scr.getTarget().addCommand("echo '" + homeDirFromScriptDir + "/" + be.getTarget() + " \"$$@\"' >> " + file, false);
-			}			
-			scr.getTarget().addCommand("chmod +x " + file, false);
-		}
-	}
+    /** Directory to place scripts in */
+    private final String scriptDir;
+
+    /** Makefile variable name for script dir */
+    public final static String SCRIPT_DIR_VAR = "SCRIPT_DIR";
+
+    /**
+     * @param scriptDir Directory to place scripts in
+     * @param homeDirFromScriptDir Home/root directory relative to script dir
+     */
+    public ScriptHandler(String scriptDir, String homeDirFromScriptDir) {
+        this.scriptDir = scriptDir;
+        this.homeDirFromScriptDir = homeDirFromScriptDir;
+    }
+
+    @Override
+    public void init(Makefile makefile) {
+        makefile.addVariable(SCRIPT_DIR_VAR + "=" + scriptDir);
+    }
+
+    @Override
+    public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
+        for (StartScript scr : be.startScripts) {
+            String file = scr.getTarget().getName();
+            String pre = scr.getParameter("pre");
+            String post = scr.getParameter("post");
+            pre = pre == null ? "" : (pre + " ");
+            post = post == null ? "" : (post + " ");
+            scr.getTarget().addCommand("echo Creating start script " + file, false);
+            scr.getTarget().addCommand("echo '#!/bin/bash' > " + file, false);
+            if (be.getFinalHandler() == JavaHandler.class) {
+                String mainClass = scr.getParameter("main-class");
+                if (mainClass == null) {
+                    scr.getTarget().addCommand("echo '" + pre + "java -jar " + homeDirFromScriptDir + "/" + be.getTarget() + " " + post + "\"$$@\"' >> " + file, false);
+                } else {
+                    scr.getTarget().addCommand("echo '" + pre + "java -cp " + homeDirFromScriptDir + "/" + be.getTarget() + " " + mainClass + " " + post + "\"$$@\"' >> " + file, false);
+                }
+            } else {
+                // normal executable
+                scr.getTarget().addCommand("echo '" + pre + homeDirFromScriptDir + "/" + be.getTarget() + " " + post + "\"$$@\"' >> " + file, false);
+            }
+            scr.getTarget().addCommand("chmod +x " + file, false);
+        }
+    }
 }

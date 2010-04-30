@@ -33,45 +33,45 @@ import makebuilder.handler.ScriptHandler;
  */
 public class StartScript {
 
-	/** Filename (relative to repository root) of start script */
-	private String filename;
-	
-	/** Attributes for this script specified in make.xml */
-	private SortedMap<String, String> params;
-	
-	/** Makefile target (is initialized when build entity it belongs to is */
-	private Makefile.Target target;
-	
-	public StartScript(String filename, SortedMap<String, String> params) {
-		this.filename = filename;
-		this.params = params;
-	}
-	
-	/**
-	 * @return Makefile target
-	 */
-	public Makefile.Target getTarget() {
-		assert(target != null);
-		return target;
-	}
-	
-	/**
-	 * Initializes target
-	 * 
-	 * @param mf Makefile
-	 * @param prefix Prefix for script file name
-	 */
-	void initTarget(Makefile mf, String prefix) {
-		target = mf.addTarget("$(" + ScriptHandler.SCRIPT_DIR_VAR + ")/" + prefix + filename, false);
-	}
+    /** Filename (relative to repository root) of start script */
+    private String filename;
 
-	/**
-	 * Get custom attribute/parameter/tag that was set in make.xml for this script
-	 * 
-	 * @param key Key
-	 * @return Value (null if it wasn't set)
-	 */
-	public String getParameter(String key) {
-		return params == null ? null : params.get(key);
-	}
+    /** Attributes for this script specified in make.xml */
+    private SortedMap<String, String> params;
+
+    /** Makefile target (is initialized when build entity it belongs to is */
+    private Makefile.Target target;
+
+    public StartScript(String filename, SortedMap<String, String> params) {
+        this.filename = filename;
+        this.params = params;
+    }
+
+    /**
+     * @return Makefile target
+     */
+    public Makefile.Target getTarget() {
+        assert(target != null);
+        return target;
+    }
+
+    /**
+     * Initializes target
+     *
+     * @param mf Makefile
+     * @param prefix Prefix for script file name
+     */
+    void initTarget(Makefile mf, String prefix) {
+        target = mf.addTarget("$(" + ScriptHandler.SCRIPT_DIR_VAR + ")/" + prefix + filename, false);
+    }
+
+    /**
+     * Get custom attribute/parameter/tag that was set in make.xml for this script
+     *
+     * @param key Key
+     * @return Value (null if it wasn't set)
+     */
+    public String getParameter(String key) {
+        return params == null ? null : params.get(key);
+    }
 }

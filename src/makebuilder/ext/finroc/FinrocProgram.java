@@ -30,36 +30,36 @@ import makebuilder.handler.CppHandler;
  * Finroc library
  */
 public class FinrocProgram extends FinrocBuildEntity {
-	
-	@Override
-	public String getTargetPrefix() {
-		if (this.getRootDir().relative.startsWith("libraries")) {
-			return "finroc_library_" + getSecondDir() + "_";
-		} else if (this.getRootDir().relative.startsWith("plugins")) {
-			return "finroc_plugin_" + getSecondDir() + "_";
-		} else if (this.getRootDir().relative.startsWith("core")) {
-			return "finroc_core_";
-		} else if (this.getRootDir().relative.startsWith("jcore")) {
-			return "finroc_jcore_";
-		}
-		return "";
-	}
-	
-	@Override
-	public String getTarget() {
-		return "$(TARGET_BIN)/" + getTargetPrefix() + name;
-	}
 
-	private String getSecondDir() {
-		String[] parts = this.getRootDir().relative.split("/");
-		if (parts.length >= 2) {
-			return parts[1];
-		}
-		return "";
-	}
-	
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+    @Override
+    public String getTargetPrefix() {
+        if (this.getRootDir().relative.startsWith("libraries")) {
+            return "finroc_library_" + getSecondDir() + "_";
+        } else if (this.getRootDir().relative.startsWith("plugins")) {
+            return "finroc_plugin_" + getSecondDir() + "_";
+        } else if (this.getRootDir().relative.startsWith("core")) {
+            return "finroc_core_";
+        } else if (this.getRootDir().relative.startsWith("jcore")) {
+            return "finroc_jcore_";
+        }
+        return "";
+    }
+
+    @Override
+    public String getTarget() {
+        return "$(TARGET_BIN)/" + getTargetPrefix() + name;
+    }
+
+    private String getSecondDir() {
+        String[] parts = this.getRootDir().relative.split("/");
+        if (parts.length >= 2) {
+            return parts[1];
+        }
+        return "";
+    }
+
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return CppHandler.class;
+    }
 }
