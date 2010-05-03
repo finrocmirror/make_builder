@@ -1,4 +1,4 @@
 CFLAGS=-O3 -D NDEBUG -march=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3
-NVCC_FLAGS=-O3
+NVCC_FLAGS=
 LIBNAME_CUDART=cudart
 LIBNAME_CUFFT=cufft
