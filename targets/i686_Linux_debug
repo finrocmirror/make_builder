@@ -1,5 +1,5 @@
 CFLAGS=-g2 -D _MCA_DEBUG_ -D _MCA_PROFILING_
-NVCC_FLAGS=
+NVCC_FLAGS=-g -G
 #NVCC=/usr/local/cuda/bin/nvcc
 LIBNAME_CUDART=cudart
 LIBNAME_CUFFT=cufft
