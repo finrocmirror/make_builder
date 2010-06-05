@@ -1,5 +1,6 @@
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface
-ann:        -I<'ANN/ANN.h'> -lANN
+ann:        -I<ANN/ANN.h> -lANN
+ann:        -I<ANN/ANN.h> -lann
 aria:       -I<Aria.h> -lAria -ldl
 asn:        -I/usr/include/asn1c -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
@@ -46,7 +47,7 @@ loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -l
 lxrt:       N/A
 mysqlcppconn: -I<mysql_driver.h> -lmysqlcppconn
 newmat:     -I<newmat/newmat.h> -lnewmat
-newton:     -lNewton
+newton:     -I<Newton.h> -lNewton
 npp32:      -I<npp.h> -lnpp32 -D_LIB_NPP_PRESENT_
 npp32util:  -lUtilNPP32 -I<ImagesNPP.h>
 nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
@@ -83,6 +84,7 @@ qwt5:       -I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/incl
 qwt5:       -I<qwt_abstract_scale.h> -lqwt-qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
+soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4
 soqt:       -I<Inventor/Qt/SoQt.h> -lSoQt
 speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
