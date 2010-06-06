@@ -1,0 +1,10 @@
+This directory contains files to set up an Ubuntu 10.04 installation so that frameworks, libraries and projects developed at the RRLAB can be compiled and run.
+
+First you should install rrlab-dependencies-common_1.0-1_i386.deb.
+This is a meta-package and will install all relevant libraries available through apt and the standard Ubuntu repositories.
+
+The fetch-<libname> can then be used to acquire additional libraries.
+They are downloaded from the internet and - in the case of source code - compiled and installed.
+
+Note: Libraries are installed using "sudo make install" or by copying stuff to "/usr/local". This is not really clean - because no package management is involved. However, I'm not sure whether it's worth spending the time to do this properly. I'm pretty happy as it is.
+

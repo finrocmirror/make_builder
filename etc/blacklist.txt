@@ -1,5 +1,5 @@
 dm_strat_birchfield: pnmio.c 								# variable verbose in two sources
-kernel: tRWLock.cpp 										# _MCA_DEBUG_ is undefined
+kernel: -safe 										# _MCA_DEBUG_ is undefined
 general: mRandom.cpp										# R defined... difficulties later...
 asn: constr_SET.c GeneralizedTime.c	UTCTime.c per_encoder.c	# viel...
 gui_draw2dworldmultibot: tDraw2DWorldMultiBot.cpp  			# global_sgn redefined
@@ -15,3 +15,5 @@ generic_kinematic_calculation: -safe
 laser_3d_hazard_detection: -safe 
 gridmap_based_navigation: -safe
 ravon_fundamentals_lib: -safe                               # global variable set_state_period in mDSPBridge and mControllerBridge
+ravon_fundamentals_lib: -safe                               # global variable set_state_period in mDSPBridge and mControllerBridge
+ravon_mediator: -safe
