@@ -39,288 +39,288 @@ import makebuilder.util.Util;
  */
 public class MakeFileBuilder implements FilenameFilter, Runnable {
 
-	/** Input Character set */
-	public static final Charset INPUT_CHARSET = Charset.forName("ISO-8859-1");
+    /** Input Character set */
+    public static final Charset INPUT_CHARSET = Charset.forName("ISO-8859-1");
 
-	/** Current working directory - should be $MCAHOME */
-	public static final File HOME = new File(".").getAbsoluteFile().getParentFile();
+    /** Current working directory - should be $MCAHOME */
+    public static final File HOME = new File(".").getAbsoluteFile().getParentFile();
 
-	/** Shortcut to file separator */
-	protected static final String FS = File.separator;
+    /** Shortcut to file separator */
+    protected static final String FS = File.separator;
 
-	/** Libraries and executables that need to be built */
-	public final List<BuildEntity> buildEntities = new ArrayList<BuildEntity>();
+    /** Libraries and executables that need to be built */
+    public final List<BuildEntity> buildEntities = new ArrayList<BuildEntity>();
 
-	/** Options from command line */
-	protected static Options opts;
+    /** Options from command line */
+    protected static Options opts;
 
-	/** List of build file loaders used int this builder */
-	private final List<BuildFileLoader> buildFileLoaders = new ArrayList<BuildFileLoader>();
-	
-	/** List of content handlers used in this builder - need to have correct order */
-	private final List<SourceFileHandler> contentHandlers = new ArrayList<SourceFileHandler>();
-	
-	/** build path where compiled binaries are placed */
-	public final SrcDir buildPath;
+    /** List of build file loaders used int this builder */
+    private final List<BuildFileLoader> buildFileLoaders = new ArrayList<BuildFileLoader>();
 
-	/** persistent temporary build path where generated files can be stored */ 
-	public final SrcDir tempBuildPath;
-	
-	/** temp-path - non-persistent temporary build artifacts belong here */
-	public final SrcDir tempPath;
-	
-	/** Makefile */
-	public final Makefile makefile;
+    /** List of content handlers used in this builder - need to have correct order */
+    private final List<SourceFileHandler> contentHandlers = new ArrayList<SourceFileHandler>();
 
-//	/** Categorization of make targets (Target/Category => dependencies) */
-//	private final SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
+    /** build path where compiled binaries are placed */
+    public final SrcDir buildPath;
 
-	/** Cache for source files */
-	protected final SourceScanner sources;
+    /** persistent temporary build path where generated files can be stored */
+    public final SrcDir tempBuildPath;
 
-	/** Temporary directory for merged files */
-	private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami() + "_" + Math.abs(HOME.getAbsolutePath().hashCode());
+    /** temp-path - non-persistent temporary build artifacts belong here */
+    public final SrcDir tempPath;
 
-	/** Error message for console - are collected and presented at the end */
-	private final List<String> errorMessages = new ArrayList<String>();
-	
-	public static void main(String[] args) {
+    /** Makefile */
+    public final Makefile makefile;
 
-		// Parse command line options
-		opts = new Options(args);
+    //  /** Categorization of make targets (Target/Category => dependencies) */
+    //  private final SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
 
-		try {
-			opts.mainClass.newInstance().run();
-		} catch (Exception e) {
-			e.printStackTrace();
-			printErrorAdvice();
-		}
-	}
+    /** Cache for source files */
+    protected final SourceScanner sources;
 
-	/**
-	 * @return Parsed options from command line
-	 */
-	public static Options getOptions() {
-		return opts;
-	}
-	
-	public MakeFileBuilder() throws Exception {
-		this("dist", "build");
-	}
-	
-	/**
-	 * Performs diverse initializations
-	 */
-	public MakeFileBuilder(String relBuildDir, String relTempBuildDir) {
-		
-		// init source scanner and paths
-		sources = new SourceScanner(HOME, this);
-		buildPath = sources.findDir(relBuildDir, true);
-		tempBuildPath = sources.findDir(relTempBuildDir, true);
-		tempPath = sources.findDir(TEMPDIR, true);
-		
-		// create makefile object
-		makefile = new Makefile("$(TARGET_DIR)", "$(TEMP_BUILD_DIR)", "$(TEMP_DIR)");
-//		makefile.addInitCommand("mkdir -p " + "$(TARGET_DIR)");
-//		makefile.addInitCommand("mkdir -p " + "$(TEMP_BUILD_DIR)");
-//		makefile.addInitCommand("mkdir -p " + "$(TEMP_DIR)");
-		
-		// add variables
-		makefile.addVariable("TARGET_DIR=" + buildPath.relative);
-		makefile.addVariable("TEMP_BUILD_DIR=" + tempBuildPath.relative);
-		makefile.addVariable("TEMP_DIR=" + tempPath.relative);
-	}
-	
-	/** Create makefile */
-	public void run() {
-		try {
-			build();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}		
-		
-	public void build() throws Exception {
-		
-		// init content handlers
-		if (buildFileLoaders.isEmpty()) {
-			buildFileLoaders.add(new MakeXMLLoader());
-		}
-		if (contentHandlers.isEmpty()) { // add default content handlers
-			contentHandlers.add(new CppHandler("", "", !opts.combineCppFiles));
-		}
-		for (SourceFileHandler ch : contentHandlers) {
-			ch.init(makefile);
-		}
-		
-		// read/process/cache source files
-		System.out.println("Caching and processing local source files...");
-		sources.scan(makefile, buildFileLoaders, contentHandlers, true, getSourceDirs());
-		
-		// find local dependencies in "external libraries"
-		LibDB.findLocalDependencies(buildEntities);
-		
-		// process dependencies
-		System.out.println("Processing dependencies...");
-		for (BuildEntity be : buildEntities) {
-			be.resolveDependencies(buildEntities, this);
-		}
+    /** Temporary directory for merged files */
+    private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami() + "_" + Math.abs(HOME.getAbsolutePath().hashCode());
 
-		// check whether all dependencies are met
-		for (BuildEntity be : buildEntities) {
-			be.checkDependencies(this);
-		}
-		
-		// add available optional libs
-		for (BuildEntity be : buildEntities) {
-			be.addOptionalLibs();
-		}
+    /** Error message for console - are collected and presented at the end */
+    private final List<String> errorMessages = new ArrayList<String>();
 
-		// collect external libraries needed for building
-		for (BuildEntity be : buildEntities) {
-			be.mergeExtLibs();
-		}
-		
-		// add build commands for entity to makefile
-		for (BuildEntity be : buildEntities) {
-			if (be.missingDep) {
-				continue;
-			}
-			build(be);
-		}
-		
-		// Write makefile
-		writeMakefile();
+    public static void main(String[] args) {
 
-		// print error messages at the end... so nobody will miss them
-		//Collections.sort(errorMessages);
-		for (String err : errorMessages) {
-			System.err.println(err);
-		}
-		
-		// completed
-		System.out.println("Creating Makefile successful.");
-	}
-	
-	/** 
-	 * Writes makefile to disk (may be overridden for custom adjustments)
-	 */
-	protected void writeMakefile() throws Exception {
+        // Parse command line options
+        opts = new Options(args);
 
-		makefile.writeTo(new File("Makefile"));
-	}
-	
-	/**
-	 * @param handler Source file handler to add to this build entity
-	 */
-	protected void addHandler(SourceFileHandler handler) {
-		contentHandlers.add(handler);
-	}
-	
-	/**
-	 * @param loader Build file loader to add to this build entity
-	 */
-	protected void addLoader(BuildFileLoader loader) {
-		buildFileLoaders.add(loader);
-	}
-	
-	/**
-	 * @return Get source directories (relative) - should be overidden
-	 */
-	public String[] getSourceDirs() {
-		return new String[]{"src"};
-	}
+        try {
+            opts.mainClass.newInstance().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            printErrorAdvice();
+        }
+    }
 
-	/**
-	 * Build single build entity
-	 * 
-	 * @param be Build entity to build
-	 */
-	private void build(final BuildEntity be) throws Exception {
-		System.out.println("Processing " + be.name);
-		be.initTarget(makefile);
-		be.computeOptions();
-		
-		for (SourceFileHandler ch : contentHandlers) {
-			ch.build(be, makefile, this);
-		}
-	}
-	
-	/**
-	 * Create and name intermediate temporary build artifact for a single source file
-	 * (can be overridden to perform custom naming)
-	 * (creates files in persistent temporary building directory)
-	 * 
-	 * @param source Source file 
-	 * @param targetExtension Suggested extension for target 
-	 * @return
-	 */
-	public SrcFile getTempBuildArtifact(SrcFile source, String targetExtension) {
-		String srcDir = source.dir.relativeTo(source.dir.getSrcRoot());
-		return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS + source.getRawName() + "." + targetExtension);
-	}
-	
-	/**
-	 * Create and name intermediate temporary build artifact for multiple source files
-	 * (can be overridden to perform custom naming)
-	 * (creates files in persistent temporary building directory)
-	 * 
-	 * @param source Source file 
-	 * @param targetExtension Suggested extension for target 
-	 * @return
-	 */
-	public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
-		String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
-		return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS +	source.name + "_" + suggestedPrefix + "." + targetExtension);
-	}
-	
-	/** 
-	 * Get directory (normally in persistent temporary building directory) for build files
-	 * (can be overridden to perform custom naming)
-	 * 
-	 * @param be Build Entity
-	 * @return Directory
-	 */
-	public String getTempBuildDir(BuildEntity source) {
-		String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
-		return tempBuildPath.relative + FS + srcDir;
-	}
-	
-	/**
-	 * Print error line deferred (when tool exits)
-	 *
-	 * @param s line to print
-	 */
-	public void printErrorLine(String s) {
-		errorMessages.add(s);
-	}
+    /**
+     * @return Parsed options from command line
+     */
+    public static Options getOptions() {
+        return opts;
+    }
 
-	/** Print advice if an error occured */
-	public static void printErrorAdvice() {
-		System.out.println("An error was encountered during the build process.");
-		System.out.println("Make sure you have the current version of this tool, called ant, and");
-		System.out.println("the libdb.txt file is up to date (call updatelibdb),");
-	}
+    public MakeFileBuilder() throws Exception {
+        this("dist", "build");
+    }
 
-	public boolean accept(File dir, String name) {
-		File f = new File(dir.getAbsolutePath() + File.separator + name);
-		return (f.isDirectory() || name.equals("SConscript"));
-	}
+    /**
+     * Performs diverse initializations
+     */
+    public MakeFileBuilder(String relBuildDir, String relTempBuildDir) {
 
-	/**
-	 * Set default include paths for directory (used for finding/resolving .h dependencies)
-	 * (may/should be overridden)
-	 * 
-	 * @param dir SrcDir instance of which to set default include paths
-	 */
-	public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
-		dir.defaultIncludePaths.add(dir);
-	}
-	
-	/**
-	 * @return Cache for source files 
-	 */
-	public SourceScanner getSources() {
-		return sources;
-	}
+        // init source scanner and paths
+        sources = new SourceScanner(HOME, this);
+        buildPath = sources.findDir(relBuildDir, true);
+        tempBuildPath = sources.findDir(relTempBuildDir, true);
+        tempPath = sources.findDir(TEMPDIR, true);
+
+        // create makefile object
+        makefile = new Makefile("$(TARGET_DIR)", "$(TEMP_BUILD_DIR)", "$(TEMP_DIR)");
+        //      makefile.addInitCommand("mkdir -p " + "$(TARGET_DIR)");
+        //      makefile.addInitCommand("mkdir -p " + "$(TEMP_BUILD_DIR)");
+        //      makefile.addInitCommand("mkdir -p " + "$(TEMP_DIR)");
+
+        // add variables
+        makefile.addVariable("TARGET_DIR=" + buildPath.relative);
+        makefile.addVariable("TEMP_BUILD_DIR=" + tempBuildPath.relative);
+        makefile.addVariable("TEMP_DIR=" + tempPath.relative);
+    }
+
+    /** Create makefile */
+    public void run() {
+        try {
+            build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void build() throws Exception {
+
+        // init content handlers
+        if (buildFileLoaders.isEmpty()) {
+            buildFileLoaders.add(new MakeXMLLoader());
+        }
+        if (contentHandlers.isEmpty()) { // add default content handlers
+            contentHandlers.add(new CppHandler("", "", !opts.combineCppFiles));
+        }
+        for (SourceFileHandler ch : contentHandlers) {
+            ch.init(makefile);
+        }
+
+        // read/process/cache source files
+        System.out.println("Caching and processing local source files...");
+        sources.scan(makefile, buildFileLoaders, contentHandlers, true, getSourceDirs());
+
+        // find local dependencies in "external libraries"
+        LibDB.findLocalDependencies(buildEntities);
+
+        // process dependencies
+        System.out.println("Processing dependencies...");
+        for (BuildEntity be : buildEntities) {
+            be.resolveDependencies(buildEntities, this);
+        }
+
+        // check whether all dependencies are met
+        for (BuildEntity be : buildEntities) {
+            be.checkDependencies(this);
+        }
+
+        // add available optional libs
+        for (BuildEntity be : buildEntities) {
+            be.addOptionalLibs();
+        }
+
+        // collect external libraries needed for building
+        for (BuildEntity be : buildEntities) {
+            be.mergeExtLibs();
+        }
+
+        // add build commands for entity to makefile
+        for (BuildEntity be : buildEntities) {
+            if (be.missingDep) {
+                continue;
+            }
+            build(be);
+        }
+
+        // Write makefile
+        writeMakefile();
+
+        // print error messages at the end... so nobody will miss them
+        //Collections.sort(errorMessages);
+        for (String err : errorMessages) {
+            System.err.println(err);
+        }
+
+        // completed
+        System.out.println("Creating Makefile successful.");
+    }
+
+    /**
+     * Writes makefile to disk (may be overridden for custom adjustments)
+     */
+    protected void writeMakefile() throws Exception {
+
+        makefile.writeTo(new File("Makefile"));
+    }
+
+    /**
+     * @param handler Source file handler to add to this build entity
+     */
+    protected void addHandler(SourceFileHandler handler) {
+        contentHandlers.add(handler);
+    }
+
+    /**
+     * @param loader Build file loader to add to this build entity
+     */
+    protected void addLoader(BuildFileLoader loader) {
+        buildFileLoaders.add(loader);
+    }
+
+    /**
+     * @return Get source directories (relative) - should be overidden
+     */
+    public String[] getSourceDirs() {
+        return new String[] {"src"};
+    }
+
+    /**
+     * Build single build entity
+     *
+     * @param be Build entity to build
+     */
+    private void build(final BuildEntity be) throws Exception {
+        System.out.println("Processing " + be.name);
+        be.initTarget(makefile);
+        be.computeOptions();
+
+        for (SourceFileHandler ch : contentHandlers) {
+            ch.build(be, makefile, this);
+        }
+    }
+
+    /**
+     * Create and name intermediate temporary build artifact for a single source file
+     * (can be overridden to perform custom naming)
+     * (creates files in persistent temporary building directory)
+     *
+     * @param source Source file
+     * @param targetExtension Suggested extension for target
+     * @return
+     */
+    public SrcFile getTempBuildArtifact(SrcFile source, String targetExtension) {
+        String srcDir = source.dir.relativeTo(source.dir.getSrcRoot());
+        return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS + source.getRawName() + "." + targetExtension);
+    }
+
+    /**
+     * Create and name intermediate temporary build artifact for multiple source files
+     * (can be overridden to perform custom naming)
+     * (creates files in persistent temporary building directory)
+     *
+     * @param source Source file
+     * @param targetExtension Suggested extension for target
+     * @return
+     */
+    public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
+        String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
+        return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+    }
+
+    /**
+     * Get directory (normally in persistent temporary building directory) for build files
+     * (can be overridden to perform custom naming)
+     *
+     * @param be Build Entity
+     * @return Directory
+     */
+    public String getTempBuildDir(BuildEntity source) {
+        String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
+        return tempBuildPath.relative + FS + srcDir;
+    }
+
+    /**
+     * Print error line deferred (when tool exits)
+     *
+     * @param s line to print
+     */
+    public void printErrorLine(String s) {
+        errorMessages.add(s);
+    }
+
+    /** Print advice if an error occured */
+    public static void printErrorAdvice() {
+        System.out.println("An error was encountered during the build process.");
+        System.out.println("Make sure you have the current version of this tool, called ant, and");
+        System.out.println("the libdb.txt file is up to date (call updatelibdb),");
+    }
+
+    public boolean accept(File dir, String name) {
+        File f = new File(dir.getAbsolutePath() + File.separator + name);
+        return (f.isDirectory() || name.equals("SConscript"));
+    }
+
+    /**
+     * Set default include paths for directory (used for finding/resolving .h dependencies)
+     * (may/should be overridden)
+     *
+     * @param dir SrcDir instance of which to set default include paths
+     */
+    public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
+        dir.defaultIncludePaths.add(dir);
+    }
+
+    /**
+     * @return Cache for source files
+     */
+    public SourceScanner getSources() {
+        return sources;
+    }
 }

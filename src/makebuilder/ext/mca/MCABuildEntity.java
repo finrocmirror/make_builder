@@ -33,56 +33,59 @@ import makebuilder.handler.CppHandler;
  * @author max
  *
  * MCA build entity.
- * 
+ *
  * This can be an MCA program or an MCA library.
  * Objects of this class are the result of parsing MCA2 SConscripts.
  */
 public abstract class MCABuildEntity extends BuildEntity {
 
-	@Override
-	public void initTarget(Makefile makefile) {
-		super.initTarget(makefile);
-		String rootDir2 = getRootDir().relative;
-		boolean project = rootDir2.startsWith("projects");
-		boolean lib = rootDir2.startsWith("libraries");
-		boolean tool = rootDir2.startsWith("tools");
-		boolean sysInstall = MakeFileBuilder.getOptions().containsKey("usesysteminstall");
-		if (lib || tool) {
-			target.addToPhony("libs");
-		}
-		if (tool) {
-			target.addToPhony("tools");
-		}
-		if (lib) {
-			if (sysInstall) {
-				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1));
-			} else {
-				target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
-			}
-		}
-		if (project || tool) {
-			String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);
-			if (projectx.contains(FS)) {
-				if (sysInstall) {
-					target.addToPhony(projectx);
-				} else {
-					target.addToPhony(projectx, "tools");
-				}
-				projectx = projectx.substring(0, projectx.indexOf(FS));
-			}
-			if (sysInstall) {
-				target.addToPhony(projectx);
-			} else {
-				target.addToPhony(projectx, "tools");
-			}
-		}
-		String targetFile = getTarget();
-		targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
-		target.addToPhony(targetFile + (isLibrary() ? "" : "-bin"));
-	}
+    @Override
+    public void initTarget(Makefile makefile) {
+        super.initTarget(makefile);
+        String rootDir2 = getRootDir().relative;
+        if (rootDir2.startsWith("mca2-legacy/")) {
+            rootDir2 = rootDir2.substring("mca2-legacy/".length());
+        }
+        boolean project = rootDir2.startsWith("projects");
+        boolean lib = rootDir2.startsWith("libraries");
+        boolean tool = rootDir2.startsWith("tools");
+        boolean sysInstall = MakeFileBuilder.getOptions().containsKey("usesysteminstall");
+        if (lib || tool) {
+            target.addToPhony("libs");
+        }
+        if (tool) {
+            target.addToPhony("tools");
+        }
+        if (lib) {
+            if (sysInstall) {
+                target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1));
+            } else {
+                target.addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
+            }
+        }
+        if (project || tool) {
+            String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);
+            if (projectx.contains(FS)) {
+                if (sysInstall) {
+                    target.addToPhony(projectx);
+                } else {
+                    target.addToPhony(projectx, "tools");
+                }
+                projectx = projectx.substring(0, projectx.indexOf(FS));
+            }
+            if (sysInstall) {
+                target.addToPhony(projectx);
+            } else {
+                target.addToPhony(projectx, "tools");
+            }
+        }
+        String targetFile = getTarget();
+        targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
+        target.addToPhony(targetFile + (isLibrary() ? "" : "-bin"));
+    }
 
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return CppHandler.class;
+    }
 }
