@@ -262,9 +262,9 @@ public abstract class BuildEntity {
      * @param makefile Makefile
      */
     public void initTarget(Makefile makefile) {
-        target = makefile.addTarget(getTarget(), false);
+        target = makefile.addTarget(getTarget(), false, getRootDir());
         for (StartScript scr : startScripts) {
-            scr.initTarget(makefile, getTargetPrefix());
+            scr.initTarget(makefile, getTargetPrefix(), getRootDir());
             scr.getTarget().addDependency(buildFile.relative);
             scr.getTarget().addDependency(target);
         }

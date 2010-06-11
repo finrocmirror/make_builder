@@ -28,18 +28,18 @@ package makebuilder.ext.mca;
  */
 public class MCAPlugin extends MCABuildEntity {
 
-	public MCAPlugin() {
-		try {
-			//this.extlibs.add(LibDB.getLib("ltdl"));
-			libs.add("ltdl");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		opts.addOptions("-shared -fPIC");
-	}
+    public MCAPlugin() {
+        try {
+            //this.extlibs.add(LibDB.getLib("ltdl"));
+            libs.add("ltdl");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        opts.addOptions("-shared -fPIC");
+    }
 
-	@Override
-	public String getTarget() {
-		return "$(TARGET_LIB)/pluginmca2_" + name + ".so";
-	}
+    @Override
+    public String getTarget() {
+        return "$(TARGET_LIB)/pluginmca2_" + name + ".so";
+    }
 }

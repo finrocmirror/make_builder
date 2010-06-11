@@ -164,6 +164,12 @@ public class FinrocBuilder extends MakeFileBuilder {
             }
         }
 
+        if (getOptions().containsKey("usesysteminstall")) {
+            new FinrocRepositoryTargetCreator().postprocess(makefile);
+        } else {
+            new FinrocRepositoryTargetCreator().postprocess(makefile, "tools");
+        }
+
         super.writeMakefile();
     }
 

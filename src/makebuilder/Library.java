@@ -30,14 +30,14 @@ import makebuilder.handler.CppHandler;
  */
 public class Library extends BuildEntity {
 
-	@Override
-	public String getTarget() {
-		return "($TARGET_DIR)/lib" + name + ".so";
-	}
+    @Override
+    public String getTarget() {
+        return "($TARGET_DIR)/lib" + name + ".so";
+    }
 
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return CppHandler.class;
+    }
 
 }

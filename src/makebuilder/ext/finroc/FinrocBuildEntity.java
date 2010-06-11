@@ -24,7 +24,6 @@ package makebuilder.ext.finroc;
 import java.io.File;
 
 import makebuilder.BuildEntity;
-import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.StartScript;
 
@@ -36,73 +35,44 @@ import makebuilder.StartScript;
  */
 public abstract class FinrocBuildEntity extends BuildEntity {
 
-	protected Makefile.Target startScriptTarget;
-	
-	@Override
-	public void initTarget(Makefile makefile) {
-		super.initTarget(makefile);
-		String rootDir2 = getRootDir().relative;
-		boolean project = rootDir2.startsWith("projects");
-		boolean lib = rootDir2.startsWith("libraries");
-		boolean tool = rootDir2.startsWith("tools");
-		boolean plugin = rootDir2.startsWith("plugins");
-		boolean rrlib = rootDir2.startsWith("rrlib");
-		boolean core = rootDir2.startsWith("core") || rootDir2.startsWith("jcore");
-		boolean sysInstall = MakeFileBuilder.getOptions().containsKey("usesysteminstall");
-		if (lib || rrlib || plugin) {
-			addToPhony("libs");
-		}
-		if (tool) {
-			addToPhony("tools");
-		}
-		if (plugin) {
-			addToPhony("plugins");
-		}
-		if (lib || plugin || rrlib) {
-			if (sysInstall) {
-				addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1));
-			} else {
-				addToPhony(rootDir2.substring(rootDir2.lastIndexOf(FS) + 1), "tools");
-			}
-		}
-		if (core) {
-			addToPhony(rootDir2);
-		}
-		if (project || tool) {
-			String projectx = rootDir2.substring(rootDir2.indexOf(FS) + 1);
-			if (projectx.contains(FS)) {
-				if (sysInstall) {
-					addToPhony(projectx);
-				} else {
-					addToPhony(projectx, "tools");
-				}
-				projectx = projectx.substring(0, projectx.indexOf(FS));
-			}
-			if (sysInstall) {
-				addToPhony(projectx);
-			} else {
-				addToPhony(projectx, "tools");
-			}
-		}
-		
-		String targetFile = getTarget();
-		targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
-		addToPhony(targetFile + ((isLibrary() || targetFile.endsWith(".jar")) ? "" : "-bin"));
-	}
-	
-	/**
-	 * Adds main target to specified phony target
-	 *
-	 * (see Makefile.Target.addToPhony for details on parameters)
-	 * (may be overridden for customization)
-	 */
-	public void addToPhony(String phony, String... phonyDefaultDependencies) {
-		if (startScripts.size() == 0) {
-			target.addToPhony(phony, phonyDefaultDependencies);
-		} else {
-			for (StartScript scr : startScripts) {
-				scr.getTarget().addToPhony(phony, phonyDefaultDependencies);
-			}
-		}
-	}
+    protected Makefile.Target startScriptTarget;
+
+    @Override
+    public void initTarget(Makefile makefile) {
+        super.initTarget(makefile);
+        String rootDir2 = getRootDir().relative;
+        boolean lib = rootDir2.startsWith("libraries");
+        boolean tool = rootDir2.startsWith("tools");
+        boolean plugin = rootDir2.startsWith("plugins");
+        boolean rrlib = rootDir2.startsWith("rrlib");
+        if (lib || rrlib || plugin) {
+            addToPhony("libs");
+        }
+        if (tool) {
+            addToPhony("tools");
+        }
+        if (plugin) {
+            addToPhony("plugins");
+        }
+
+        String targetFile = getTarget();
+        targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
+        addToPhony(targetFile + ((isLibrary() || targetFile.endsWith(".jar")) ? "" : "-bin"));
+    }
+
+    /**
+     * Adds main target to specified phony target
+     *
+     * (see Makefile.Target.addToPhony for details on parameters)
+     * (may be overridden for customization)
+     */
+    public void addToPhony(String phony, String... phonyDefaultDependencies) {
+        if (startScripts.size() == 0) {
+            target.addToPhony(phony, phonyDefaultDependencies);
+        } else {
+            for (StartScript scr : startScripts) {
+                scr.getTarget().addToPhony(phony, phonyDefaultDependencies);
+            }
+        }
+    }
 }

@@ -31,21 +31,21 @@ import makebuilder.handler.CppHandler;
  */
 public class RRLib extends FinrocBuildEntity {
 
-	public RRLib() {
-		opts.addOptions("-shared -fPIC");
-	}
+    public RRLib() {
+        opts.addOptions("-shared -fPIC");
+    }
 
-	//???
-	//librr_finroc_core_util.so
-	//librrlib_finroc_core_util.so
-	
-	@Override
-	public String getTarget() {
-		return "$(TARGET_LIB)/librrlib_" + name + ".so";
-	}
-	
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+    //???
+    //librr_finroc_core_util.so
+    //librrlib_finroc_core_util.so
+
+    @Override
+    public String getTarget() {
+        return "$(TARGET_LIB)/librrlib_" + name + ".so";
+    }
+
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return CppHandler.class;
+    }
 }

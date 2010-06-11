@@ -28,23 +28,23 @@ package makebuilder.ext.mca;
  */
 public class MCAProgram extends MCABuildEntity {
 
-	@Override
-	public String getTarget() {
-		if (this.getRootDir().relative.startsWith("libraries")) {
-			String[] parts = this.getRootDir().relative.split("/");
-			if (parts.length >= 2) {
-				String prefix = "mcal_" + parts[1];
-				if (!name.startsWith(prefix)) {
-					String n = name;
-					if (n.startsWith("mcal_")) {
-						n = n.substring(5);
-					} else if (n.startsWith(parts[1])) {
-						n = n.substring(parts[1].length() + 1);
-					}
-					return "$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "");
-				}
-			}
-		}
-		return "$(TARGET_BIN)/" + name;
-	}
+    @Override
+    public String getTarget() {
+        if (this.getRootDir().relative.startsWith("libraries")) {
+            String[] parts = this.getRootDir().relative.split("/");
+            if (parts.length >= 2) {
+                String prefix = "mcal_" + parts[1];
+                if (!name.startsWith(prefix)) {
+                    String n = name;
+                    if (n.startsWith("mcal_")) {
+                        n = n.substring(5);
+                    } else if (n.startsWith(parts[1])) {
+                        n = n.substring(parts[1].length() + 1);
+                    }
+                    return "$(TARGET_BIN)/" + prefix + (n.length() > 0 ? ("_" + n) : "");
+                }
+            }
+        }
+        return "$(TARGET_BIN)/" + name;
+    }
 }
