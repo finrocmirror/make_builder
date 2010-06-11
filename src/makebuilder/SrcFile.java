@@ -76,6 +76,9 @@ public class SrcFile implements Serializable {
 	
 	/** Build entity that this source file belongs to - may be null if not clear */
 	private transient BuildEntity owner;
+
+    /** Currently processing file? (temporary variable for BuildEntity.java) */
+    public boolean processing = false;
 	
 	/**
 	 * @param dir Directory that file is in

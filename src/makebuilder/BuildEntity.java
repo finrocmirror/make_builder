@@ -76,6 +76,9 @@ public abstract class BuildEntity {
     /** Start scripts for this build entity */
     public List<StartScript> startScripts = new ArrayList<StartScript>();
 
+    /** Are we currently checking dependencies (used to check for cycles)? */
+    private boolean checkingDeps = false;
+
     /**
      * @param tb Reference to main builder instance
      */
@@ -118,14 +121,20 @@ public abstract class BuildEntity {
         if (missingDep) {
             return;
         }
+        checkingDeps = true;
         for (BuildEntity be : dependencies) {
+            if (be.checkingDeps) {
+                throw new RuntimeException("Detected cyclic dependency (" + name + " [" + getRootDir().toString() + "] -> " + be.name + " [" + be.getRootDir().toString() + "])");
+            }
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
                 mfb.printErrorLine("Not building " + name + " due to dependency " + be.name + " which cannot be built");
+                checkingDeps = false;
                 return;
             }
         }
+        checkingDeps = false;
     }
 
     /**
@@ -153,6 +162,9 @@ public abstract class BuildEntity {
             opts.merge(el.ccOptions, false);
         }
         for (BuildEntity be : dependencies) {
+            if (!be.isLibrary()) {
+                throw new RuntimeException(toString() + " depends on non-library " + be.toString());
+            }
             String s = be.getTarget();
             target.addDependency(s);
             s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
@@ -207,20 +219,39 @@ public abstract class BuildEntity {
      */
     public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
         // TODO: test this
-        /*for (SrcFile sf : sources) {
-            for (SrcFile sfDep : sf.dependencies) {
-                BuildEntity owner = sfDep.getOwner();
-                if (owner != null && (!dependencies.contains(owner))) {
-                    dependencies.add(owner);
-                }
-            }
-        }*/
+        for (SrcFile sf : sources) {
+            checkForDependencies(sf);
+        }
         for (int i = 0; i < libs.size(); i++) {
             resolveDependency(false, buildEntities, libs.get(i), builder);
         }
         for (String dep : optionalLibs) {
             resolveDependency(true, buildEntities, dep, builder);
         }
+    }
+
+    /**
+     * sf is one of our (possibly indirect) source files.
+     *
+     * Check for dependencies to other build entities.
+     *
+     * @param sf Source file
+     */
+    public void checkForDependencies(SrcFile sf) {
+        if (sf.processing) {
+            return;
+        }
+        sf.processing = true;
+        for (SrcFile sfDep : sf.dependencies) {
+            BuildEntity owner = sfDep.getOwner();
+            if (owner != null && owner != this && (!dependencies.contains(owner))) {
+                System.out.println("Adding " + owner.toString() + " to " + toString() + " because of " + sfDep.toString());
+                dependencies.add(owner);
+            } else if (owner == null || owner == this) {
+                checkForDependencies(sfDep);
+            }
+        }       
+        sf.processing = false;
     }
 
     /**
