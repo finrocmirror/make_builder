@@ -2,7 +2,7 @@
  * You received this file as part of an experimental
  * build tool ('makebuilder') - originally developed for MCA2.
  *
- * Copyright (C) 2008-2009 Max Reichardt,
+ * Copyright (C) 2010 Max Reichardt,
  *   Robotics Research Lab, University of Kaiserslautern
  *
  * This program is free software; you can redistribute it and/or
@@ -19,25 +19,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package makebuilder;
+package makebuilder.ext.finroc;
 
-import makebuilder.handler.CppHandler;
+import makebuilder.ext.mca.MCA2RepositoryTargetCreator;
 
 /**
  * @author max
  *
- * This class is a build entity that will be compiled to a c/c++ (shared) library.
  */
-public class Library extends BuildEntity {
+public class FinrocRepositoryTargetCreator extends MCA2RepositoryTargetCreator {
 
-    @Override
-    public String getTarget() {
-        return "($TARGET_DIR)/lib" + name + ".so";
+    public FinrocRepositoryTargetCreator() {
+        for (ClassEntry ce : classEntries) {
+            ce.directory = "mca2-legacy/" + ce.directory;
+        }
+        classEntries.add(new ClassEntry("core", "finroc_core", false));
+        classEntries.add(new ClassEntry("jcore", "finroc_jcore", false));
+        classEntries.add(new ClassEntry("rrlib", "rrlib", true));
+        classEntries.add(new ClassEntry("libraries", "finroc_libraries", true));
+        classEntries.add(new ClassEntry("projects", "finroc_projects", true));
+        classEntries.add(new ClassEntry("tools", "finroc_tools", true));
+        classEntries.add(new ClassEntry("plugins", "finroc_plugins", true));
     }
-
-    @Override
-    public Class <? extends SourceFileHandler > getFinalHandler() {
-        return CppHandler.class;
-    }
-
 }

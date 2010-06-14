@@ -29,87 +29,87 @@ import java.util.Set;
 /**
  * @author max
  *
- * Set with entries ordered by the time they were added 
+ * Set with entries ordered by the time they were added
  */
 public class AddOrderSet<T> implements Set<T> {
 
-	/** list based on which functionality is implemented */
-	private ArrayList<T> backend = new ArrayList<T>();
-	
-	@Override
-	public boolean add(T t) {
-		if (!backend.contains(t)) {
-			backend.add(t);
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean addAll(Collection<? extends T> ts) {
-		boolean change = false;
-		for (T t : ts) {
-			change |= add(t);
-		}
-		return change;
-	}
+    /** list based on which functionality is implemented */
+    private ArrayList<T> backend = new ArrayList<T>();
 
-	@Override
-	public Iterator<T> iterator() {
-		return backend.iterator();
-	}
+    @Override
+    public boolean add(T t) {
+        if (!backend.contains(t)) {
+            backend.add(t);
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public void clear() {
-		backend.clear();
-	}
+    @Override
+    public boolean addAll(Collection <? extends T > ts) {
+        boolean change = false;
+        for (T t : ts) {
+            change |= add(t);
+        }
+        return change;
+    }
 
-	@Override
-	public boolean contains(Object o) {
-		return backend.contains(o);
-	}
+    @Override
+    public Iterator<T> iterator() {
+        return backend.iterator();
+    }
 
-	@Override
-	public boolean containsAll(Collection<?> ts) {
-		boolean r = true;
-		for (Object t : ts) {
-			r &= contains(t);
-		}
-		return r;
-	}
+    @Override
+    public void clear() {
+        backend.clear();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return backend.isEmpty();
-	}
+    @Override
+    public boolean contains(Object o) {
+        return backend.contains(o);
+    }
 
-	@Override
-	public boolean remove(Object o) {
-		return backend.remove(o);
-	}
+    @Override
+    public boolean containsAll(Collection<?> ts) {
+        boolean r = true;
+        for (Object t : ts) {
+            r &= contains(t);
+        }
+        return r;
+    }
 
-	@Override
-	public boolean removeAll(Collection<?> c) {
-		return backend.removeAll(c);
-	}
+    @Override
+    public boolean isEmpty() {
+        return backend.isEmpty();
+    }
 
-	@Override
-	public boolean retainAll(Collection<?> c) {
-		return backend.retainAll(c);
-	}
+    @Override
+    public boolean remove(Object o) {
+        return backend.remove(o);
+    }
 
-	@Override
-	public int size() {
-		return backend.size();
-	}
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return backend.removeAll(c);
+    }
 
-	@Override
-	public Object[] toArray() {
-		return backend.toArray();
-	}
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return backend.retainAll(c);
+    }
 
-	@Override
-	public <X> X[] toArray(X[] a) {
-		return backend.toArray(a);
-	}
+    @Override
+    public int size() {
+        return backend.size();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return backend.toArray();
+    }
+
+    @Override
+    public <X> X[] toArray(X[] a) {
+        return backend.toArray(a);
+    }
 }

@@ -29,24 +29,24 @@ package makebuilder.util;
  */
 public class GCC {
 
-	/**
-	 * @return GCC version as string
-	 */
-	public static String getGCCVersion() {
-		try {
-			Process p = Runtime.getRuntime().exec("gcc --version");
-			p.waitFor();
-			for (String s : Files.readLines(p.getInputStream())) {
-				s = s.substring(s.indexOf(")") + 1);
-				if (s.contains("(")) {
-					return s.substring(0, s.indexOf("(")).trim();
-				}
-				return s.trim();
-			}
-		} catch (Exception e) {
-			// no gcc version found
+    /**
+     * @return GCC version as string
+     */
+    public static String getGCCVersion() {
+        try {
+            Process p = Runtime.getRuntime().exec("gcc --version");
+            p.waitFor();
+            for (String s : Files.readLines(p.getInputStream())) {
+                s = s.substring(s.indexOf(")") + 1);
+                if (s.contains("(")) {
+                    return s.substring(0, s.indexOf("(")).trim();
+                }
+                return s.trim();
+            }
+        } catch (Exception e) {
+            // no gcc version found
             e.printStackTrace();
-		}
-		return null;
-	}
+        }
+        return null;
+    }
 }

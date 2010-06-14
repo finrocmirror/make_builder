@@ -31,17 +31,17 @@ import makebuilder.handler.CppHandler;
  */
 public class FinrocPlugin extends FinrocBuildEntity {
 
-	public FinrocPlugin() {
-		opts.addOptions("-shared -fPIC");
-	}
+    public FinrocPlugin() {
+        opts.addOptions("-shared -fPIC");
+    }
 
-	@Override
-	public String getTarget() {
-		return "$(TARGET_LIB)/libfinroc_plugin_" + name + ".so";
-	}
-	
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return CppHandler.class;
-	}
+    @Override
+    public String getTarget() {
+        return "$(TARGET_LIB)/libfinroc_plugin_" + name + ".so";
+    }
+
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return CppHandler.class;
+    }
 }

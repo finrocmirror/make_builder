@@ -49,7 +49,7 @@ public class LdPreloadScriptHandler extends SourceFileHandler.Impl {
 
     @Override
     public void init(Makefile makefile) {
-        target = makefile.addTarget(FILENAME, false);
+        target = makefile.addTarget(FILENAME, false, null);
         target.addCommand("echo echo -n export LD_PRELOAD=>" + FILENAME, false);
         target.addCommand("chmod +x " + FILENAME, false);
 
@@ -64,6 +64,7 @@ public class LdPreloadScriptHandler extends SourceFileHandler.Impl {
             for (BuildEntity b : be.dependencies) {
                 if (b.getTarget().endsWith(".so")) { // c++ library
                     if (!preloads.contains(b.getTargetFilename())) {
+                        target.addDependency(b.getTarget());
                         target.addCommand("echo echo -n " + (preloads.size() > 0 ? ":" : "") + b.getTargetFilename() + ">>" + FILENAME, false);
                         preloads.add(b.getTargetFilename());
                     }

@@ -60,9 +60,10 @@ public class StartScript {
      *
      * @param mf Makefile
      * @param prefix Prefix for script file name
+     * @param rootDir
      */
-    void initTarget(Makefile mf, String prefix) {
-        target = mf.addTarget("$(" + ScriptHandler.SCRIPT_DIR_VAR + ")/" + prefix + filename, false);
+    void initTarget(Makefile mf, String prefix, SrcDir rootDir) {
+        target = mf.addTarget("$(" + ScriptHandler.SCRIPT_DIR_VAR + ")/" + prefix + filename, false, rootDir);
     }
 
     /**

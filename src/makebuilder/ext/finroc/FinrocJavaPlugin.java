@@ -31,14 +31,14 @@ import makebuilder.handler.JavaHandler;
  */
 public class FinrocJavaPlugin extends FinrocBuildEntity {
 
-	@Override
-	public Class<? extends SourceFileHandler> getFinalHandler() {
-		return JavaHandler.class;
-	}
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        return JavaHandler.class;
+    }
 
-	@Override
-	public String getTarget() {
-		return "$(TARGET_JAVA)/finroc_plugin_" + name + ".jar";
-	}
+    @Override
+    public String getTarget() {
+        return "$(TARGET_JAVA)/finroc_plugin_" + name + ".jar";
+    }
 
 }

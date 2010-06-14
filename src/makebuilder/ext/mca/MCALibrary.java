@@ -28,12 +28,12 @@ package makebuilder.ext.mca;
  */
 public class MCALibrary extends MCABuildEntity {
 
-	public MCALibrary() {
-		opts.addOptions("-shared -fPIC");
-	}
-	
-	@Override
-	public String getTarget() {
-		return "$(TARGET_LIB)/libmca2_" + name + ".so";
-	}
+    public MCALibrary() {
+        opts.addOptions("-shared -fPIC");
+    }
+
+    @Override
+    public String getTarget() {
+        return "$(TARGET_LIB)/libmca2_" + name + ".so";
+    }
 }
