@@ -197,7 +197,7 @@ public abstract class BuildEntity {
      */
     public void addOptionalLibs() {
         for (BuildEntity be : optionalDependencies) {
-            if (!be.missingDep) {
+            if (!be.missingDep && (!dependencies.contains(be))) {
                 dependencies.add(be);
             }
         }
@@ -266,14 +266,18 @@ public abstract class BuildEntity {
         if (LibDB.available(dep)) { // External library dependency?
             LibDB.ExtLib xl = LibDB.getLib(dep);
             directExtlibs.add(xl);
-            dependencies.addAll(xl.dependencies);
+            for (BuildEntity be : xl.dependencies) {
+                if (!dependencies.contains(be)) {
+                    dependencies.add(be);
+                }
+            }
             return;
         }
         for (BuildEntity be : buildEntities) { // local dependency?
             if (be.getReferenceName().equals(dep)) {
                 if (optional) {
                     optionalDependencies.add(be);
-                } else {
+                } else if (!dependencies.contains(be)) {
                     dependencies.add(be);
                 }
                 return;
