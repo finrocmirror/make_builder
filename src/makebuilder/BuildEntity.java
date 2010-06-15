@@ -76,9 +76,9 @@ public abstract class BuildEntity {
     /** Start scripts for this build entity */
     public List<StartScript> startScripts = new ArrayList<StartScript>();
 
-    /** Are we currently checking dependencies (used to check for cycles)? */
-    private boolean checkingDeps = false;
-
+    /** "Stack" for cycle check */
+    private static ArrayList<BuildEntity> cycleCheckStack = new ArrayList<BuildEntity>(100);
+    
     /**
      * @param tb Reference to main builder instance
      */
@@ -114,6 +114,26 @@ public abstract class BuildEntity {
     }
 
     /**
+     * Check dependency tree for cycles
+     */
+    public void checkForCycles() {
+        if (cycleCheckStack.contains(this)) {
+            System.out.println("Detected cyclic dependency: ");
+            for (BuildEntity be : cycleCheckStack) {
+                System.out.println("-> " + be.toString() +  " [" + be.getRootDir().toString() + "]");
+            }
+            System.out.println("-> " + toString() +  " [" + getRootDir().toString() + "]");
+            System.exit(-1);
+        }
+        
+        cycleCheckStack.add(this);
+        for (BuildEntity be : dependencies) {
+            be.checkForCycles();
+        }
+        cycleCheckStack.remove(this);
+    }
+    
+    /**
      * Determine, whether build entity can be built.
      * missingDep is set accordingly
      */
@@ -121,20 +141,14 @@ public abstract class BuildEntity {
         if (missingDep) {
             return;
         }
-        checkingDeps = true;
         for (BuildEntity be : dependencies) {
-            if (be.checkingDeps) {
-                throw new RuntimeException("Detected cyclic dependency (" + name + " [" + getRootDir().toString() + "] -> " + be.name + " [" + be.getRootDir().toString() + "])");
-            }
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
                 mfb.printErrorLine("Not building " + name + " due to dependency " + be.name + " which cannot be built");
-                checkingDeps = false;
                 return;
             }
         }
-        checkingDeps = false;
     }
 
     /**
