@@ -308,4 +308,11 @@ public abstract class BuildEntity {
     public String getTargetPrefix() {
         return "";
     }
+
+    /**
+     * @return Is this a test program?
+     */
+    public boolean isTestProgram() {
+        return false;
+    }
 }

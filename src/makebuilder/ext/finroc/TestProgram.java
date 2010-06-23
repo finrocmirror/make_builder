@@ -64,4 +64,9 @@ public class TestProgram extends FinrocBuildEntity {
     public Class <? extends SourceFileHandler > getFinalHandler() {
         return CppHandler.class;
     }
+
+    @Override
+    public boolean isTestProgram() {
+        return true;
+    }
 }
