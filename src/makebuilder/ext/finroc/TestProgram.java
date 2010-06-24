@@ -34,15 +34,15 @@ public class TestProgram extends FinrocBuildEntity {
     @Override
     public String getTargetPrefix() {
         if (this.getRootDir().relative.startsWith("libraries")) {
-            return "finroc_library_" + getSecondDir() + "_";
+            return "finroc_library_" + getSecondDir() + "_test_";
         } else if (this.getRootDir().relative.startsWith("plugins")) {
-            return "finroc_plugin_" + getSecondDir() + "_";
+            return "finroc_plugin_" + getSecondDir() + "_test_";
         } else if (this.getRootDir().relative.startsWith("rrlib")) {
-            return "rrlib_" + getSecondDir() + "_";
+            return "rrlib_" + getSecondDir() + "_test_";
         } else if (this.getRootDir().relative.startsWith("core")) {
-            return "finroc_core_";
+            return "finroc_core_test_";
         } else if (this.getRootDir().relative.startsWith("jcore")) {
-            return "finroc_jcore_";
+            return "finroc_jcore_test_";
         }
         return "";
     }
