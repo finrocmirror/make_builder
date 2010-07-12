@@ -218,7 +218,7 @@ public class MCABuilder extends MakeFileBuilder {
     }
 
     public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
-        return sources.registerBuildProduct(tempPath + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+        return sources.registerBuildProduct(tempPath + FS + source.getTargetFilename().replace('.', '_') + "_" + suggestedPrefix + "." + targetExtension);
     }
 
 }

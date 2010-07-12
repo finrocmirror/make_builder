@@ -271,7 +271,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (targetExtension.equals("mf")) {
             return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "") + ".mf");
         }
-        return sources.registerBuildProduct(tempPath + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+        return sources.registerBuildProduct(tempPath + FS + source.getTargetFilename().replace('.', '_') + "_" + suggestedPrefix + "." + targetExtension);
     }
 
     @Override
