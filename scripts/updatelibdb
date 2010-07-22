@@ -119,6 +119,7 @@ foreach my $line (@lines) {
     print "$libname: "; #$opts\n";
     $statusok = "";
     $statusfail = "";
+    my $fail = 0;
 
     # process includes
     while ($opts =~ /(\s|^)(-I<(\S+)>)(\s|$)/) {
@@ -128,6 +129,7 @@ foreach my $line (@lines) {
         #print " path $path\n";
         if ($path eq "") {
             $opts = "";
+            $fail = 1;
         } elsif ($path eq "/usr/include" || $path =~ /\/gcc\//) {
             $opts =~ s/\Q$old\E//;
         } else {
@@ -161,6 +163,7 @@ foreach my $line (@lines) {
                 $path = findPath($a);
                 if ($path eq "") {
                     $opts = "";
+                    $fail = 1;
                     last;
                 }
             }
@@ -180,7 +183,7 @@ foreach my $line (@lines) {
     }
 
     # create entry
-    if ($opts eq "") {
+    if ($fail == 1) {
         $libs { $libname } = "N/A";
         print "no (missing $statusfail)\n";
     } else {
