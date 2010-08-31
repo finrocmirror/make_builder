@@ -166,6 +166,12 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
             be.resolveDependencies(buildEntities, this);
         }
 
+        // dump dependency graph to dot file?
+        if (getOptions().outputDotFile) {
+            DotFile.write(new File("targets.dot"), buildEntities);
+            return;
+        }
+
         // check whether all dependencies are met
         for (BuildEntity be : buildEntities) {
             be.checkForCycles();
@@ -300,6 +306,17 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     public void printErrorLine(String s) {
         errorMessages.add(s);
     }
+
+    /**
+     * Print error line which says that target cannot be built
+     *
+     * @param be Entity that cannot be built
+     * @param string Error string
+     */
+    public void printCannotBuildError(BuildEntity be, String string) {
+        printErrorLine("Cannot build " + be.toString() + " (" + be.buildFile + ")" + string);
+    }
+
 
     /** Print advice if an error occured */
     public static void printErrorAdvice() {

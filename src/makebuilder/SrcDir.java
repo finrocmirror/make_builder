@@ -21,7 +21,9 @@
  */
 package makebuilder;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ import java.util.List;
  *
  * Source directory
  */
-public class SrcDir {
+public class SrcDir implements Comparable<SrcDir> {
 
     /** Source Scanner instance that this directory belongs to and was created from */
     public final SourceScanner sources;
@@ -49,6 +51,9 @@ public class SrcDir {
 
     /** Root directory for source files? */
     public boolean srcRoot = false;
+
+    /** repository of version control system that this directory is in (e.g. svn; lazily inizialized, "" if not determinable) */
+    public String repository = null;
 
     /**
      * @param sourceScanner Source Scanner instance that this directory belongs to and was created from
@@ -130,5 +135,55 @@ public class SrcDir {
      */
     public boolean isTempDir() {
         return relative.startsWith(sources.builder.tempPath.relative);
+    }
+
+    /**
+     * @return repository of version control system that this directory is in (e.g. svn); null if not determinable
+     */
+    public String getRepository() {
+        if (repository == null) {
+            // check for svn
+            File svn = new File(absolute.getAbsoluteFile() + "/.svn/entries");
+            if (svn.exists()) {
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(svn));
+                    br.readLine();
+                    br.readLine();
+                    br.readLine();
+                    br.readLine();
+                    br.readLine();
+                    repository = br.readLine();
+                    //System.out.println("Found repo entry: " + repository);
+                    br.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (repository == null) {
+                repository = "";
+            }
+        }
+        if (repository.length() == 0) {
+            return null;
+        }
+        return repository;
+    }
+
+    /**
+     * @return Root directory of repository checkout
+     */
+    public SrcDir getRepositoryRoot() {
+        if (getRepository() == null) {
+            return null;
+        }
+        if (getParent() == null || getParent().getRepository() == null || (!getParent().getRepository().equals(getRepository()))) {
+            return this;
+        }
+        return getParent().getRepositoryRoot();
+    }
+
+    @Override
+    public int compareTo(SrcDir arg0) {
+        return relative.compareTo(arg0.relative);
     }
 }

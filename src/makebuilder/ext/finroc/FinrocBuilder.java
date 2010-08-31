@@ -98,12 +98,14 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // init handlers
         addLoader(new SConscriptParser());
-        addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class,
+        addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, TestProgram.class, JavaTestProgram.class,
                                     RRLib.class, FinrocProgram.class, RRJavaLib.class, FinrocJavaProgram.class, FinrocJavaLibrary.class, FinrocJavaPlugin.class));
         addHandler(new Qt4Handler());
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
-        DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
+        if (!(new File(DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN.trim()).exists())) {
+            DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
+        }
         if (getOptions().combineCppFiles) {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
@@ -271,7 +273,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (targetExtension.equals("mf")) {
             return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "") + ".mf");
         }
-        return sources.registerBuildProduct(tempPath + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+        return sources.registerBuildProduct(tempPath + FS + source.getTargetFilename().replace('.', '_') + "_" + suggestedPrefix + "." + targetExtension);
     }
 
     @Override

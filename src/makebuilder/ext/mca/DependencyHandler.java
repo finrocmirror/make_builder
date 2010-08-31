@@ -47,55 +47,85 @@ import makebuilder.SrcFile;
  */
 public class DependencyHandler extends SourceFileHandler.Impl {
 
-    // Dependencies for all directories
-    private Map<String, TreeSet<String>> dependencies = new HashMap<String, TreeSet<String>>();
+    /** Dependencies for all directories (repository roots) */
+    private Map<SrcDir, TreeSet<SrcDir>> dependencies = new HashMap<SrcDir, TreeSet<SrcDir>>();
 
-    // Libraries to exclude
-    private final List<String> EXCLUDE = new ArrayList<String>(Arrays.asList(new String[] {"kernel", "general", "math", "qt", "fileio", "gui", "browser", "libraries", "etc", ".", "..", "common"}));
+    /** Optional dependencies for all directories (repository roots) */
+    private Map<SrcDir, TreeSet<SrcDir>> optDependencies = new HashMap<SrcDir, TreeSet<SrcDir>>();
+
+    //TODO maybe... private Map<String, String> repoRoots = new HashMap<String, String>();
+
+    /** Libraries to exclude */
+    private final List<String> EXCLUDE = new ArrayList<String>(Arrays.asList(new String[] {/*"kernel", "general", "math", "qt", "fileio",*/ "gui", "browser", "libraries", "etc", ".", "..", "common"}));
 
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
-        String libDir = getLibDir(be.getRootDir());
+
+        // skip sources not in svn
+        if (be.getRootDir().getRepository() == null) {
+            return;
+        }
 
         // get/create tree set
-        TreeSet<String> depSet = getTreeSet(libDir);
+        TreeSet<SrcDir> depSet = getTreeSet(be.getRootDir(), be.isTestProgram());
+        TreeSet<SrcDir> optDepSet = getTreeSet(be.getRootDir(), true);
 
         // add all dependencies to dependency set
         for (BuildEntity dep : be.dependencies) {
-            String depDir = getLibDir(dep.getRootDir());
+            String name = getLibraryDirName(dep.getRootDir());
+            if (!EXCLUDE.contains(name) && (!be.optionalDependencies.contains(dep))) {
+                depSet.add(be.getRootDir().getRepositoryRoot());
+            }
+        }
+
+        // add all dependencies to dependency set
+        for (BuildEntity dep : be.optionalDependencies) {
             String name = getLibraryDirName(dep.getRootDir());
             if (!EXCLUDE.contains(name)) {
-                depSet.add(depDir);
+                optDepSet.add(be.getRootDir().getRepositoryRoot());
             }
         }
     }
 
     public void writeFiles(String print) throws Exception {
-        for (Map.Entry<String, TreeSet<String>> entry : dependencies.entrySet()) {
-            TreeSet<String> result = new TreeSet<String>();
-            TreeSet<String> visited = new TreeSet<String>();
+        writeFilesHelper(print, dependencies, ".dependencies");
+        writeFilesHelper(print, optDependencies, ".optional_dependencies");
+    }
+
+    public void writeFilesHelper(String print, Map<SrcDir, TreeSet<SrcDir>> deps, String file) throws Exception {
+        for (Map.Entry<SrcDir, TreeSet<SrcDir>> entry : deps.entrySet()) {
+            TreeSet<SrcDir> result = new TreeSet<SrcDir>();
+            TreeSet<SrcDir> visited = new TreeSet<SrcDir>();
             visited.add(entry.getKey());
             collectDependencies(result, visited, entry.getValue(), 0, print != null && print.equals(entry.getKey()));
 
             // (re)write .dependencies
-            File output = new File(entry.getKey() + "/.dependencies");
+            File output = new File(entry.getKey() + "/" + file);
             if (!output.getParentFile().exists()) {
                 continue;
             }
             result.remove(entry.getKey());
 
             PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(output)));
-            for (String s : result) {
-                ps.println("mcal_" + s.substring(s.indexOf("/") + 1));
+            for (SrcDir s : result) {
+                String repo = s.getRepository();
+                if (repo == null) {
+                    System.out.println("warning: dir " + s.relative + " has no repository");
+                } else {
+                    if (deps == dependencies || (!dependencies.get(entry.getKey()).contains(s))) {
+                        repo = repo.substring(repo.lastIndexOf("/") + 1);
+                        ps.println(repo);
+                    }
+                }
             }
             ps.close();
         }
     }
 
-    private void collectDependencies(TreeSet<String> result, TreeSet<String> visited, TreeSet<String> value, int level, boolean print) {
+    private void collectDependencies(TreeSet<SrcDir> result, TreeSet<SrcDir> visited, TreeSet<SrcDir> value, int level, boolean print) {
         result.addAll(value);
-        for (String s : value) {
-            TreeSet<String> set = dependencies.get(s);
+        for (SrcDir s : value) {
+            TreeSet<SrcDir> set = dependencies.get(s);
             if (print) {
                 for (int i = 0; i < level; i++) {
                     System.out.print("  ");
@@ -109,18 +139,21 @@ public class DependencyHandler extends SourceFileHandler.Impl {
         }
     }
 
-    private TreeSet<String> getTreeSet(String libDir) {
-        TreeSet<String> depSet = dependencies.get(libDir);
+    private TreeSet<SrcDir> getTreeSet(SrcDir dir, boolean optional) {
+        Map<SrcDir, TreeSet<SrcDir>> deps = optional ? optDependencies : dependencies;
+        dir = dir.getRepositoryRoot();
+        TreeSet<SrcDir> depSet = deps.get(dir);
         if (depSet == null) {
-            depSet = new TreeSet<String>();
-            dependencies.put(libDir, depSet);
+            depSet = new TreeSet<SrcDir>();
+            deps.put(dir, depSet);
         }
         return depSet;
     }
 
-    private String getLibDir(SrcDir rootDir) {
-        String[] tokens = rootDir.relative.split("/");
-        return tokens[0] + "/" + tokens[1];
+    private String getRepositoryDir(SrcDir rootDir) {
+        //String[] tokens = rootDir.relative.split("/");
+        //return tokens[0] + "/" + tokens[1];
+        return rootDir.getRepositoryRoot().relative;
     }
 
     @Override
@@ -130,35 +163,37 @@ public class DependencyHandler extends SourceFileHandler.Impl {
             return;
         }
 
-        String libDir = getLibDir(file.dir);
-        TreeSet<String> depSet = getTreeSet(libDir);
-        for (String dep : file.rawDependencies) {
-            if (!dep.contains("/")) {
-                continue;
-            }
-            String name = dep.substring(0, dep.indexOf("/"));
+        boolean testProgram = file.getOwner() == null || file.getOwner().isTestProgram();
+        TreeSet<SrcDir> depSet = getTreeSet(file.dir, testProgram);
+        for (SrcFile sf : file.dependencies) {
+            //String name = dep.substring(0, dep.indexOf("/"));
 
             //String name = getLibraryDirName(file.dir);
-            if (!EXCLUDE.contains(name)) {
-                depSet.add("libraries/" + name);
+            //if (!EXCLUDE.contains(name)) {
+            SrcDir root = sf.dir.getRepositoryRoot();
+            if (root != null) {
+                depSet.add(root);
+            } else {
+                //System.out.println("warning: " + sf.relative + " no source repository found");
             }
+            //}
         }
     }
 
 
     public String getLibraryDirName(SrcDir dep) {
-        String libDir = getLibDir(dep);
+        String libDir = getRepositoryDir(dep);
         return libDir.substring(libDir.indexOf("/") + 1);
     }
 
     @Override
     public void init(Makefile makefile) {
-        File projectDir = new File("projects");
+        /*File projectDir = new File("projects");
         for (File f : projectDir.listFiles()) {
             if (f.isDirectory()) {
                 EXCLUDE.add(f.getName());
             }
-        }
+        }*/
     }
 
 }

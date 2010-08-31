@@ -9,7 +9,8 @@ ax10420:    -I<AX10420.h>
 bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.6/ -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
-boost:      -I<boost/regex.hpp> -lboost_regex-mt
+boost:      -I<boost/any.hpp>
+boost_regex:    -I<boost/regex.hpp> -lboost_regex-mt
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread-mt
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system-mt
 can:        -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
@@ -23,6 +24,7 @@ cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil
+cutil:      -I<cutil.h> -lcutil_i386
 crypt:      -I<crypt.h> -lcrypt
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
@@ -54,8 +56,10 @@ nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h','FEDM_Functions.h','FEDM_ISCReader.h','FEDM_ISCReaderID_LRU1000.h','FEDM_ISOTabItem.h','fefu.h','FEDM_Base.h','FEDM.h','FEDM_ISCReaderID.h','FEDM_ISCReaderID_LRU2000.h','FEDM_XmlBase.h','feisc.h','FEDM_BRMTabItem.h','FEDM_ISCFunctionUnit.h','FEDM_ISCReaderID_LR2000.h','FEDM_ISCReaderID_MR200.h','FEDM_Xml.h','fetcp.h','FEDM_DataBase.h','FEDM_ISCFunctionUnitID.h','FEDM_ISCReaderID_LR200.h','FEDM_ISCReaderModule.h','FEDM_XmlReaderCfgDataModul.h','feusb.h'>
 ode:        -I<ode/ode.h> -lode
 oiv:        -I<Inventor/SoDB.h> -lCoin
-opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxtypes.h,cxmisc.h,cv.h> -lcxcore -lcv 
-opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxtypes.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
+opencv2_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy
+opencv2_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui
+opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
+opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
 opencl:     -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -D _LIB_OPENCL_PRESENT_ -lshrutil_i386 -loclUtil_i386
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto

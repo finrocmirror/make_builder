@@ -109,13 +109,13 @@ public class CCOptions implements Comparator<String> {
             check("link", opt, type, libPaths, linkOptions);
             libPaths.add(opt.substring(2));
         } else if (opt.startsWith("-I")) {
-            check("compile", opt, type, libs);
+            check("compile", opt, type, cCompileOptions, cxxCompileOptions, includePaths);
             includePaths.add(opt.substring(2));
         } else if (opt.startsWith("-Wl")) {
-            check("link", opt, type, libs);
+            check("link", opt, type, libs, linkOptions);
             linkOptions.add(opt);
         } else if (opt.startsWith("-D") || opt.startsWith("-f")) {
-            check("compile", opt, type, libs);
+            check("compile", opt, type, cCompileOptions, cxxCompileOptions);
             cxxCompileOptions.add(opt);
             cCompileOptions.add(opt);
         } else {

@@ -40,11 +40,15 @@ public class Options extends Properties {
     /** start build entity calculations? */
     public boolean calculateDependencies;
 
+    /** create dot file of dependecy graph? */
+    public boolean outputDotFile;
+
     /** Main class to instantiate (optional) */
     Class <? extends Runnable > mainClass = MakeFileBuilder.class;
 
     /** String with concatenated command line arguments */
     public final String args;
+
 
 //  /** compile binaries to shared libraries? */
 //  boolean compileBinsToSO = false;
@@ -63,6 +67,8 @@ public class Options extends Properties {
                 combineCppFiles = true;
             } else if (s.startsWith("--dependency")) {
                 calculateDependencies = true;
+            } else if (s.startsWith("--dotfile")) {
+                outputDotFile = true;
             } else if (s.startsWith("--")) {
                 String key = s.contains("=") ? s.substring(2, s.indexOf("=")) : s.substring(2);
                 String value = s.contains("=") ? s.substring(s.indexOf("=") + 1) : "N/A";

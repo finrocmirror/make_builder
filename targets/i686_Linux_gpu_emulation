@@ -1,5 +1,5 @@
 CFLAGS=-g2 -D _MCA_DEBUG_ -D _MCA_PROFILING_
-NVCC_FLAGS=--device-emulation --debug --device-debug 0 --profile
+NVCC_FLAGS=--device-emulation --debug --device-debug 0 --profile -arch=sm_11
 #LIBNAME_CUDART=cudartemu
 LIBNAME_CUDART=cudart
 LIBNAME_CUFFT=cufftemu

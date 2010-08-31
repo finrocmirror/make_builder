@@ -145,7 +145,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printErrorLine("Not building " + name + " due to dependency " + be.name + " which cannot be built");
+                mfb.printCannotBuildError(this, " due to dependency " + be.name + "(" + be.buildFile.relative + ") which cannot be built");
                 return;
             }
         }
@@ -301,7 +301,7 @@ public abstract class BuildEntity {
         // not found...
         if (!optional) {
             missingDep = true;
-            builder.printErrorLine("Not building " + name + " due to missing dependency " + dep);
+            builder.printCannotBuildError(this, " due to missing dependency " + dep);
         }
     }
 
@@ -352,5 +352,12 @@ public abstract class BuildEntity {
      */
     public String getTargetPrefix() {
         return "";
+    }
+
+    /**
+     * @return Is this a test program?
+     */
+    public boolean isTestProgram() {
+        return false;
     }
 }
