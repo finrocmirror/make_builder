@@ -131,10 +131,10 @@ public class MakeXMLLoader implements BuildFileLoader {
 
                 // Source files are a little more complicated
                 for (String s : asStringList(params.get("sources"))) {
-                    be.sources.addAll(new FileSet(file.dir, s, scanner).files);
+                    be.sources.addAll(new FileSet(be, file.dir, s, scanner).files);
                 }
                 for (String s : asStringList(params.get("exclude"))) {
-                    be.sources.removeAll(new FileSet(file.dir, s, scanner).files);
+                    be.sources.removeAll(new FileSet(be, file.dir, s, scanner).files);
                 }
             }
         }
@@ -180,10 +180,11 @@ public class MakeXMLLoader implements BuildFileLoader {
         private List<SrcFile> files = new ArrayList<SrcFile>();
 
         /**
+         * @param be BuildEntity files will be added to
          * @param dir Directory to search in
          * @param pattern Pattern (* means anything except of / - ** means anything - similar as in Apache Ant)
          */
-        private FileSet(SrcDir dir, String pattern, SourceScanner sources) {
+        private FileSet(BuildEntity be, SrcDir dir, String pattern, SourceScanner sources) {
 
             // no-wildcard optimization
             if (!pattern.contains("*")) {
@@ -191,7 +192,8 @@ public class MakeXMLLoader implements BuildFileLoader {
                 if (sf != null) {
                     files.add(sf);
                 } else {
-                    System.out.println("warning: " + dir + "/" + pattern + " not found");
+                    be.missingDep = true;
+                    sources.builder.printCannotBuildError(be, ": " + dir + "/" + pattern + " not found");
                 }
                 return;
             }
@@ -207,6 +209,11 @@ public class MakeXMLLoader implements BuildFileLoader {
                 if (p.matcher(rel).matches()) {
                     files.add(sf);
                 }
+            }
+
+            if (files.isEmpty()) {
+                be.missingDep = true;
+                sources.builder.printCannotBuildError(be, ": Pattern '" + pattern + "': no files found");
             }
         }
     }

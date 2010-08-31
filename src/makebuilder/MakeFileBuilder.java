@@ -301,6 +301,17 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         errorMessages.add(s);
     }
 
+    /**
+     * Print error line which says that target cannot be built
+     *
+     * @param be Entity that cannot be built
+     * @param string Error string
+     */
+    public void printCannotBuildError(BuildEntity be, String string) {
+        printErrorLine("Cannot build " + be.toString() + " (" + be.buildFile + ")" + string);
+    }
+
+
     /** Print advice if an error occured */
     public static void printErrorAdvice() {
         System.out.println("An error was encountered during the build process.");
