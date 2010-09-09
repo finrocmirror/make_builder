@@ -90,6 +90,7 @@ public class MakeXMLLoader implements BuildFileLoader {
                 // create build entity
                 BuildEntity be = (BuildEntity)c.newInstance();
                 be.buildFile = file;
+                be.autoDependencies = true;
                 result.add(be);
 
                 // collect parameters - first attributes, then subtags

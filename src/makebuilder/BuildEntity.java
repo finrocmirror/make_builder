@@ -78,7 +78,10 @@ public abstract class BuildEntity {
 
     /** "Stack" for cycle check */
     private static ArrayList<BuildEntity> cycleCheckStack = new ArrayList<BuildEntity>(100);
-    
+
+    /** Search for dependencies automatically */
+    public boolean autoDependencies;
+
     /**
      * @param tb Reference to main builder instance
      */
@@ -125,14 +128,14 @@ public abstract class BuildEntity {
             System.out.println("-> " + toString() +  " [" + getRootDir().toString() + "]");
             System.exit(-1);
         }
-        
+
         cycleCheckStack.add(this);
         for (BuildEntity be : dependencies) {
             be.checkForCycles();
         }
         cycleCheckStack.remove(this);
     }
-    
+
     /**
      * Determine, whether build entity can be built.
      * missingDep is set accordingly
@@ -232,9 +235,10 @@ public abstract class BuildEntity {
      * @param builder MakeFileBuilder instance
      */
     public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
-        // TODO: test this
-        for (SrcFile sf : sources) {
-            checkForDependencies(sf);
+        if (autoDependencies) {
+            for (SrcFile sf : sources) {
+                checkForDependencies(sf);
+            }
         }
         for (int i = 0; i < libs.size(); i++) {
             resolveDependency(false, buildEntities, libs.get(i), builder);
@@ -264,7 +268,7 @@ public abstract class BuildEntity {
             } else if (owner == null || owner == this) {
                 checkForDependencies(sfDep);
             }
-        }       
+        }
         sf.processing = false;
     }
 
