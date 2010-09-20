@@ -31,6 +31,7 @@ import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
+import makebuilder.handler.CppHandler.CodeTreeNode;
 import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
@@ -66,7 +67,8 @@ public class NvccHandler extends SourceFileHandler.Impl {
             if (!file.isInfoUpToDate()) {
                 CppHandler.processIncludes(file, scanner);
             }
-            file.resolveDependencies(true);
+
+            CppHandler.resolveDependencies(file, (CodeTreeNode)file.properties.get(CppHandler.CPP_MODEL_KEY), true, false, false);
         }
     }
 

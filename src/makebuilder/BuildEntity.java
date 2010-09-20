@@ -148,7 +148,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, " due to dependency " + be.name + "(" + be.buildFile.relative + ") which cannot be built");
+                mfb.printCannotBuildError(this, " due to dependency " + be.name + " (" + be.buildFile.relative + ") which cannot be built");
                 return;
             }
         }

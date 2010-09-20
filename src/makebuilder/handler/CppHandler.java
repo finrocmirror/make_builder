@@ -21,7 +21,9 @@
  */
 package makebuilder.handler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import makebuilder.BuildEntity;
@@ -47,8 +49,14 @@ public class CppHandler implements SourceFileHandler {
     /** Do compiling and linking separately (or rather in one gcc call)? */
     private final boolean separateCompileAndLink;
 
+    /** Key for code model in source file properties */
+    public static final String CPP_MODEL_KEY = "cppModel";
+
     /** Dependency buffer */
     private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
+
+    /** Debug cpp handler? */
+    private final boolean debug = MakeFileBuilder.getOptions().containsKey("debug_cpp_handler");
 
     /**
      * @param compileOptions Standard compile options (included in every compile)
@@ -81,7 +89,18 @@ public class CppHandler implements SourceFileHandler {
             if (!file.isInfoUpToDate()) {
                 processIncludes(file, sources);
             }
-            file.resolveDependencies(false);
+
+            if (debug) {
+                System.out.println("\nParsing of " + file.relative + ":");
+                ((CodeTreeNode)file.properties.get(CPP_MODEL_KEY)).dumpTree("");
+            }
+            resolveDependencies(file, (CodeTreeNode)file.properties.get(CPP_MODEL_KEY), true, false, false);
+            if (debug) {
+                System.out.println("\nResolved dependencies:");
+                for (SrcFile sf : file.dependencies) {
+                    System.out.println(" " + sf.relative);
+                }
+            }
         }
     }
 
@@ -92,29 +111,98 @@ public class CppHandler implements SourceFileHandler {
      * @param sources SourceScanner instance that contains possible includes
      */
     public static void processIncludes(SrcFile file, SourceScanner sources) {
+
+        CodeTreeNode root = new CodeTreeNode(null, null, false);
+        CodeTreeNode curNode = root;
+
+        // parse code an build code tree model
         for (String line : file.getCppLines()) {
             String orgLine = line;
             if (line.trim().startsWith("#")) {
-                line = line.substring(1).trim();
+                line = line.trim().substring(1).trim();
                 try {
                     if (line.startsWith("include")) {
                         line = line.substring(7).trim();
                         if (line.startsWith("\"")) {
                             line = line.substring(1, line.lastIndexOf("\""));
-                            file.rawDependencies.add(line);
+                            if (curNode.elseBranch) {
+                                curNode.altIncludes.add(line);
+                            } else {
+                                curNode.includes.add(line);
+                            }
+                            //file.rawDependencies.add(line);
                         } else if (line.startsWith("<")) {
                             //line = line.substring(1, line.indexOf(">"));
                         } else {
                             throw new RuntimeException("Error getting include string");
                         }
-
+                    } else if (line.startsWith("if")) {
+                        if (line.startsWith("ifdef")) {
+                            curNode = new CodeTreeNode(line.substring(5).trim(), curNode, curNode.elseBranch);
+                        } else {
+                            curNode = new CodeTreeNode(null, curNode, curNode.elseBranch);
+                        }
+                    } else if (line.startsWith("el")) {
+                        curNode.elseBranch = true;
+                    } else if (line.startsWith("endif")) {
+                        curNode = curNode.parent;
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Error while parsing include file. Line was: " + orgLine);
                 }
             }
         }
+
+        // optimize tree (delete empty leaves and branches)
+        root.optimize();
+
+        // set source file's tree model
+        file.properties.put(CPP_MODEL_KEY, root);
     }
+
+    /**
+     * (Recursive helper method)
+     * Process code model node and resolve dependencies
+     *
+     * @param file Source file
+     * @param node node to process
+     * @param mandatory Is this node's includes mandatory?
+     * @param ignoreMissing Ignore missing includes?
+     * @param elseBranch Check out else branch of node?
+     */
+    public static void resolveDependencies(SrcFile file, CodeTreeNode node, boolean mandatory, boolean ignoreMissing, boolean elseBranch) {
+        SrcDir dir = file.dir;
+        List<SrcFile> result = new ArrayList<SrcFile>();
+        for (String raw : (elseBranch ? node.altIncludes : node.includes)) {
+            boolean found = ignoreMissing;
+            for (SrcDir sd : dir.defaultIncludePaths) {
+                SrcFile sf = dir.sources.find(sd, raw);
+                if (sf != null) {
+                    result.add(sf);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                if (mandatory) {
+                    file.missingDependency = raw;
+                } else if ((!elseBranch) && (!node.altIncludes.isEmpty())) {
+                    resolveDependencies(file, node, true, ignoreMissing, true);
+                }
+                return;
+                //throw new RuntimeException("Dependency " + raw + " not found");
+            }
+        }
+        file.dependencies.addAll(result);
+
+        for (CodeTreeNode child : (elseBranch ? node.altChildren : node.children)) {
+            resolveDependencies(file, child, mandatory && (child.makroName == null), ignoreMissing, false);
+            if (file.missingDependency != null) {
+                break;
+            }
+        }
+    }
+
 
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
@@ -211,6 +299,100 @@ public class CppHandler implements SourceFileHandler {
                 be.target.addCommand(options.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true), true);
             }
             be.target.addDependencies(dependencyBuffer);
+        }
+    }
+
+    /**
+     * Node of a preprocessor model/tree of a source file
+     *
+     * Every #if-nesting creates a new node
+     */
+    public static class CodeTreeNode implements Serializable {
+
+        /** UID */
+        private static final long serialVersionUID = -1187066325757049661L;
+
+        /** Name of makro - if block starts with #ifdef - otherwise null */
+        private String makroName;
+
+        /** Parent node */
+        private CodeTreeNode parent;
+
+        /** Child nodes - in standard case */
+        private ArrayList<CodeTreeNode> children = new ArrayList<CodeTreeNode>();
+
+        /** Child nodes - in "else* case */
+        private ArrayList<CodeTreeNode> altChildren = new ArrayList<CodeTreeNode>();
+
+        /** Include files - in standard case */
+        private ArrayList<String> includes = new ArrayList<String>();
+
+        /** Include files - in "else" case */
+        private ArrayList<String> altIncludes = new ArrayList<String>();
+
+        /** temporary variable - are we in "else" branch now? */
+        private transient boolean elseBranch;
+
+        private CodeTreeNode(String makroName, CodeTreeNode parent, boolean inElseBranch) {
+            this.makroName = makroName;
+            this.parent = parent;
+            if (parent != null) {
+                if (inElseBranch) {
+                    parent.altChildren.add(this);
+                } else {
+                    parent.children.add(this);
+                }
+            }
+        }
+
+        /**
+         * remove empty leaves and branches
+         *
+         * @return Is this node empty now?
+         */
+        public boolean optimize() {
+            boolean allEmpty = true;
+            for (CodeTreeNode child : new ArrayList<CodeTreeNode>(children)) {
+                allEmpty &= child.optimize();
+            }
+            for (CodeTreeNode child : new ArrayList<CodeTreeNode>(altChildren)) {
+                allEmpty &= child.optimize();
+            }
+            allEmpty &= (includes.isEmpty() & altIncludes.isEmpty());
+            if (allEmpty && parent != null) {
+                parent.children.remove(this);
+            }
+            return allEmpty;
+        }
+
+        /**
+         * Debug method: dump tree
+         *
+         * @param indent String containing spaces
+         */
+        public void dumpTree(String indent) {
+            String indent2 = indent + " ";
+            if (parent != null) {
+                System.out.println(indent + "#if" + (makroName == null ? " <something>" : ("def " + makroName)));
+            }
+            for (String include : includes) {
+                System.out.println(indent2 + "#include \"" + include + "\"");
+            }
+            for (CodeTreeNode child : children) {
+                child.dumpTree(indent2);
+            }
+            if ((!altIncludes.isEmpty()) || (!altChildren.isEmpty())) {
+                System.out.println(indent + "#else");
+            }
+            for (String include : altIncludes) {
+                System.out.println(indent2 + "#include \"" + include + "\"");
+            }
+            for (CodeTreeNode child : altChildren) {
+                child.dumpTree(indent2);
+            }
+            if (parent != null) {
+                System.out.println(indent + "#endif");
+            }
         }
     }
 }
