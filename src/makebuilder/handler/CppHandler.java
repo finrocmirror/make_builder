@@ -81,7 +81,7 @@ public class CppHandler implements SourceFileHandler {
             if (!file.isInfoUpToDate()) {
                 processIncludes(file, sources);
             }
-            file.resolveDependencies(true);
+            file.resolveDependencies(false);
         }
     }
 

@@ -68,6 +68,9 @@ public class SrcFile implements Serializable {
     /** Other source files that this file directly depends on - resolved */
     public transient final List<SrcFile> dependencies = new ArrayList<SrcFile>();
 
+    /** First raw dependency that could not be resolved - null if no dependencies were missing */
+    private transient String missingDependency = null;
+
     /** Raw source lines - in case file needs to be analyzed (temporary) */
     public transient List<String> srcLines;
 
@@ -273,9 +276,18 @@ public class SrcFile implements Serializable {
                 }
             }
             if (!found) {
-                throw new RuntimeException("Dependency " + raw + " not found");
+                missingDependency = raw;
+                return;
+                //throw new RuntimeException("Dependency " + raw + " not found");
             }
         }
+    }
+
+    /**
+     * @return First raw dependency that could not be resolved - null if no dependencies were missing
+     */
+    public String getMissingDependency() {
+        return missingDependency;
     }
 
 //  /** File object to Source file */

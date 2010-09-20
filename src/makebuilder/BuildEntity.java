@@ -237,7 +237,10 @@ public abstract class BuildEntity {
     public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
         if (autoDependencies) {
             for (SrcFile sf : sources) {
-                checkForDependencies(sf);
+                checkForDependencies(sf, builder);
+                if (missingDep) {
+                    return;
+                }
             }
         }
         for (int i = 0; i < libs.size(); i++) {
@@ -254,9 +257,19 @@ public abstract class BuildEntity {
      * Check for dependencies to other build entities.
      *
      * @param sf Source file
+     * @param builder Makefile builder instance
      */
-    public void checkForDependencies(SrcFile sf) {
+    public void checkForDependencies(SrcFile sf, MakeFileBuilder builder) {
         if (sf.processing) {
+            return;
+        }
+        if (sf.getMissingDependency() != null) {
+            missingDep = true;
+            String miss = sf.getMissingDependency();
+            if (miss.contains("/")) {
+                miss += " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
+            }
+            builder.printCannotBuildError(this, " due to missing dependency " + miss);
             return;
         }
         sf.processing = true;
@@ -266,7 +279,11 @@ public abstract class BuildEntity {
                 System.out.println("Adding " + owner.toString() + " to " + toString() + " because of " + sfDep.toString());
                 dependencies.add(owner);
             } else if (owner == null || owner == this) {
-                checkForDependencies(sfDep);
+                checkForDependencies(sfDep, builder);
+            }
+            if (missingDep) {
+                sf.processing = false;
+                return;
             }
         }
         sf.processing = false;
