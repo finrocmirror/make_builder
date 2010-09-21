@@ -76,6 +76,12 @@ public abstract class BuildEntity {
     /** Start scripts for this build entity */
     public List<StartScript> startScripts = new ArrayList<StartScript>();
 
+    /** "Stack" for cycle check */
+    private static ArrayList<BuildEntity> cycleCheckStack = new ArrayList<BuildEntity>(100);
+
+    /** Search for dependencies automatically */
+    public boolean autoDependencies;
+
     /**
      * @param tb Reference to main builder instance
      */
@@ -111,6 +117,26 @@ public abstract class BuildEntity {
     }
 
     /**
+     * Check dependency tree for cycles
+     */
+    public void checkForCycles() {
+        if (cycleCheckStack.contains(this)) {
+            System.out.println("Detected cyclic dependency: ");
+            for (BuildEntity be : cycleCheckStack) {
+                System.out.println("-> " + be.toString() +  " [" + be.getRootDir().toString() + "]");
+            }
+            System.out.println("-> " + toString() +  " [" + getRootDir().toString() + "]");
+            System.exit(-1);
+        }
+
+        cycleCheckStack.add(this);
+        for (BuildEntity be : dependencies) {
+            be.checkForCycles();
+        }
+        cycleCheckStack.remove(this);
+    }
+
+    /**
      * Determine, whether build entity can be built.
      * missingDep is set accordingly
      */
@@ -122,7 +148,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, " due to dependency " + be.name + "(" + be.buildFile.relative + ") which cannot be built");
+                mfb.printCannotBuildError(this, " due to dependency " + be.name + " (" + be.buildFile.relative + ") which cannot be built");
                 return;
             }
         }
@@ -153,6 +179,9 @@ public abstract class BuildEntity {
             opts.merge(el.ccOptions, false);
         }
         for (BuildEntity be : dependencies) {
+            if (!be.isLibrary()) {
+                throw new RuntimeException(toString() + " depends on non-library " + be.toString());
+            }
             String s = be.getTarget();
             target.addDependency(s);
             s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
@@ -206,21 +235,58 @@ public abstract class BuildEntity {
      * @param builder MakeFileBuilder instance
      */
     public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
-        // TODO: test this
-        /*for (SrcFile sf : sources) {
-            for (SrcFile sfDep : sf.dependencies) {
-                BuildEntity owner = sfDep.getOwner();
-                if (owner != null && (!dependencies.contains(owner))) {
-                    dependencies.add(owner);
+        if (autoDependencies) {
+            for (SrcFile sf : sources) {
+                checkForDependencies(sf, builder);
+                if (missingDep) {
+                    return;
                 }
             }
-        }*/
+        }
         for (int i = 0; i < libs.size(); i++) {
             resolveDependency(false, buildEntities, libs.get(i), builder);
         }
         for (String dep : optionalLibs) {
             resolveDependency(true, buildEntities, dep, builder);
         }
+    }
+
+    /**
+     * sf is one of our (possibly indirect) source files.
+     *
+     * Check for dependencies to other build entities.
+     *
+     * @param sf Source file
+     * @param builder Makefile builder instance
+     */
+    public void checkForDependencies(SrcFile sf, MakeFileBuilder builder) {
+        if (sf.processing) {
+            return;
+        }
+        if (sf.getMissingDependency() != null) {
+            missingDep = true;
+            String miss = sf.getMissingDependency();
+            if (miss.contains("/")) {
+                miss += " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
+            }
+            builder.printCannotBuildError(this, " due to missing dependency " + miss);
+            return;
+        }
+        sf.processing = true;
+        for (SrcFile sfDep : sf.dependencies) {
+            BuildEntity owner = sfDep.getOwner();
+            if (owner != null && owner != this && (!dependencies.contains(owner))) {
+                //System.out.println("Adding " + owner.toString() + " to " + toString() + " because of " + sfDep.toString());
+                dependencies.add(owner);
+            } else if (owner == null || owner == this) {
+                checkForDependencies(sfDep, builder);
+            }
+            if (missingDep) {
+                sf.processing = false;
+                return;
+            }
+        }
+        sf.processing = false;
     }
 
     /**

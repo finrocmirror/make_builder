@@ -25,8 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 import java.util.SortedSet;
 
 import makebuilder.util.Files;
@@ -51,7 +51,7 @@ public class SrcFile implements Serializable {
     public final transient SrcDir dir;
 
     /** Contains any data that ContentHandlers wish to store about this file */
-    public final Properties properties = new Properties();
+    public final Hashtable<String, Serializable> properties = new Hashtable<String, Serializable>();
 
     /** Date of last change to source file */
     public final long lastChange;
@@ -62,11 +62,11 @@ public class SrcFile implements Serializable {
     /** True, if properties/dependencies were cached and loaded from last run and file has not changed in the mean-time */
     private transient boolean infoCachedAndUpToDate = false;
 
-    /** Other source files that this file directly depends on - as parsed from file */
-    public final List<String> rawDependencies = new ArrayList<String>();
-
     /** Other source files that this file directly depends on - resolved */
     public transient final List<SrcFile> dependencies = new ArrayList<SrcFile>();
+
+    /** First raw dependency that could not be resolved - null if no dependencies were missing */
+    public transient String missingDependency = null;
 
     /** Raw source lines - in case file needs to be analyzed (temporary) */
     public transient List<String> srcLines;
@@ -76,6 +76,9 @@ public class SrcFile implements Serializable {
 
     /** Build entity that this source file belongs to - may be null if not clear */
     private transient BuildEntity owner;
+
+    /** Currently processing file? (temporary variable for BuildEntity.java) */
+    public boolean processing = false;
 
     /**
      * @param dir Directory that file is in
@@ -100,7 +103,6 @@ public class SrcFile implements Serializable {
         if ((cachedInfo != null) && (cachedInfo.size == size) && (cachedInfo.lastChange == lastChange)) {
             infoCachedAndUpToDate = true;
             properties.putAll(cachedInfo.properties);
-            rawDependencies.addAll(cachedInfo.rawDependencies);
         }
     }
 
@@ -253,26 +255,10 @@ public class SrcFile implements Serializable {
     }
 
     /**
-     * Resolve dependencies (rawDependencies => dependencies)
-     * (looks for "raw dependencies" in standard include paths)
-     *
-     * @param ignoreMissing Ignore dependencies that cannot be found (instead of throwing an exception) ?
+     * @return First raw dependency that could not be resolved - null if no dependencies were missing
      */
-    public void resolveDependencies(boolean ignoreMissing) {
-        for (String raw : rawDependencies) {
-            boolean found = ignoreMissing;
-            for (SrcDir sd : dir.defaultIncludePaths) {
-                SrcFile sf = dir.sources.find(sd, raw);
-                if (sf != null) {
-                    dependencies.add(sf);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new RuntimeException("Dependency " + raw + " not found");
-            }
-        }
+    public String getMissingDependency() {
+        return missingDependency;
     }
 
 //  /** File object to Source file */
