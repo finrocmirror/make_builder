@@ -145,10 +145,14 @@ public class CppHandler implements SourceFileHandler {
                     } else if (line.startsWith("el")) {
                         curNode.elseBranch = true;
                     } else if (line.startsWith("endif")) {
-                        curNode = curNode.parent;
+                        if (curNode.parent == null) {
+                            System.err.println("Warning parsing " + file.relative + ": There seem to be more #endif than #if");
+                        } else {
+                            curNode = curNode.parent;
+                        }
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException("Error while parsing include file. Line was: " + orgLine);
+                    throw new RuntimeException("Error while parsing C++ file (" + file.relative + "). Line was: " + orgLine);
                 }
             }
         }

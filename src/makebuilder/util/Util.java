@@ -79,6 +79,9 @@ public class Util {
                     }
                     if (preProcessorComment != NO) {
                         if (s.trim().equals("#endif")) {
+                            if (preProcessorComment == ELSE) {
+                                lines.remove(lines.size() - 1);
+                            }
                             preProcessorComment = NO;
                         }
                         if (s.trim().equals("#else")) {
