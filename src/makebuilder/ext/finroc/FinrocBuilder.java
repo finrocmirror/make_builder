@@ -155,6 +155,9 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // apply options for specific target?
         String target = System.getenv("FINROC_TARGET");
+        if (target == null) {
+            target = System.getenv("MCATARGET");
+        }
         if (target != null) {
             //File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
             File targetFile = Util.getFileInEtcDir("../targets/" + target);
