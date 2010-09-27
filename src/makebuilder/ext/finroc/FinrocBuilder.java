@@ -49,7 +49,6 @@ import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
-import makebuilder.util.Util;
 
 /**
  * @author max
@@ -160,8 +159,9 @@ public class FinrocBuilder extends MakeFileBuilder {
         }
         if (target != null) {
             //File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
-        	File targetFile = new File(System.getenv("MCAHOME") + "/etc/targets/" + target);
-//            File targetFile = Util.getFileInEtcDir("../targets/" + target);
+        	String home = System.getenv("FINROC_HOME") != null ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME");
+            File targetFile = new File(home + "/etc/targets/" + target);
+            //File targetFile = Util.getFileInEtcDir("../targets/" + target);
             if (targetFile.exists()) {
                 System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
                 makefile.applyVariablesFromFile(targetFile);
