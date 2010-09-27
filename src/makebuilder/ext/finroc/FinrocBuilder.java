@@ -160,7 +160,8 @@ public class FinrocBuilder extends MakeFileBuilder {
         }
         if (target != null) {
             //File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
-            File targetFile = Util.getFileInEtcDir("../targets/" + target);
+        	File targetFile = new File(System.getenv("MCAHOME") + "/etc/targets/" + target);
+//            File targetFile = Util.getFileInEtcDir("../targets/" + target);
             if (targetFile.exists()) {
                 System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
                 makefile.applyVariablesFromFile(targetFile);
