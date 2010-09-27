@@ -1,6 +1,0 @@
-#!/bin/bash
-cd $MCAHOME
-rm Makefile
-[ "x$MCALOCAL" == "xno" ] && USE_SYSTEM_INSTALL=--usesysteminstall
-java -jar make_builder/dist/build.jar makebuilder.ext.mca.MCABuilder --build=$MCATARGET $USE_SYSTEM_INSTALL "$@"
-

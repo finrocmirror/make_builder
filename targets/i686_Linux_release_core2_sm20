@@ -1,4 +1,0 @@
-CFLAGS=-O3 -D NDEBUG -D _RRLIB_LOGGING_LESS_OUTPUT_ -march=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3 -mssse3
-NVCC_FLAGS=--ptxas-options="-v" -arch=sm_20 -D__CUDA_ARCH__=200
-LIBNAME_CUDART=cudart
-LIBNAME_CUFFT=cufft
