@@ -5,10 +5,10 @@ set -e
 
 mkdir -p temp
 cd temp
-sudo apt-get install build-essential libginac-dev libx11-dev cmake libxt-dev automake gfortran
+sudo apt-get install build-essential libginac-dev libx11-dev cmake libxt-dev automake gfortran libf2c2-dev
 
 wget http://downloads.sourceforge.net/project/ltilib/LTI-Lib-1/1.9.16/100410_ltilib-1.9.16.tar.bz2?use_mirror=kent
-tar -xjf 100410_ltilib-1.9.16.tar.bz2
+tar -xjf 100410_ltilib-1.9.16.tar.bz2?use_mirror=kent
 cd ltilib/linux
 make -f Makefile.cvs
 ./configure --disable-debug --without-gtk --disable-gtk 
