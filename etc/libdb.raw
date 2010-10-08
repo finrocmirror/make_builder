@@ -10,6 +10,7 @@ bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.6/ -ldbxml-2.4 -ldb_cxx-4.6 -
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
+boost_filesystem: -I<boost/filesystem.hpp> -lboost_filesystem-mt
 boost_regex:    -I<boost/regex.hpp> -lboost_regex-mt
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread-mt
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system-mt
