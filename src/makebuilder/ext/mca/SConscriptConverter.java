@@ -76,8 +76,9 @@ public class SConscriptConverter extends MakeFileBuilder {
 
         // write result to make.xml
         PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(dest)));
-        ps.println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
-        ps.println("<targets>");
+        ps.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        ps.println("<!DOCTYPE targets PUBLIC \"-//RRLIB//DTD make 1.0\" \"http://finroc.org/xml/rrlib/1.0/make.dtd\">");
+        ps.println("<targets>\n");
         for (BuildEntity be : entities) {
             String type = be.getClass().getSimpleName().toLowerCase();
             ps.print("  <" + type + " name=\"" + be.name + "\"");
