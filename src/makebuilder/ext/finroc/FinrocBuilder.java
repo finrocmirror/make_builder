@@ -63,11 +63,14 @@ public class FinrocBuilder extends MakeFileBuilder {
     /** Target to build */
     private final static String TARGET = BUILDING_FINROC ? System.getenv("FINROC_TARGET") : System.getenv("MCATARGET");
 
-    /** Include paths to use */
-    private final static String[] INCLUDE_PATHS = BUILDING_FINROC ?
+    /** Source directories to use */
+    private final static String[] SOURCE_PATHS = BUILDING_FINROC ?
             new String[] {"source/cpp", "source/cpp/mca2-legacy/libraries", "source/cpp/mca2-legacy/projects", "source/cpp/mca2-legacy/tools"} :
-            new String[] {"libraries", "projects", "tools", "."};
-
+            new String[] {"libraries", "projects", "tools"};
+            
+    /** Include paths to use */
+    private final static String[] INCLUDE_PATHS = BUILDING_FINROC ? SOURCE_PATHS : new String[] {"libraries", "projects", "tools", "."};
+            
     /** Global definitions - e.g. */
     private final CodeBlock globalDefine = new CodeBlock();
 
@@ -223,7 +226,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public String[] getSourceDirs() {
-        return INCLUDE_PATHS;
+        return SOURCE_PATHS;
     }
 
     public void run() {
