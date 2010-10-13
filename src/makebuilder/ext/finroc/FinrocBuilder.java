@@ -57,14 +57,22 @@ import makebuilder.util.CodeBlock;
  */
 public class FinrocBuilder extends MakeFileBuilder {
 
+    /** Are we building finroc? */
+    private final static boolean BUILDING_FINROC = System.getenv("FINROC_TARGET") != null;
+
+    /** Target to build */
+    private final static String TARGET = BUILDING_FINROC ? System.getenv("FINROC_TARGET") : System.getenv("MCATARGET");
+
+    /** Include paths to use */
+    private final static String[] INCLUDE_PATHS = BUILDING_FINROC ?
+            new String[] {"source/cpp", "source/cpp/mca2-legacy/libraries", "source/cpp/mca2-legacy/projects", "source/cpp/mca2-legacy/tools"} :
+            new String[] {"libraries", "projects", "tools", "."};
+
     /** Global definitions - e.g. */
     private final CodeBlock globalDefine = new CodeBlock();
 
     /** Target directory for libraries, Target directory for binaries */
     public final SrcDir targetLib, targetBin;
-
-    /** Standard compiler options for MCA */
-    public static final String MCAOPTS = "-include libinfo.h -Ilibraries -Iprojects -Itools -Iplugins -Irrlib -I. ";
 
     /** System library installation handler */
     public final MCASystemLibLoader systemInstall;
@@ -153,14 +161,10 @@ public class FinrocBuilder extends MakeFileBuilder {
         }
 
         // apply options for specific target?
-        String target = System.getenv("FINROC_TARGET");
-        if (target == null) {
-            target = System.getenv("MCATARGET");
-        }
-        if (target != null) {
+        if (TARGET != null) {
             //File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
-        	String home = System.getenv("FINROC_HOME") != null ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME");
-            File targetFile = new File(home + "/etc/targets/" + target);
+            String home = BUILDING_FINROC ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME");
+            File targetFile = new File(home + "/etc/targets/" + TARGET);
             //File targetFile = Util.getFileInEtcDir("../targets/" + target);
             if (targetFile.exists()) {
                 System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
@@ -181,53 +185,45 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
-        dir.defaultIncludePaths.add(sources.findDir(".", true));
-        dir.defaultIncludePaths.add(sources.findDir("projects", true));
-        dir.defaultIncludePaths.add(sources.findDir("core", true));
-        dir.defaultIncludePaths.add(sources.findDir("libraries", true));
-        dir.defaultIncludePaths.add(sources.findDir("tools", true));
-        dir.defaultIncludePaths.add(sources.findDir("rrlib", true));
-        dir.defaultIncludePaths.add(sources.findDir("plugins", true));
-        dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/libraries", true));
-        dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/projects", true));
-        dir.defaultIncludePaths.add(sources.findDir("mca2-legacy/tools", true));
+        for (String s : INCLUDE_PATHS) {
+            dir.defaultIncludePaths.add(sources.findDir(s, true));
+        }
 
         // add system include paths - in case MCA is installed system-wide
         if (systemInstall != null && systemInstall.systemInstallExists) {
-            String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
-            dir.defaultIncludePaths.add(sources.findDir(p, true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/projects", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/core", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/libraries", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/tools", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/rrlib", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/plugins", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/libraries", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/projects", true));
-            dir.defaultIncludePaths.add(sources.findDir(p + "/mca2-legacy/tools", true));
+            String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath() + "/";
+            for (String s : INCLUDE_PATHS) {
+                dir.defaultIncludePaths.add(sources.findDir(p + s, true));
+            }
         }
 
         if (dir.relative.startsWith(tempBuildPath.relative)) {
             return;
         }
-        dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "projects", true));
-        dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "libraries", true));
-        dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/libraries", true));
+        if (BUILDING_FINROC) {
+            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/libraries", true));
+            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/projects", true));
+        } else {
+            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "projects", true));
+            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "libraries", true));
+        }
 
         // add all parent directories (in source and build paths)... not nice but somehow required :-/
-        SrcDir parent = dir;
-        SrcDir parent2 = sources.findDir(tempBuildPath.relative + FS + dir.relative, true);
-        while (parent.relative.contains(FS) && (parent.relative.charAt(0) != '/')) {
-            dir.defaultIncludePaths.add(parent);
-            dir.defaultIncludePaths.add(parent2);
-            parent = parent.getParent();
-            parent2 = parent2.getParent();
+        if (!BUILDING_FINROC) {
+            SrcDir parent = dir;
+            SrcDir parent2 = sources.findDir(tempBuildPath.relative + FS + dir.relative, true);
+            while (parent.relative.contains(FS) && (parent.relative.charAt(0) != '/')) {
+                dir.defaultIncludePaths.add(parent);
+                dir.defaultIncludePaths.add(parent2);
+                parent = parent.getParent();
+                parent2 = parent2.getParent();
+            }
         }
     }
 
     @Override
     public String[] getSourceDirs() {
-        return new String[] {"core", "jcore", "libraries", "projects", "tools", "plugins", "rrlib", "mca2-legacy"};
+        return INCLUDE_PATHS;
     }
 
     public void run() {
@@ -263,13 +259,24 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public SrcFile getTempBuildArtifact(SrcFile source, String targetExtension) {
-        SrcDir targetDir = tempBuildPath.getSubDir(source.dir.relative);
+        SrcDir targetDir = tempBuildPath.getSubDir(trimDir(source.dir.relative));
         if (source.getExtension().equals("ui")) {
             return sources.registerBuildProduct(targetDir.relative + FS + "ui_" + source.getRawName() + ".h");
         } else if (targetExtension.equals("hpp")) { // description builder template
             return sources.registerBuildProduct(targetDir.relative + FS + "descr_h_" + source.getRawName() + ".hpp");
         }
         return sources.registerBuildProduct(targetDir.relative + FS + source.getRawName() + "." + targetExtension);
+    }
+
+    /**
+     * @param relative Relative path
+     * @return Relative path without source/cpp in front
+     */
+    private String trimDir(String relative) {
+        if (relative.startsWith("source/cpp/")) {
+            return relative.substring("source/cpp/".length());
+        }
+        return relative;
     }
 
     @Override
@@ -285,7 +292,8 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (source.getFinalHandler() == JavaHandler.class) {
             return tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "");
         }
-        return super.getTempBuildDir(source);
+        String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
+        return tempBuildPath.relative + FS + trimDir(srcDir);
     }
 
 }
