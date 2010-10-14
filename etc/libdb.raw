@@ -38,6 +38,7 @@ finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMu
 flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
+glui:       -I<GL/glui.h> -lglui -lGLU -IGL
 gsl:        -lgsl -lgslcblas
 jack:       -I<jack/jack.h> -ljack
 java:       -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h> -ljava
