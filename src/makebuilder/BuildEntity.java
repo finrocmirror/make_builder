@@ -266,10 +266,11 @@ public abstract class BuildEntity {
         if (sf.getMissingDependency() != null) {
             missingDep = true;
             String miss = sf.getMissingDependency();
+            String msg = miss + " in " + sf.relative;
             if (miss.contains("/")) {
-                miss += " in " + sf.relative + " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
+                msg += " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
             }
-            builder.printCannotBuildError(this, " due to missing dependency " + miss);
+            builder.printCannotBuildError(this, " due to missing dependency " + msg);
             return;
         }
         sf.processing = true;

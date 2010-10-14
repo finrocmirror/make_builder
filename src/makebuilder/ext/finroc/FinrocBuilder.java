@@ -65,12 +65,15 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     /** Source directories to use */
     private final static String[] SOURCE_PATHS = BUILDING_FINROC ?
-            new String[] {"source/cpp", "source/cpp/mca2-legacy/libraries", "source/cpp/mca2-legacy/projects", "source/cpp/mca2-legacy/tools"} :
+            new String[] {"sources/cpp"} :
             new String[] {"libraries", "projects", "tools", "rrlib"};
-            
+
     /** Include paths to use */
-    private final static String[] INCLUDE_PATHS = BUILDING_FINROC ? SOURCE_PATHS : new String[] {"libraries", "projects", "tools", "rrlib", "."};
-            
+    private final static String[] INCLUDE_PATHS = BUILDING_FINROC ? SOURCE_PATHS : new String[] {"libraries", "projects", "tools", "."};
+
+    /** Include paths for mca2-legacy targets */
+    private final String[] LEGACY_INCLUDE_PATHS = new String[] {"sources/cpp", "sources/cpp/mca2-legacy/libraries", "sources/cpp/mca2-legacy/projects", "sources/cpp/mca2-legacy/tools"};
+
     /** Global definitions - e.g. */
     private final CodeBlock globalDefine = new CodeBlock();
 
@@ -188,14 +191,20 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
-        for (String s : INCLUDE_PATHS) {
+        String[] includePaths = INCLUDE_PATHS;
+        boolean legacyTarget = dir.relative.contains("mca2-legacy");
+        if (BUILDING_FINROC && legacyTarget) {
+            includePaths = LEGACY_INCLUDE_PATHS;
+        }
+
+        for (String s : includePaths) {
             dir.defaultIncludePaths.add(sources.findDir(s, true));
         }
 
         // add system include paths - in case MCA is installed system-wide
         if (systemInstall != null && systemInstall.systemInstallExists) {
             String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath() + "/";
-            for (String s : INCLUDE_PATHS) {
+            for (String s : includePaths) {
                 dir.defaultIncludePaths.add(sources.findDir(p + s, true));
             }
         }
@@ -204,23 +213,13 @@ public class FinrocBuilder extends MakeFileBuilder {
             return;
         }
         if (BUILDING_FINROC) {
-            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/libraries", true));
-            dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/projects", true));
+            if (legacyTarget) {
+                dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/libraries", true));
+                dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "mca2-legacy/projects", true));
+            }
         } else {
             dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "projects", true));
             dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "libraries", true));
-        }
-
-        // add all parent directories (in source and build paths)... not nice but somehow required :-/
-        if (!BUILDING_FINROC) {
-            SrcDir parent = dir;
-            SrcDir parent2 = sources.findDir(tempBuildPath.relative + FS + dir.relative, true);
-            while (parent.relative.contains(FS) && (parent.relative.charAt(0) != '/')) {
-                dir.defaultIncludePaths.add(parent);
-                dir.defaultIncludePaths.add(parent2);
-                parent = parent.getParent();
-                parent2 = parent2.getParent();
-            }
         }
     }
 
@@ -276,8 +275,8 @@ public class FinrocBuilder extends MakeFileBuilder {
      * @return Relative path without source/cpp in front
      */
     private String trimDir(String relative) {
-        if (relative.startsWith("source/cpp/")) {
-            return relative.substring("source/cpp/".length());
+        if (relative.startsWith("sources/cpp/")) {
+            return relative.substring("sources/cpp/".length());
         }
         return relative;
     }
