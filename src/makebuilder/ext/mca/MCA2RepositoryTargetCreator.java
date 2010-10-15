@@ -95,6 +95,8 @@ public class MCA2RepositoryTargetCreator extends RepositoryTargetCreator {
         for (ClassEntry ce : classEntries) {
             if (srcDir.startsWith("sources/cpp/")) {
                 srcDir = srcDir.substring("sources/cpp/".length());
+            } else if (srcDir.startsWith("sources/java/")) {
+                srcDir = srcDir.substring("sources/java/".length());
             }
             String name = ce.getRepositoryName(srcDir, shortName);
             if (name != null) {

@@ -328,7 +328,7 @@ public abstract class BuildEntity {
         // not found...
         if (!optional) {
             missingDep = true;
-            builder.printCannotBuildError(this, " due to missing (external) dependency " + dep, Color.Y);
+            builder.printCannotBuildError(this, " due to missing dependency " + dep, Color.Y);
         }
     }
 
