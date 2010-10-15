@@ -49,6 +49,8 @@ import makebuilder.handler.NvccHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
+import makebuilder.util.Util;
+import makebuilder.util.Util.Color;
 
 /**
  * @author max
@@ -173,10 +175,10 @@ public class FinrocBuilder extends MakeFileBuilder {
             File targetFile = new File(home + "/etc/targets/" + TARGET);
             //File targetFile = Util.getFileInEtcDir("../targets/" + target);
             if (targetFile.exists()) {
-                System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
+                System.out.println(Util.color("Using custom options from target config file: " + targetFile.getCanonicalPath(), Color.GREEN, true));
                 makefile.applyVariablesFromFile(targetFile);
             } else {
-                System.out.println("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")");
+                System.out.println(Util.color("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")", Color.Y, true));
             }
         }
 

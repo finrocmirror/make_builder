@@ -31,6 +31,8 @@ import makebuilder.handler.CppHandler;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.AddOrderSet;
 import makebuilder.util.CCOptions;
+import makebuilder.util.Util;
+import makebuilder.util.Util.Color;
 
 /**
  * @author max
@@ -81,6 +83,9 @@ public abstract class BuildEntity {
 
     /** Search for dependencies automatically */
     public boolean autoDependencies;
+
+    /** Error message id */
+    public int errorMessageId = -1;
 
     /**
      * @param tb Reference to main builder instance
@@ -148,7 +153,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, " due to dependency " + be.name + " (" + be.buildFile.relative + ") which cannot be built");
+                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.name + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
                 return;
             }
         }
@@ -270,7 +275,7 @@ public abstract class BuildEntity {
             if (miss.contains("/")) {
                 msg += " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
             }
-            builder.printCannotBuildError(this, " due to missing dependency " + msg);
+            builder.printCannotBuildError(this, " due to missing dependency " + msg, Color.RED);
             return;
         }
         sf.processing = true;
@@ -323,7 +328,7 @@ public abstract class BuildEntity {
         // not found...
         if (!optional) {
             missingDep = true;
-            builder.printCannotBuildError(this, " due to missing dependency " + dep);
+            builder.printCannotBuildError(this, " due to missing (external) dependency " + dep, Color.Y);
         }
     }
 

@@ -182,7 +182,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         for (BuildEntity be : buildEntities) {
             be.addOptionalLibs();
         }
-        
+
         // check for new cycles
         for (BuildEntity be : buildEntities) {
             be.checkForCycles();
@@ -211,7 +211,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // completed
-        System.out.println("Creating Makefile successful.");
+        System.out.println(Util.color("Creating Makefile successful.", Util.Color.GREEN, true));
     }
 
     /**
@@ -249,7 +249,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      * @param be Build entity to build
      */
     private void build(final BuildEntity be) throws Exception {
-        System.out.println("Processing " + be.name);
+        System.out.println(Util.color("Processing " + be.name, Util.Color.GREEN, false));
         be.initTarget(makefile);
         be.computeOptions();
 
@@ -312,9 +312,11 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      *
      * @param be Entity that cannot be built
      * @param string Error string
+     * @param c Color to print "Cannot build ..." in
      */
-    public void printCannotBuildError(BuildEntity be, String string) {
-        printErrorLine("Cannot build " + be.toString() + " (" + be.buildFile + ")" + string);
+    public void printCannotBuildError(BuildEntity be, String string, Util.Color c) {
+        be.errorMessageId = errorMessages.size() + 1;
+        printErrorLine(Util.color("(" + be.errorMessageId + ") ", c, false) + Util.color("Cannot build " + be.toString(), c, true) + " (" + be.buildFile + ")" + Util.color(string, c, false));
     }
 
 

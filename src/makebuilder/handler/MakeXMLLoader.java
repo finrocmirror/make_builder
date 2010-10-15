@@ -43,6 +43,7 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.StartScript;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -194,7 +195,7 @@ public class MakeXMLLoader implements BuildFileLoader {
                     files.add(sf);
                 } else {
                     be.missingDep = true;
-                    sources.builder.printCannotBuildError(be, ": " + dir + "/" + pattern + " not found");
+                    sources.builder.printCannotBuildError(be, ": " + dir + "/" + pattern + " not found", Util.Color.RED);
                 }
                 return;
             }
@@ -214,7 +215,7 @@ public class MakeXMLLoader implements BuildFileLoader {
 
             if (files.isEmpty()) {
                 be.missingDep = true;
-                sources.builder.printCannotBuildError(be, ": Pattern '" + pattern + "': no files found");
+                sources.builder.printCannotBuildError(be, ": Pattern '" + pattern + "': no files found", Util.Color.RED);
             }
         }
     }

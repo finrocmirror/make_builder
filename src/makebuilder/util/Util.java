@@ -168,4 +168,29 @@ public class Util {
             return "" + System.currentTimeMillis();
         }
     }
+
+    /** Color for output */
+    public enum Color { NONE, RED, GREEN, X, Y }
+
+    /** Control Strings for colors */
+    private static String[] COLOR_STRING = {"", "\033[;2;31m", "\033[;2;32m", "\033[;2;34m", "\033[;2;33m"};
+
+    /**
+     * Create colored string for console output
+     *
+     * @param s String to color
+     * @param color Color to use
+     * @param fat Use fat font
+     * @return The string containing the color control sequences
+     */
+    public static String color(String s, Color color, boolean fat) {
+        if (color == null || color == Color.NONE) {
+            return s;
+        }
+        String c = COLOR_STRING[color.ordinal()];
+        if (fat) {
+            c = c.replace("[;2;", "[;1;");
+        }
+        return c + s + "\033[;0m";
+    }
 }
