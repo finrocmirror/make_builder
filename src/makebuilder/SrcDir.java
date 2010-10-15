@@ -186,4 +186,17 @@ public class SrcDir implements Comparable<SrcDir> {
     public int compareTo(SrcDir arg0) {
         return relative.compareTo(arg0.relative);
     }
+
+    /**
+     * Is this path parent of other directory?
+     *
+     * @param dir Other directory
+     * @return Answer
+     */
+    public boolean isParentOf(SrcDir dir) {
+        if (relative.equals(".") && (!dir.relative.startsWith("/"))) {
+            return true;
+        }
+        return dir.relative.startsWith(relative);
+    }
 }

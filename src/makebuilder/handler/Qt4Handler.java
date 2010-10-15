@@ -29,6 +29,7 @@ import makebuilder.SourceFileHandler;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceScanner;
+import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.libdb.LibDB;
 
@@ -93,7 +94,7 @@ public class Qt4Handler extends SourceFileHandler.Impl {
                     mocTargets.put(be, target);
                 }
                 target.addDependency(file);
-                target.addCommand(MOC_CALL + " " + file.relative + " >> " + target.getName(), false);
+                target.addCommand(MOC_CALL + " -p " + getIncludePath(file) + " " + file.relative + " >> " + target.getName(), false);
             }
 
         } else if (file.hasExtension("ui")) { // run uic?
@@ -102,5 +103,19 @@ public class Qt4Handler extends SourceFileHandler.Impl {
             t.addDependency(file);
             t.addCommand(UIC_CALL + " " + file.relative + " -o " + hdr.relative, true);
         }
+    }
+
+    /**
+     * @param file Source file
+     * @return Include path to best include this file from
+     */
+    private String getIncludePath(SrcFile file) {
+        String best = "";
+        for (SrcDir path : file.dir.defaultIncludePaths) {
+            if (path.isParentOf(file.dir) && (best.length() < path.relative.length())) {
+                best = path.relative;
+            }
+        }
+        return file.dir.relative.substring(best.length() + 1);
     }
 }
