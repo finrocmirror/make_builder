@@ -119,7 +119,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
         if (!(new File(DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN.trim()).exists())) {
-            DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
+            DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "sources/cpp/mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
         }
         if (getOptions().combineCppFiles) {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));

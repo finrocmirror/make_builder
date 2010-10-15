@@ -41,6 +41,10 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     public void initTarget(Makefile makefile) {
         super.initTarget(makefile);
         String rootDir2 = getRootDir().relative;
+        if (rootDir2.startsWith("sources")) {
+            rootDir2 = rootDir2.substring(9);
+            rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
+        }
         boolean lib = rootDir2.startsWith("libraries");
         boolean tool = rootDir2.startsWith("tools");
         boolean plugin = rootDir2.startsWith("plugins");

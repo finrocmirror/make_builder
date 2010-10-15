@@ -33,15 +33,19 @@ public class TestProgram extends FinrocBuildEntity {
 
     @Override
     public String getTargetPrefix() {
-        if (this.getRootDir().relative.startsWith("libraries")) {
-            return "finroc_library_" + getSecondDir() + "_test_";
-        } else if (this.getRootDir().relative.startsWith("plugins")) {
-            return "finroc_plugin_" + getSecondDir() + "_test_";
-        } else if (this.getRootDir().relative.startsWith("rrlib")) {
-            return "rrlib_" + getSecondDir() + "_test_";
-        } else if (this.getRootDir().relative.startsWith("core")) {
+        String rootDir2 = this.getRootDir().relative;
+        assert(rootDir2.startsWith("sources"));
+        rootDir2 = rootDir2.substring(9);
+        rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
+        if (rootDir2.startsWith("libraries")) {
+            return "finroc_library_" + getSecondDir(rootDir2) + "_test_";
+        } else if (rootDir2.startsWith("plugins")) {
+            return "finroc_plugin_" + getSecondDir(rootDir2) + "_test_";
+        } else if (rootDir2.startsWith("rrlib")) {
+            return "rrlib_" + getSecondDir(rootDir2) + "_test_";
+        } else if (rootDir2.startsWith("core")) {
             return "finroc_core_test_";
-        } else if (this.getRootDir().relative.startsWith("jcore")) {
+        } else if (rootDir2.startsWith("jcore")) {
             return "finroc_jcore_test_";
         }
         return "";
@@ -52,8 +56,8 @@ public class TestProgram extends FinrocBuildEntity {
         return "$(TARGET_BIN)/" + getTargetPrefix() + name;
     }
 
-    private String getSecondDir() {
-        String[] parts = this.getRootDir().relative.split("/");
+    private String getSecondDir(String rootDir2) {
+        String[] parts = rootDir2.split("/");
         if (parts.length >= 2) {
             return parts[1];
         }

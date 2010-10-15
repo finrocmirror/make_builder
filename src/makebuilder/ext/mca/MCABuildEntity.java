@@ -42,8 +42,8 @@ public abstract class MCABuildEntity extends BuildEntity {
     public void initTarget(Makefile makefile) {
         super.initTarget(makefile);
         String rootDir2 = getRootDir().relative;
-        if (rootDir2.startsWith("mca2-legacy/")) {
-            rootDir2 = rootDir2.substring("mca2-legacy/".length());
+        if (rootDir2.startsWith("sources/cpp/mca2-legacy/")) {
+            rootDir2 = rootDir2.substring("sources/cpp/mca2-legacy/".length());
         }
         boolean lib = rootDir2.startsWith("libraries");
         boolean tool = rootDir2.startsWith("tools");
