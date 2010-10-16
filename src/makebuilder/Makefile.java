@@ -164,18 +164,36 @@ public class Makefile {
     /**
      * Change variable at beginning of makefile
      *
-     * @param variable Variable to add
+     * @param variable Variable to change
      */
     public void changeVariable(String newVariable) {
-        String varname = newVariable.substring(0, newVariable.indexOf('=') + 1);
+        String varname = extractVarName(newVariable);
         for (int i = 0; i < variables.size(); i++) {
-            if (variables.get(i).startsWith(varname)) {
+            String varname2 = extractVarName(variables.get(i));
+            if (varname.equals(varname2)) {
                 variables.set(i, newVariable);
                 return;
             }
         }
         //System.out.println("attempt to change non-existing variable " + newVariable + "; adding instead");
         addVariable(newVariable);
+    }
+
+    /**
+     * Extract variable name from variable string
+     *
+     * @param s Variable string
+     * @return Variable name
+     */
+    private static String extractVarName(String s) {
+        if (!s.contains("=") || s.startsWith("=")) {
+            return null; // actually no variable
+        }
+        s = s.substring(0, s.indexOf('=') + 1);
+        while (s.length() != 0 && (!Character.isJavaIdentifierPart(s.charAt(s.length() - 1)))) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s;
     }
 
     /**

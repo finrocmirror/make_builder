@@ -62,8 +62,11 @@ public class FinrocBuilder extends MakeFileBuilder {
     /** Are we building finroc? */
     private final static boolean BUILDING_FINROC = System.getenv("FINROC_TARGET") != null;
 
+    /** Environment variable containing target */
+    private final static String TARGET_ENV_VAR = BUILDING_FINROC ? "FINROC_TARGET" : "MCATARGET";
+
     /** Target to build */
-    private final static String TARGET = BUILDING_FINROC ? System.getenv("FINROC_TARGET") : System.getenv("MCATARGET");
+    private final static String TARGET = System.getenv(TARGET_ENV_VAR);
 
     /** Source directories to use */
     private final static String[] SOURCE_PATHS = BUILDING_FINROC ?
@@ -92,14 +95,17 @@ public class FinrocBuilder extends MakeFileBuilder {
     private DependencyHandler dependencyHandler;
 
     public FinrocBuilder() {
-        super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
+        super("export/$(TARGET)", "build/$(TARGET)");
+        //super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
 
         // init target paths
         targetBin = buildPath.getSubDir("bin");
         targetLib = buildPath.getSubDir("lib");
-        makefile.addVariable("TARGET_BIN=$(TARGET_DIR)/bin");
-        makefile.addVariable("TARGET_LIB=$(TARGET_DIR)/lib");
-        makefile.addVariable("TARGET_JAVA=export/java");
+        makefile.addVariable(TARGET_ENV_VAR + "?=$(" + TARGET + ")");
+        makefile.addVariable("TARGET:=$(" + TARGET_ENV_VAR + ")");
+        makefile.addVariable("TARGET_BIN:=$(TARGET_DIR)/bin");
+        makefile.addVariable("TARGET_LIB:=$(TARGET_DIR)/lib");
+        makefile.addVariable("TARGET_JAVA:=export/java");
         makefile.addBuildDir("build/java");
         makefile.addBuildDir("export/java");
         //makefile.addVariable("TARGET_PLUGIN=$(TARGET_DIR)/plugin");
@@ -143,9 +149,9 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // generate library info files?
         if (getOptions().containsKey("systeminstall")) {
-            makefile.addVariable("TARGET_INFO=$(TARGET_DIR)/info");
-            makefile.addVariable("TARGET_INCLUDE=$(TARGET_DIR)/include");
-            makefile.addVariable("TARGET_ETC=$(TARGET_DIR)/etc");
+            makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
+            makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
+            makefile.addVariable("TARGET_ETC:=$(TARGET_DIR)/etc");
             addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
             addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
             addHandler(new EtcDirCopier("$(TARGET_ETC)"));
@@ -181,6 +187,9 @@ public class FinrocBuilder extends MakeFileBuilder {
                 System.out.println(Util.color("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")", Color.Y, true));
             }
         }
+
+        // include target file
+        makefile.addVariable("-include etc/targets/$(TARGET)");
 
         if (getOptions().containsKey("usesysteminstall")) {
             new FinrocRepositoryTargetCreator().postprocess(makefile);
