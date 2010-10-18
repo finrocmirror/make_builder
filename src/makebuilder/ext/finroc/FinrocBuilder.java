@@ -101,7 +101,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         // init target paths
         targetBin = buildPath.getSubDir("bin");
         targetLib = buildPath.getSubDir("lib");
-        makefile.addVariable(TARGET_ENV_VAR + "?=$(" + TARGET + ")");
+        makefile.addVariable(TARGET_ENV_VAR + "?=" + TARGET);
         makefile.addVariable("TARGET:=$(" + TARGET_ENV_VAR + ")");
         makefile.addVariable("TARGET_BIN:=$(TARGET_DIR)/bin");
         makefile.addVariable("TARGET_LIB:=$(TARGET_DIR)/lib");
