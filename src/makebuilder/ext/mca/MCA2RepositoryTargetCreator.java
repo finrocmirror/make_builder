@@ -53,7 +53,7 @@ public class MCA2RepositoryTargetCreator extends RepositoryTargetCreator {
 
         /**
          * @param srcDir Src directory
-         * @return Repository name (or null if not this kinf of target)
+         * @return Repository name (or null if not this kind of target)
          */
         public String getRepositoryName(String srcDir, boolean shortName) {
             String prefix = shortName ? "" : (repoPrefix + "_");
@@ -62,7 +62,7 @@ public class MCA2RepositoryTargetCreator extends RepositoryTargetCreator {
                     if (srcDir.contains("/")) {
                         srcDir = srcDir.substring(0, srcDir.indexOf("/"));
                     }
-                    return prefix + srcDir;
+                    return shortName ? srcDir : repoPrefix;
                 } else {
                     srcDir = srcDir.substring(directory.length() + 1);
                     if (srcDir.contains("/")) {
@@ -92,12 +92,12 @@ public class MCA2RepositoryTargetCreator extends RepositoryTargetCreator {
     }
 
     public String getRepositoryName(String srcDir, boolean shortName) {
+        if (srcDir.startsWith("sources/cpp/")) {
+            srcDir = srcDir.substring("sources/cpp/".length());
+        } else if (srcDir.startsWith("sources/java/")) {
+            srcDir = srcDir.substring("sources/java/".length());
+        }
         for (ClassEntry ce : classEntries) {
-            if (srcDir.startsWith("sources/cpp/")) {
-                srcDir = srcDir.substring("sources/cpp/".length());
-            } else if (srcDir.startsWith("sources/java/")) {
-                srcDir = srcDir.substring("sources/java/".length());
-            }
             String name = ce.getRepositoryName(srcDir, shortName);
             if (name != null) {
                 return name;

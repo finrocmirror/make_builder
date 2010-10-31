@@ -57,6 +57,8 @@ public abstract class RepositoryTargetCreator {
                 Makefile.Target shortTarget = mf.getPhonyTarget(shortRep);
                 if (shortTarget == null) {
                     mf.addPhonyTarget(shortRep, longRep);
+                } else {
+                    shortTarget.addDependency(longRep);
                 }
             }
 

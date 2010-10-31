@@ -34,7 +34,6 @@ public class FinrocRepositoryTargetCreator extends MCA2RepositoryTargetCreator {
             ce.directory = "mca2-legacy/" + ce.directory;
         }
         classEntries.add(new ClassEntry("core", "finroc_core", false));
-        classEntries.add(new ClassEntry("jcore", "finroc_jcore", false));
         classEntries.add(new ClassEntry("rrlib", "rrlib", true));
         classEntries.add(new ClassEntry("libraries", "finroc_libraries", true));
         classEntries.add(new ClassEntry("projects", "finroc_projects", true));
