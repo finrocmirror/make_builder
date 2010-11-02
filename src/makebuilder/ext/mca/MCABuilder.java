@@ -110,7 +110,7 @@ public class MCABuilder extends MakeFileBuilder {
             addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
             addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
             addHandler(new EtcDirCopier("$(TARGET_ETC)"));
-            Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools");
+            Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools", "test");
             t.addCommand("echo success > $(TARGET_DIR)/success", true);
         }
 
