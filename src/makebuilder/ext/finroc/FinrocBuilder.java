@@ -137,7 +137,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new JavaHandler());
         addHandler(new CakeHandler());
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
-        addHandler(new LdPreloadScriptHandler());
+        //addHandler(new LdPreloadScriptHandler());
 
         // is MCA installed system-wide?
         if (getOptions().containsKey("usesysteminstall")) {
