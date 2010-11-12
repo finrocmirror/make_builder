@@ -60,7 +60,7 @@ import makebuilder.util.Util.Color;
 public class FinrocBuilder extends MakeFileBuilder {
 
     /** Are we building finroc? */
-    private final static boolean BUILDING_FINROC = System.getenv("FINROC_TARGET") != null;
+    public final static boolean BUILDING_FINROC = System.getenv("FINROC_TARGET") != null;
 
     /** Environment variable containing target */
     private final static String TARGET_ENV_VAR = BUILDING_FINROC ? "FINROC_TARGET" : "MCATARGET";
@@ -202,25 +202,33 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public void setDefaultIncludePaths(SrcDir dir, SourceScanner sources) {
+
         String[] includePaths = INCLUDE_PATHS;
         boolean legacyTarget = dir.relative.contains("mca2-legacy");
         if (BUILDING_FINROC && legacyTarget) {
             includePaths = LEGACY_INCLUDE_PATHS;
         }
 
-        for (String s : includePaths) {
-            dir.defaultIncludePaths.add(sources.findDir(s, true));
+        if (!dir.relative.startsWith("/")) {
+            for (String s : includePaths) {
+                dir.defaultIncludePaths.add(sources.findDir(s, true));
+            }
         }
 
         // add system include paths - in case MCA is installed system-wide
         if (systemInstall != null && systemInstall.systemInstallExists) {
-            String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath() + "/";
+            String p = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
             for (String s : includePaths) {
+                if (BUILDING_FINROC && s.startsWith("sources/cpp")) {
+                    s = s.substring("sources/cpp".length());
+                }  else {
+                    s = "/" + s;
+                }
                 dir.defaultIncludePaths.add(sources.findDir(p + s, true));
             }
         }
 
-        if (dir.relative.startsWith(tempBuildPath.relative)) {
+        if (dir.relative.startsWith(tempBuildPath.relative) && dir.relative.startsWith("/")) {
             return;
         }
         if (BUILDING_FINROC) {
@@ -236,6 +244,12 @@ public class FinrocBuilder extends MakeFileBuilder {
 
     @Override
     public String[] getSourceDirs() {
+        if (systemInstall != null && systemInstall.systemInstallExists) {
+            String[] tmp = new String[SOURCE_PATHS.length + 1];
+            System.arraycopy(SOURCE_PATHS, 0, tmp, 0, SOURCE_PATHS.length);
+            tmp[SOURCE_PATHS.length] = systemInstall.MCA_SYSTEM_INCLUDE.getAbsolutePath();
+            return tmp;
+        }
         return SOURCE_PATHS;
     }
 

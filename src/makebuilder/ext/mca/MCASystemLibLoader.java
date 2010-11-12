@@ -22,6 +22,7 @@
 package makebuilder.ext.mca;
 
 import java.io.File;
+import java.util.List;
 
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
@@ -29,6 +30,7 @@ import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SourceScanner;
 import makebuilder.SrcFile;
+import makebuilder.ext.finroc.FinrocBuilder;
 import makebuilder.util.Files;
 
 /**
@@ -54,10 +56,10 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
     public final boolean systemInstallExists;
 
     /** relative mca system-include path */
-    public static final String MCA_SYSTEM_INCLUDE_DIR = "/include/mca2";
+    public static final String MCA_SYSTEM_INCLUDE_DIR = FinrocBuilder.BUILDING_FINROC ? "/include/finroc" : "/include/mca2";
 
     /** relative mca system-lib-info path */
-    public static final String MCA_SYSTEM_INFO_DIR = "/share/mca2/info";
+    public static final String MCA_SYSTEM_INFO_DIR = FinrocBuilder.BUILDING_FINROC ? "/share/finroc/info" : "/share/mca2/info";
 
     public MCASystemLibLoader() {
         File h1 = new File("/usr" + MCA_SYSTEM_INCLUDE_DIR);
@@ -90,11 +92,21 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
                 }
                 if (!exists) {
                     SystemLibrary be = new SystemLibrary();
-                    be.name = libName.substring(8, libName.lastIndexOf("."));
+                    be.name = libName; /*.substring(8, libName.lastIndexOf("."));*/
                     be.buildFile = scanner.registerBuildProduct(f.getAbsolutePath());
-                    for (String extlib : Files.readLines(f).get(0).split("\\s")) {
+                    List<String> lines = Files.readLines(f);
+                    for (String extlib : lines.get(0).split("\\s")) {
                         if (extlib.trim().length() > 0) {
                             be.libs.add(extlib);
+                        }
+                    }
+                    for (String header : lines.get(1).split("\\s")) {
+                        String hdr = MCA_SYSTEM_INCLUDE_DIR + "/" + header;
+                        SrcFile sf = scanner.find(hdr);
+                        if (sf != null) {
+                            sf.setOwner(be);
+                        } else {
+                            System.err.println("Cannot find system header " + hdr + " from " + file.relative);
                         }
                     }
                     be.targetName = MCA_SYSTEM_LIB + "/" + libName;
@@ -104,7 +116,7 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
         }
     }
 
-    private class SystemLibrary extends MCALibrary {
+    private class SystemLibrary extends BuildEntity {
 
         private String targetName;
 
@@ -114,6 +126,11 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
 
         public void initTarget(Makefile makefile) {
             target = makefile.DUMMY_TARGET;
+        }
+
+        @Override
+        public Class <? extends SourceFileHandler > getFinalHandler() {
+            return null;
         }
     }
 }

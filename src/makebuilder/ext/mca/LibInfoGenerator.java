@@ -82,6 +82,22 @@ public class LibInfoGenerator extends SourceFileHandler.Impl {
             extlibs += " " + el.name;
         }
         t.addCommand("echo '" + extlibs.trim() + "' > " + infoFile, false);
+
+        // find all header files belonging to target
+        StringBuilder sb = new StringBuilder();
+        for (SrcFile sf : builder.getSources().getAllFiles()) {
+            if (sf.getOwner() == be && (sf.relative.endsWith(".h") || sf.relative.endsWith(".hpp"))) {
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                String s = sf.relative;
+                if (s.startsWith("sources/cpp/")) {
+                    s = s.substring("sources/cpp/".length());
+                }
+                sb.append(s);
+            }
+        }
+        t.addCommand("echo '" + sb.toString() + "' >> " + infoFile, false);
     }
 
     /**

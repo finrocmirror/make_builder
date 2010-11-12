@@ -163,7 +163,9 @@ public class SourceScanner {
             // scan/process source files
             for (SourceFileHandler handler : handlers) {
                 for (SrcFile file : tempFiles) {
-                    handler.processSourceFile(file, makefile, this, builder);
+                    if (!file.relative.startsWith("/")) {
+                        handler.processSourceFile(file, makefile, this, builder);
+                    }
                 }
             }
 

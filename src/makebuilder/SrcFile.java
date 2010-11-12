@@ -181,7 +181,7 @@ public class SrcFile implements Serializable {
     /**
      * @param owner Build entity that this source file belongs to
      */
-    void setOwner(BuildEntity owner) {
+    public void setOwner(BuildEntity owner) {
         this.owner = owner;
     }
 
