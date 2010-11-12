@@ -70,13 +70,13 @@ public class ScriptHandler extends SourceFileHandler.Impl {
             if (be.getFinalHandler() == JavaHandler.class) {
                 String mainClass = scr.getParameter("main-class");
                 if (mainClass == null) {
-                    scr.getTarget().addCommand("echo '" + pre + "java -jar " + homeDirFromScriptDir + "/" + be.getTarget() + " " + post + "\"$$@\"' >> " + file, false);
+                    scr.getTarget().addCommand("echo '" + pre + "java -jar \"`dirname $$0`/../../java/" + be.getTargetFilename() + "\" " + post + "\"$$@\"' >> " + file, false);
                 } else {
-                    scr.getTarget().addCommand("echo '" + pre + "java -cp " + homeDirFromScriptDir + "/" + be.getTarget() + " " + mainClass + " " + post + "\"$$@\"' >> " + file, false);
+                    scr.getTarget().addCommand("echo '" + pre + "java -cp \"`dirname $$0`/../../java/" + be.getTargetFilename() + "\" " + mainClass + " " + post + "\"$$@\"' >> " + file, false);
                 }
             } else {
                 // normal executable
-                scr.getTarget().addCommand("echo '" + pre + homeDirFromScriptDir + "/" + be.getTarget() + " " + post + "\"$$@\"' >> " + file, false);
+                scr.getTarget().addCommand("echo '" + pre + be.getTargetFilename() + " " + post + "\"$$@\"' >> " + file, false);
             }
             scr.getTarget().addCommand("chmod +x " + file, false);
         }
