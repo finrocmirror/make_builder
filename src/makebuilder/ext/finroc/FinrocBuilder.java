@@ -86,7 +86,7 @@ public class FinrocBuilder extends MakeFileBuilder {
     public final SrcDir targetLib, targetBin;
 
     /** System library installation handler */
-    public final MCASystemLibLoader systemInstall;
+    public MCASystemLibLoader systemInstall;
 
     /** Done message with warning for quick builds */
     public static final String QUICK_BUILD_DONE_MSG = "done \\(reminder: This is a \\\"quick \\& dirty\\\" build. Please check with makeSafe*** whether your code is actually correct C/C++, before committing to the svn repositories.\\)";
@@ -131,8 +131,13 @@ public class FinrocBuilder extends MakeFileBuilder {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
         }
+        String addLinkPath = "";
+        if (getOptions().containsKey("usesysteminstall")) {
+            systemInstall = new MCASystemLibLoader();
+            addLinkPath = " " + systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
+        }
         addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h",
-                                  "-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative,
+                                  "-lm -L" + targetLib.relative + addLinkPath + " -Wl,-rpath," + targetLib.relative,
                                   !opts.combineCppFiles));
         addHandler(new JavaHandler());
         addHandler(new CakeHandler());
@@ -140,11 +145,8 @@ public class FinrocBuilder extends MakeFileBuilder {
         //addHandler(new LdPreloadScriptHandler());
 
         // is MCA installed system-wide?
-        if (getOptions().containsKey("usesysteminstall")) {
-            systemInstall = new MCASystemLibLoader();
+        if (systemInstall != null) {
             addHandler(systemInstall);
-        } else {
-            systemInstall = null;
         }
 
         // generate library info files?
