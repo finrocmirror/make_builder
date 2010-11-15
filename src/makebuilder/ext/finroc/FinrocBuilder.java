@@ -261,19 +261,22 @@ public class FinrocBuilder extends MakeFileBuilder {
             if (!be.missingDep) {
                 if (be instanceof RRLib) {
                     // _RRLIB_COMPUTER_VISION_BASE_PRESENT_
-                    globalDefine.add("#define _RRLIB_" + be.name.toUpperCase() + "_PRESENT_");
+                    globalDefine.add("#define _LIB_RRLIB_" + be.name.toUpperCase() + "_PRESENT_");
                 } else if (be instanceof FinrocLibrary) {
                     // _LIB_FINROC_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_FINROC_" + be.name.toUpperCase() + "_PRESENT_");
                 } else if (be instanceof FinrocPlugin) {
                     // _FINROC_PLUGIN_COMPUTER_VISION_BASE_PRESENT_
-                    globalDefine.add("#define _FINROC_PLUGIN_" + be.name.toUpperCase() + "_PRESENT_");
+                    globalDefine.add("#define _LIB_FINROC_PLUGIN_" + be.name.toUpperCase() + "_PRESENT_");
                 } else if (be instanceof MCALibrary) {
                     // _LIB_MCA2_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_MCA2_" + be.name.toUpperCase() + "_PRESENT_");
-                } else if ((be instanceof MCASystemLibLoader.SystemLibrary) && be.getFinalHandler() == CppHandler.class) {
-                    String def = be.getTarget().toUpperCase() + "_PRESENT_";
-                    globalDefine.add("#define _LIB_" + def.substring("lib".length()) + "_PRESENT_");
+                } else if ((be instanceof MCASystemLibLoader.SystemLibrary) && be.getTarget().endsWith(".so")) {
+                    String def = be.getTargetFilename().toUpperCase();
+                    def = def.substring(0, def.length() - 3); // cut off ".SO"
+                    if (def.startsWith("LIB")) {
+                        globalDefine.add("#define _LIB_" + def.substring("lib".length()) + "_PRESENT_");
+                    }
                 }
             }
         }
