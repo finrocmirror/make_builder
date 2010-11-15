@@ -101,12 +101,12 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
                         }
                     }
                     for (String header : lines.get(1).split("\\s")) {
-                        String hdr = MCA_SYSTEM_INCLUDE_DIR + "/" + header;
+                        String hdr = MCA_SYSTEM_INCLUDE + "/" + header;
                         SrcFile sf = scanner.find(hdr);
                         if (sf != null) {
                             sf.setOwner(be);
                         } else {
-                            System.err.println("Cannot find system header " + hdr + " from " + file.relative);
+                            System.err.println("Cannot find system header " + hdr + " from " + f.getPath());
                         }
                     }
                     be.targetName = MCA_SYSTEM_LIB + "/" + libName;

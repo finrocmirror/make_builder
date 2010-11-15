@@ -30,6 +30,7 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
+import makebuilder.handler.CppHandler;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.ToStringComparator;
 
@@ -60,7 +61,7 @@ public class LibInfoGenerator extends SourceFileHandler.Impl {
 
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
-        if (!be.isLibrary()) {
+        if (!be.isLibrary() || (!(be.getFinalHandler() == CppHandler.class))) {
             return;
         }
 
