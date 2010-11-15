@@ -131,13 +131,16 @@ public class FinrocBuilder extends MakeFileBuilder {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
         }
-        String addLinkPath = "";
+        String sysLinkPath = "";
+        String sysLinkPath2 = "";
         if (getOptions().containsKey("usesysteminstall")) {
             systemInstall = new MCASystemLibLoader();
-            addLinkPath = " " + systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
+            sysLinkPath = systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
+            sysLinkPath2 = ",-rpath," + sysLinkPath;
+            sysLinkPath = " -L" + sysLinkPath;
         }
         addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h",
-                                  "-lm -L" + targetLib.relative + addLinkPath + " -Wl,-rpath," + targetLib.relative,
+                                  "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2,
                                   !opts.combineCppFiles));
         addHandler(new JavaHandler());
         addHandler(new CakeHandler());
