@@ -116,7 +116,7 @@ public class MCASystemLibLoader extends SourceFileHandler.Impl {
         }
     }
 
-    private class SystemLibrary extends BuildEntity {
+    public class SystemLibrary extends BuildEntity {
 
         private String targetName;
 

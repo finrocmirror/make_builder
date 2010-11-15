@@ -271,6 +271,9 @@ public class FinrocBuilder extends MakeFileBuilder {
                 } else if (be instanceof MCALibrary) {
                     // _LIB_MCA2_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_MCA2_" + be.name.toUpperCase() + "_PRESENT_");
+                } else if ((be instanceof MCASystemLibLoader.SystemLibrary) && be.getFinalHandler() == CppHandler.class) {
+                    String def = be.getTarget().toUpperCase() + "_PRESENT_";
+                    globalDefine.add("#define _LIB_" + def.substring("lib".length()) + "_PRESENT_");
                 }
             }
         }
