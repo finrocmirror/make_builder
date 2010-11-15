@@ -212,7 +212,7 @@ public class CppHandler implements SourceFileHandler {
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
 
         // build it?
-        if (!(be.getFinalHandler().equals(CppHandler.class))) {
+        if (!(be.getFinalHandler() == CppHandler.class)) {
             return;
         }
 
