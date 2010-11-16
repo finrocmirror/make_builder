@@ -135,9 +135,11 @@ public class FinrocBuilder extends MakeFileBuilder {
         String sysLinkPath2 = "";
         if (getOptions().containsKey("usesysteminstall")) {
             systemInstall = new MCASystemLibLoader();
-            sysLinkPath = systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
-            sysLinkPath2 = ",-rpath," + sysLinkPath;
-            sysLinkPath = " -L" + sysLinkPath;
+            if (systemInstall.MCA_SYSTEM_LIB != null) {
+                sysLinkPath = systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
+                sysLinkPath2 = ",-rpath," + sysLinkPath;
+                sysLinkPath = " -L" + sysLinkPath;
+            }
         }
         addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h",
                                   "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2,
