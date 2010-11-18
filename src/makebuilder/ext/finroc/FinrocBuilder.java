@@ -170,6 +170,11 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (getOptions().calculateDependencies) {
             addHandler((dependencyHandler = new DependencyHandler()));
         }
+        
+        // Add "tools" target - if it does not exist yet
+        if (makefile.getPhonyTarget("tools") == null) {
+            makefile.addPhonyTarget("tools");
+        }
     }
 
     @Override
