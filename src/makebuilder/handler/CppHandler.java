@@ -175,6 +175,7 @@ public class CppHandler implements SourceFileHandler {
      * @param elseBranch Check out else branch of node?
      */
     public static void resolveDependencies(SrcFile file, CodeTreeNode node, boolean mandatory, boolean ignoreMissing, boolean elseBranch) {
+        assert(node != null);
         SrcDir dir = file.dir;
         List<SrcFile> result = new ArrayList<SrcFile>();
         for (String raw : (elseBranch ? node.altIncludes : node.includes)) {

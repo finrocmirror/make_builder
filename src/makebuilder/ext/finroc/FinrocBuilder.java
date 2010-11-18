@@ -292,6 +292,10 @@ public class FinrocBuilder extends MakeFileBuilder {
                 }
             }
         }
+        
+        if (systemInstall != null && systemInstall.systemInstallExists) {
+            globalDefine.add("#define _FINROC_SYSTEM_INSTALL_PRESENT_");
+        }
 
         // write defines to libinfo.h
         globalDefine.add("");
