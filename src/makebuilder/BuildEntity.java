@@ -242,7 +242,7 @@ public abstract class BuildEntity {
     public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
         if (autoDependencies) {
             for (SrcFile sf : sources) {
-                checkForDependencies(sf, builder);
+                checkForDependencies(sf, builder, false);
                 if (missingDep) {
                     return;
                 }
@@ -263,12 +263,16 @@ public abstract class BuildEntity {
      *
      * @param sf Source file
      * @param builder Makefile builder instance
+     * @param optional Optional dependencies?
      */
-    public void checkForDependencies(SrcFile sf, MakeFileBuilder builder) {
+    public void checkForDependencies(SrcFile sf, MakeFileBuilder builder, boolean optional) {
         if (sf.processing) {
             return;
         }
         if (sf.getMissingDependency() != null) {
+            if (optional) {
+                return;
+            }
             missingDep = true;
             String miss = sf.getMissingDependency();
             String msg = miss + " in " + sf.relative;
@@ -278,21 +282,39 @@ public abstract class BuildEntity {
             builder.printCannotBuildError(this, " due to missing dependency " + msg, Color.RED);
             return;
         }
+
         sf.processing = true;
-        for (SrcFile sfDep : sf.dependencies) {
+        checkForDependencies2(sf, builder, optional, sf.dependencies);
+        if (missingDep) {
+            sf.processing = false;
+            return;
+        }
+        checkForDependencies2(sf, builder, true, sf.optionalDependencies);
+        sf.processing = false;
+    }
+
+    /**
+     * Helper for above method
+     *
+     * @param sf Source file
+     * @param builder Makefile builder instance
+     * @param optional Optional dependencies?
+     * @param sfDependencies Dependency list of file to process
+     */
+    private void checkForDependencies2(SrcFile sf, MakeFileBuilder builder, boolean optional, List<SrcFile> sfDependencies) {
+        List<BuildEntity> resultList = optional ? optionalDependencies : dependencies;
+        for (SrcFile sfDep : sfDependencies) {
             BuildEntity owner = sfDep.getOwner();
-            if (owner != null && owner != this && (!dependencies.contains(owner))) {
+            if (owner != null && owner != this && (!dependencies.contains(owner)) && (!resultList.contains(owner))) {
                 //System.out.println("Adding " + owner.toString() + " to " + toString() + " because of " + sfDep.toString());
-                dependencies.add(owner);
+                resultList.add(owner);
             } else if (owner == null || owner == this) {
-                checkForDependencies(sfDep, builder);
+                checkForDependencies(sfDep, builder, optional);
             }
             if (missingDep) {
-                sf.processing = false;
                 return;
             }
         }
-        sf.processing = false;
     }
 
     /**

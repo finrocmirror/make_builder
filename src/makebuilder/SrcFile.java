@@ -65,6 +65,9 @@ public class SrcFile implements Serializable {
     /** Other source files that this file directly depends on - resolved */
     public transient final List<SrcFile> dependencies = new ArrayList<SrcFile>();
 
+    /** Other source files that this file directly depends on - resolved */
+    public transient final List<SrcFile> optionalDependencies = new ArrayList<SrcFile>();
+
     /** First raw dependency that could not be resolved - null if no dependencies were missing */
     public transient String missingDependency = null;
 
@@ -224,6 +227,7 @@ public class SrcFile implements Serializable {
      * Collect ALL (direct and indirect) dependencies of source files
      * (includes this file as well)
      * (recursive function - obviously)
+     * (includes all optional dependencies that are available)
      *
      * @param Set that will contain results - may contain entries already - these won't be deleted
      * @return Returns the parameter - for convenience
@@ -232,6 +236,11 @@ public class SrcFile implements Serializable {
         result.add(this);
         for (SrcFile dep : dependencies) {
             if (!result.contains(dep)) {
+                dep.getAllDependencies(result);
+            }
+        }
+        for (SrcFile dep : optionalDependencies) {
+            if (!result.contains(dep) && (dep.absolute.exists())) {
                 dep.getAllDependencies(result);
             }
         }

@@ -100,6 +100,10 @@ public class CppHandler implements SourceFileHandler {
                 for (SrcFile sf : file.dependencies) {
                     System.out.println(" " + sf.relative);
                 }
+                System.out.println("\nResolved optional dependencies:");
+                for (SrcFile sf : file.dependencies) {
+                    System.out.println(" " + sf.relative);
+                }
             }
         }
     }
@@ -198,7 +202,7 @@ public class CppHandler implements SourceFileHandler {
                 //throw new RuntimeException("Dependency " + raw + " not found");
             }
         }
-        file.dependencies.addAll(result);
+        (mandatory ? file.dependencies : file.optionalDependencies).addAll(result);
 
         for (CodeTreeNode child : (elseBranch ? node.altChildren : node.children)) {
             resolveDependencies(file, child, mandatory && (child.makroName == null), ignoreMissing, false);
