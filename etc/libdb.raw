@@ -61,7 +61,7 @@ nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h','FEDM_Functions.h','FEDM_ISCReader.h','FEDM_ISCReaderID_LRU1000.h','FEDM_ISOTabItem.h','fefu.h','FEDM_Base.h','FEDM.h','FEDM_ISCReaderID.h','FEDM_ISCReaderID_LRU2000.h','FEDM_XmlBase.h','feisc.h','FEDM_BRMTabItem.h','FEDM_ISCFunctionUnit.h','FEDM_ISCReaderID_LR2000.h','FEDM_ISCReaderID_MR200.h','FEDM_Xml.h','fetcp.h','FEDM_DataBase.h','FEDM_ISCFunctionUnitID.h','FEDM_ISCReaderID_LR200.h','FEDM_ISCReaderModule.h','FEDM_XmlReaderCfgDataModul.h','feusb.h'>
 ode:        -I<ode/ode.h> -lode
 oiv:        -I<Inventor/SoDB.h> -lCoin
-opencv2_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy
+opencv2_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
 opencv2_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui
 opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
 opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
