@@ -7,6 +7,7 @@ asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:    -I<AX10420.h>
 bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.6/ -ldbxml-2.4 -ldb_cxx-4.6 -lxqilla
+bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.8/ -ldbxml-2.5 -ldb_cxx-4.8 -lxqilla
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
