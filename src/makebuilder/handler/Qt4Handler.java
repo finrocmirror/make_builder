@@ -116,6 +116,10 @@ public class Qt4Handler extends SourceFileHandler.Impl {
                 best = path.relative;
             }
         }
-        return file.dir.relative.substring(best.length() + 1);
+        if (best.equals(".")) {
+            return file.dir.relative;
+        } else {
+            return file.dir.relative.substring(best.length() + 1);
+        }
     }
 }

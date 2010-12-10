@@ -34,9 +34,11 @@ public class TestProgram extends FinrocBuildEntity {
     @Override
     public String getTargetPrefix() {
         String rootDir2 = this.getRootDir().relative;
-        assert(rootDir2.startsWith("sources"));
-        rootDir2 = rootDir2.substring(9);
-        rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
+        if (FinrocBuilder.BUILDING_FINROC) {
+            assert(rootDir2.startsWith("sources"));
+            rootDir2 = rootDir2.substring(9);
+            rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
+        }
         if (rootDir2.startsWith("libraries")) {
             return "finroc_library_" + getSecondDir(rootDir2) + "_test_";
         } else if (rootDir2.startsWith("plugins")) {
