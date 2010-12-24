@@ -76,7 +76,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     //  private final SortedMap<String, List<String>> categories = new TreeMap<String, List<String>>();
 
     /** Cache for source files */
-    protected final SourceScanner sources;
+    protected SourceScanner sources;
 
     /** Temporary directory for merged files */
     private final String TEMPDIR = "/tmp/mbuild_" + Util.whoami() + "_" + Math.abs(HOME.getAbsolutePath().hashCode());
@@ -155,7 +155,20 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // read/process/cache source files
         System.out.println("Caching and processing local source files...");
-        sources.scan(makefile, buildFileLoaders, contentHandlers, true, getSourceDirs());
+        try {
+            sources.scan(makefile, buildFileLoaders, contentHandlers, true, getSourceDirs());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(Util.color("Error scanning files. A corrupted cache can cause errors. Trying again without cache.", Util.Color.RED, true));
+            try {
+                sources = new SourceScanner(HOME, this);
+                sources.scan(makefile, buildFileLoaders, contentHandlers, false, getSourceDirs());
+            } catch (Exception e2) {
+                e2.printStackTrace();
+                System.out.println(Util.color("Error still occured. Exiting.", Util.Color.RED, true));
+                System.exit(-1);
+            }
+        }
 
         // find local dependencies in "external libraries"
         LibDB.findLocalDependencies(buildEntities);

@@ -22,6 +22,7 @@
 package makebuilder.handler;
 
 import java.io.File;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -58,6 +60,21 @@ public class MakeXMLLoader implements BuildFileLoader {
     /** build entity subclasses known to loader and instantiated when their simple name is found in XML tag */
     private final Class<?>[] buildEntityClasses;
 
+    /** Objects for parsing XML */
+    static private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    static private DocumentBuilder dbuilder;
+
+    static {
+
+        // Initialize document builder
+        try {
+            dbuilder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
     public MakeXMLLoader(Class<?>... buildEntityClasses) {
         this.buildEntityClasses = buildEntityClasses;
     }
@@ -79,9 +96,18 @@ public class MakeXMLLoader implements BuildFileLoader {
         }
 
         // parse XML
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dbuilder = factory.newDocumentBuilder();
-        Document doc = dbuilder.parse(file.absolute);
+        Document doc = null;
+        try {
+            doc = dbuilder.parse(file.absolute);
+        } catch (UnknownHostException ex) {
+            System.out.println(Util.color("Disabling DTD parsing, because there seems to be no internet connection available.", Util.Color.Y, false));
+
+            // ok, we're not connected to the internet - disable DTD
+            factory.setValidating(false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            dbuilder = factory.newDocumentBuilder();
+            doc = dbuilder.parse(file.absolute);
+        }
 
         for (Class<?> c : buildEntityClasses) {
             NodeList nl = doc.getElementsByTagName(c.getSimpleName().toLowerCase()); // all build entities of type c

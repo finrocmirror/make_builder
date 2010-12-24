@@ -98,7 +98,7 @@ public class SourceScanner {
      * @param useCache Use cache for file information?
      * @param sourceDirs Relative source directories
      */
-    public void scan(Makefile makefile, Collection<BuildFileLoader> loaders, Collection<SourceFileHandler> handlers, boolean useCache, String... sourceDirs) {
+    public void scan(Makefile makefile, Collection<BuildFileLoader> loaders, Collection<SourceFileHandler> handlers, boolean useCache, String... sourceDirs) throws Exception {
 
         // find/register all source directories and files
         LinkedList<SrcDir> dirsToScan = new LinkedList<SrcDir>();
@@ -139,43 +139,38 @@ public class SourceScanner {
             }
         }
 
-        try {
-            ArrayList<SrcFile> tempFiles = new ArrayList<SrcFile>(files.values()); // make copy
+        ArrayList<SrcFile> tempFiles = new ArrayList<SrcFile>(files.values()); // make copy
 
-            // load build files
+        // load build files
+        for (SrcFile file : tempFiles) {
+            for (BuildFileLoader loader : loaders) {
+                loader.process(file, builder.buildEntities, this, builder);
+            }
+        }
+
+        // set ownership of files: relate SrcFile instances to BuildEntity instances
+        // heuristic: all files with same base name (no extension) as one of build entity's source files belong to build entity
+        for (BuildEntity be : builder.buildEntities) {
+            for (SrcFile sf : be.sources) {
+                String baseName = sf.dir.relative + FS + sf.getRawName();
+                for (SrcFile sf2 : files.subMap(baseName + ".aaa", baseName + ".zzz").values()) {
+                    sf2.setOwner(be);
+                }
+            }
+        }
+
+        // scan/process source files
+        for (SourceFileHandler handler : handlers) {
             for (SrcFile file : tempFiles) {
-                for (BuildFileLoader loader : loaders) {
-                    loader.process(file, builder.buildEntities, this, builder);
+                if (!file.relative.startsWith("/")) {
+                    handler.processSourceFile(file, makefile, this, builder);
                 }
             }
+        }
 
-            // set ownership of files: relate SrcFile instances to BuildEntity instances
-            // heuristic: all files with same base name (no extension) as one of build entity's source files belong to build entity
-            for (BuildEntity be : builder.buildEntities) {
-                for (SrcFile sf : be.sources) {
-                    String baseName = sf.dir.relative + FS + sf.getRawName();
-                    for (SrcFile sf2 : files.subMap(baseName + ".aaa", baseName + ".zzz").values()) {
-                        sf2.setOwner(be);
-                    }
-                }
-            }
-
-            // scan/process source files
-            for (SourceFileHandler handler : handlers) {
-                for (SrcFile file : tempFiles) {
-                    if (!file.relative.startsWith("/")) {
-                        handler.processSourceFile(file, makefile, this, builder);
-                    }
-                }
-            }
-
-            // release resources (cached lines)
-            for (SrcFile file : tempFiles) {
-                file.scanCompleted();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        // release resources (cached lines)
+        for (SrcFile file : tempFiles) {
+            file.scanCompleted();
         }
 
         // save cached info
