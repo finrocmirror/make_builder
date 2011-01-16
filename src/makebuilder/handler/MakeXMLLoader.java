@@ -97,17 +97,17 @@ public class MakeXMLLoader implements BuildFileLoader {
 
         // parse XML
         Document doc = null;
-        try {
+        /*try {
             doc = dbuilder.parse(file.absolute);
         } catch (UnknownHostException ex) {
-            System.out.println(Util.color("Disabling DTD parsing, because there seems to be no internet connection available.", Util.Color.Y, false));
+            System.out.println(Util.color("Disabling DTD parsing, because there seems to be no internet connection available.", Util.Color.Y, false));*/
 
-            // ok, we're not connected to the internet - disable DTD
-            factory.setValidating(false);
-            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            dbuilder = factory.newDocumentBuilder();
-            doc = dbuilder.parse(file.absolute);
-        }
+        // disable DTD
+        factory.setValidating(false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        dbuilder = factory.newDocumentBuilder();
+        doc = dbuilder.parse(file.absolute);
+        //}
 
         for (Class<?> c : buildEntityClasses) {
             NodeList nl = doc.getElementsByTagName(c.getSimpleName().toLowerCase()); // all build entities of type c
