@@ -218,7 +218,7 @@ public class MCABuilder extends MakeFileBuilder {
     }
 
     public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
-        SrcDir targetDir = tempBuildPath.getSubDir(source.getTargetPath());
+        SrcDir targetDir = tempBuildPath.getSubDir(source.getRootDir().relative);
         String filename = source.getTargetFilename();
         if (filename.contains(".")) {
             filename = filename.substring(0, filename.lastIndexOf("."));
