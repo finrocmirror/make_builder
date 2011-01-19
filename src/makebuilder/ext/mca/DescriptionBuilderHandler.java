@@ -67,6 +67,7 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                 t.addDependency(file.relative);
                 t.addDependency(DESCRIPTION_BUILDER_BIN);
                 t.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " > " + target.relative, true);
+                t.addToPhony("template_descriptions");
 
                 // normal description?
             } else if (file.hasMark("DESCR")) {
@@ -82,6 +83,7 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                     SrcFile sft = builder.getTempBuildArtifact(be, "cpp", "descriptions"); // sft = "source file target"
                     target = makefile.addTarget(sft.relative, true, file.dir);
                     target.addDependency(be.buildFile);
+                    target.addDependency("template_descriptions");
                     target.addMessage("Creating " + sft.relative);
                     target.addCommand("echo \\/\\/ generated > " + target.getName(), false);
                     be.sources.add(sft);
