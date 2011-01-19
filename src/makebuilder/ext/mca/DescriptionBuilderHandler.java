@@ -44,6 +44,12 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
     /** Contains a makefile target for each build entity with files to call description build upon */
     private Map<BuildEntity, Makefile.Target> descrTargets = new HashMap<BuildEntity, Makefile.Target>();
 
+    /** Target for all description from template classes */
+    public static final String TEMPLATE_DESCRIPTION_TARGET = "template_descriptions";
+    
+    /** Has template description target been created? */
+    public boolean templateDescriptionTargetCreated = false;
+    
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         if (file.hasExtension("h")) {
@@ -67,7 +73,8 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                 t.addDependency(file.relative);
                 t.addDependency(DESCRIPTION_BUILDER_BIN);
                 t.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " > " + target.relative, true);
-                t.addToPhony("template_descriptions");
+                t.addToPhony(TEMPLATE_DESCRIPTION_TARGET);
+                templateDescriptionTargetCreated = true;
 
                 // normal description?
             } else if (file.hasMark("DESCR")) {
@@ -83,11 +90,16 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                     SrcFile sft = builder.getTempBuildArtifact(be, "cpp", "descriptions"); // sft = "source file target"
                     target = makefile.addTarget(sft.relative, true, file.dir);
                     target.addDependency(be.buildFile);
-                    target.addDependency("template_descriptions");
+                    target.addDependency(TEMPLATE_DESCRIPTION_TARGET);
                     target.addMessage("Creating " + sft.relative);
                     target.addCommand("echo \\/\\/ generated > " + target.getName(), false);
                     be.sources.add(sft);
                     descrTargets.put(be, target);
+                    
+                    if (!templateDescriptionTargetCreated) {
+                        makefile.addPhonyTarget(TEMPLATE_DESCRIPTION_TARGET);
+                        templateDescriptionTargetCreated = true;
+                    }
                 }
                 target.addDependency(file);
                 target.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " >> " + target.getName(), false);
