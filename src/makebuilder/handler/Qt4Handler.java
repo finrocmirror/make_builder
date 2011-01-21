@@ -21,8 +21,10 @@
  */
 package makebuilder.handler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import makebuilder.BuildEntity;
 import makebuilder.SourceFileHandler;
@@ -32,6 +34,7 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.libdb.LibDB;
+import makebuilder.util.ToStringComparator;
 
 /**
  * @author max
@@ -42,6 +45,24 @@ import makebuilder.libdb.LibDB;
  */
 public class Qt4Handler extends SourceFileHandler.Impl {
 
+    /** Single target for .cpp descr files */
+    class CppQtTarget {
+
+        /** Makefile target for descr file */
+        final Makefile.Target target;
+
+        /** List of .cpp files that descr file is generated from */
+        final ArrayList<SrcFile> originalSourceFiles = new ArrayList<SrcFile>();
+
+        /** Descr file */
+        final SrcFile descrFile;
+
+        public CppQtTarget(Makefile.Target target, SrcFile descrFile) {
+            this.target = target;
+            this.descrFile = descrFile;
+        }
+    }
+
     /** moc executable */
     private final String MOC_CALL;
 
@@ -49,7 +70,10 @@ public class Qt4Handler extends SourceFileHandler.Impl {
     private final String UIC_CALL;
 
     /** Contains a makefile target for each build entity with files to moc */
-    private Map<BuildEntity, Makefile.Target> mocTargets = new HashMap<BuildEntity, Makefile.Target>();
+    private Map<BuildEntity, CppQtTarget> mocTargets = new HashMap<BuildEntity, CppQtTarget>();
+
+    /** Dependency buffer */
+    private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
 
     public Qt4Handler() {
         try {
@@ -83,18 +107,19 @@ public class Qt4Handler extends SourceFileHandler.Impl {
                 }
 
                 // get or create target
-                Makefile.Target target = mocTargets.get(be);
+                CppQtTarget target = mocTargets.get(be);
                 if (target == null) {
                     SrcFile sft = builder.getTempBuildArtifact(be, "cpp", "qt_generated"); // sft = "source file target"
-                    target = makefile.addTarget(sft.relative, true, file.dir);
-                    target.addDependency(be.buildFile);
-                    target.addMessage("Creating " + sft.relative);
-                    target.addCommand("echo \\/\\/ generated > " + target.getName(), false);
+                    target = new CppQtTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
+                    target.target.addDependency(be.buildFile);
+                    target.target.addMessage("Creating " + sft.relative);
+                    target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                     be.sources.add(sft);
                     mocTargets.put(be, target);
                 }
-                target.addDependency(file);
-                target.addCommand(MOC_CALL + " -p " + getIncludePath(file) + " " + file.relative + " >> " + target.getName(), false);
+                target.target.addDependency(file);
+                target.originalSourceFiles.add(file);
+                target.target.addCommand(MOC_CALL + " -p " + getIncludePath(file) + " " + file.relative + " >> " + target.target.getName(), false);
             }
 
         } else if (file.hasExtension("ui")) { // run uic?
@@ -120,6 +145,20 @@ public class Qt4Handler extends SourceFileHandler.Impl {
             return file.dir.relative;
         } else {
             return file.dir.relative.substring(best.length() + 1);
+        }
+    }
+
+    @Override
+    public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
+        CppQtTarget target = mocTargets.get(be);
+        if (target != null) {
+
+            // Add all dependencies of original files to generated .descr cpp file
+            dependencyBuffer.clear();
+            for (SrcFile sf : target.originalSourceFiles) {
+                sf.getAllDependencies(dependencyBuffer);
+            }
+            target.descrFile.dependencies.addAll(dependencyBuffer);
         }
     }
 }
