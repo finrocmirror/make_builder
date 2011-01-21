@@ -21,8 +21,10 @@
  */
 package makebuilder.ext.mca;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import makebuilder.BuildEntity;
 import makebuilder.SourceFileHandler;
@@ -30,6 +32,7 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcFile;
+import makebuilder.util.ToStringComparator;
 
 /**
  * @author max
@@ -38,18 +41,33 @@ import makebuilder.SrcFile;
  */
 public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
 
+    /** Single target for .cpp descr files */
+    class CppDescrTarget {
+        
+        /** Makefile target for descr file */
+        final Makefile.Target target;
+        
+        /** List of .cpp files that descr file is generated from */
+        final ArrayList<SrcFile> originalSourceFiles = new ArrayList<SrcFile>(); 
+        
+        /** Descr file */
+        final SrcFile descrFile;
+        
+        public CppDescrTarget(Makefile.Target target, SrcFile descrFile) {
+            this.target = target;
+            this.descrFile = descrFile;
+        }
+    }
+    
     /** Description builder script */
     public static String DESCRIPTION_BUILDER_BIN = "script/description_builder.pl ";
 
     /** Contains a makefile target for each build entity with files to call description build upon */
-    private Map<BuildEntity, Makefile.Target> descrTargets = new HashMap<BuildEntity, Makefile.Target>();
+    private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
 
-    /** Target for all description from template classes */
-    public static final String TEMPLATE_DESCRIPTION_TARGET = "template_descriptions";
-    
-    /** Has template description target been created? */
-    public boolean templateDescriptionTargetCreated = false;
-    
+    /** Dependency buffer */
+    private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
+
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         if (file.hasExtension("h")) {
@@ -73,8 +91,6 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                 t.addDependency(file.relative);
                 t.addDependency(DESCRIPTION_BUILDER_BIN);
                 t.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " > " + target.relative, true);
-                t.addToPhony(TEMPLATE_DESCRIPTION_TARGET);
-                templateDescriptionTargetCreated = true;
 
                 // normal description?
             } else if (file.hasMark("DESCR")) {
@@ -85,25 +101,34 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
                 }
 
                 // get or create target
-                Makefile.Target target = descrTargets.get(be);
+                CppDescrTarget target = descrTargets.get(be);
                 if (target == null) {
                     SrcFile sft = builder.getTempBuildArtifact(be, "cpp", "descriptions"); // sft = "source file target"
-                    target = makefile.addTarget(sft.relative, true, file.dir);
-                    target.addDependency(be.buildFile);
-                    target.addDependency(TEMPLATE_DESCRIPTION_TARGET);
-                    target.addMessage("Creating " + sft.relative);
-                    target.addCommand("echo \\/\\/ generated > " + target.getName(), false);
+                    target = new CppDescrTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
+                    target.target.addDependency(be.buildFile);
+                    target.target.addMessage("Creating " + sft.relative);
+                    target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                     be.sources.add(sft);
                     descrTargets.put(be, target);
-                    
-                    if (!templateDescriptionTargetCreated) {
-                        makefile.addPhonyTarget(TEMPLATE_DESCRIPTION_TARGET);
-                        templateDescriptionTargetCreated = true;
-                    }
                 }
-                target.addDependency(file);
-                target.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " >> " + target.getName(), false);
+                target.target.addDependency(file);
+                target.originalSourceFiles.add(file);
+                target.target.addCommand(DESCRIPTION_BUILDER_BIN + file.relative + " >> " + target.target.getName(), false);
             }
+        }
+    }
+
+    @Override
+    public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
+        CppDescrTarget target = descrTargets.get(be);
+        if (target != null) {
+            
+            // Add all dependencies of original files to generated .descr cpp file
+            dependencyBuffer.clear();
+            for (SrcFile sf : target.originalSourceFiles) {
+                sf.getAllDependencies(dependencyBuffer);
+            }
+            target.descrFile.dependencies.addAll(dependencyBuffer);
         }
     }
 }
