@@ -75,6 +75,7 @@ Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL: -lpq -I<pg_config.h,postgres.h>
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
+plotter:    -I<plotter.h> -lplotter
 pwc:        -I<pwc-ioctl.h>
 pthread:    -I<pthread.h> -lpthread
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
