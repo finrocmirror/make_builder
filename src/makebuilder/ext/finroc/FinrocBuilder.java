@@ -127,6 +127,9 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (!(new File(DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN.trim()).exists())) {
             DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN = "sources/cpp/mca2-legacy/" + DescriptionBuilderHandler.DESCRIPTION_BUILDER_BIN; // not nice... but ok for now
         }
+        if (BUILDING_FINROC) {
+            addHandler(new PortDescriptionBuilderHandler());
+        }
         if (getOptions().combineCppFiles) {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
@@ -170,7 +173,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (getOptions().calculateDependencies) {
             addHandler((dependencyHandler = new DependencyHandler()));
         }
-        
+
         // Add "tools" target - if it does not exist yet
         if (makefile.getPhonyTarget("tools") == null) {
             makefile.addPhonyTarget("tools");
@@ -292,7 +295,7 @@ public class FinrocBuilder extends MakeFileBuilder {
                 }
             }
         }
-        
+
         if (systemInstall != null && systemInstall.systemInstallExists) {
             globalDefine.add("#define _FINROC_SYSTEM_INSTALLATION_PRESENT_");
         }
@@ -347,6 +350,9 @@ public class FinrocBuilder extends MakeFileBuilder {
             return tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "");
         }
         String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
+        if (source.getRootDir().relative.startsWith("sources/cpp/")) {
+            srcDir = source.getRootDir().relative.substring("sources/cpp/".length());
+        }
         return tempBuildPath.relative + FS + trimDir(srcDir);
     }
 

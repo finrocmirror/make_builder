@@ -113,6 +113,7 @@ public class SrcDir implements Comparable<SrcDir> {
             if (current.relative.equals(".") || current.relative.startsWith("/")) {
                 return null;
             }
+            current = current.getParent();
         }
         return current;
     }
