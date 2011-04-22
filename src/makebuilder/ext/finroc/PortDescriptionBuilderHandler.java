@@ -85,6 +85,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
                 target = new CppDescrTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
                 target.target.addDependency(be.buildFile);
                 target.target.addMessage("Creating " + sft.relative);
+                target.target.addDependency(DESCRIPTION_BUILDER_BIN);
                 //target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                 be.sources.add(sft);
                 descrTargets.put(be, target);
