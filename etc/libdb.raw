@@ -14,8 +14,8 @@ boost_filesystem: -I<boost/filesystem.hpp> -lboost_filesystem-mt
 boost_regex:    -I<boost/regex.hpp> -lboost_regex-mt
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread-mt
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system-mt
-can:        -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
-can:        -I<cccan_public.h> -D _MCA_CC_CAN_ 
+can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
+can_cc_systems:    -I<cccan_public.h> -D _MCA_CC_CAN_ 
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core
 cppunit:    -lcppunit
