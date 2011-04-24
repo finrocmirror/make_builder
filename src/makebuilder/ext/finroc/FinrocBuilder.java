@@ -119,7 +119,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // init handlers
         addLoader(new SConscriptParser());
-        addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, TestProgram.class, JavaTestProgram.class,
+        addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, JavaTestProgram.class,
                                     RRLib.class, FinrocProgram.class, RRJavaLib.class, FinrocJavaProgram.class, FinrocJavaLibrary.class, FinrocJavaPlugin.class));
         addHandler(new Qt4Handler());
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));

@@ -409,4 +409,11 @@ public abstract class BuildEntity {
     public boolean isTestProgram() {
         return false;
     }
+
+    /**
+     * @return Is this a unit test (program) that should be executed at compile time?
+     */
+    public boolean isUnitTest() {
+        return false;
+    }
 }
