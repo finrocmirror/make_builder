@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -o verbose #echo on
+
+if [ -d $MCAHOME/libraries/physics_simulation_physx ] 
+  then
+    find -L $MCAHOME/libraries/physics_simulation_physx -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+fi
+
+
+set +o verbose #echo off
+
+
