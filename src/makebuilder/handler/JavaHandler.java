@@ -136,6 +136,8 @@ public class JavaHandler implements SourceFileHandler {
                 jars += " " + dep.getTargetFilename();
                 cpJars += ":" + dep.getTarget();
                 mainTarget.addDependency(dep.getTarget());
+            } else {
+                mainTarget.addDependency(dep.getTarget());
             }
         }
 
