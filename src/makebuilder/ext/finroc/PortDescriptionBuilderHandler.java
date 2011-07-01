@@ -60,7 +60,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
     }
 
     /** Description builder script */
-    public static String DESCRIPTION_BUILDER_BIN = "scripts/finroc_port_description_builder.pl";
+    public static String DESCRIPTION_BUILDER_BIN = "scripts/tools/port_name_builder";
 
     /** Contains a makefile target for each build entity with files to call description build upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
