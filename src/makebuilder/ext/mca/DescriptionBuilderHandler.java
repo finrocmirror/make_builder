@@ -60,7 +60,7 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
     }
     
     /** Description builder script */
-    public static String DESCRIPTION_BUILDER_BIN = "script/description_builder.pl ";
+    public static String DESCRIPTION_BUILDER_BIN = "scripts/description_builder.pl ";
 
     /** Contains a makefile target for each build entity with files to call description build upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
