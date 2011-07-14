@@ -169,6 +169,8 @@ public class MCABuilder extends MakeFileBuilder {
         }
         dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "projects", true));
         dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative + FS + "libraries", true));
+        dir.defaultIncludePaths.add(sources.findDir(tempBuildPath.relative, true));
+
 
         // add all parent directories (in source and build paths)... not nice but somehow required :-/
         SrcDir parent = dir;

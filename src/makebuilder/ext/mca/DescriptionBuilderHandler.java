@@ -43,24 +43,24 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
 
     /** Single target for .cpp descr files */
     class CppDescrTarget {
-        
+
         /** Makefile target for descr file */
         final Makefile.Target target;
-        
+
         /** List of .cpp files that descr file is generated from */
-        final ArrayList<SrcFile> originalSourceFiles = new ArrayList<SrcFile>(); 
-        
+        final ArrayList<SrcFile> originalSourceFiles = new ArrayList<SrcFile>();
+
         /** Descr file */
         final SrcFile descrFile;
-        
+
         public CppDescrTarget(Makefile.Target target, SrcFile descrFile) {
             this.target = target;
             this.descrFile = descrFile;
         }
     }
-    
+
     /** Description builder script */
-    public static String DESCRIPTION_BUILDER_BIN = "scripts/description_builder.pl ";
+    public static String DESCRIPTION_BUILDER_BIN = "make_builder/scripts/description_builder.pl ";
 
     /** Contains a makefile target for each build entity with files to call description build upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
@@ -122,7 +122,7 @@ public class DescriptionBuilderHandler extends SourceFileHandler.Impl {
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
         CppDescrTarget target = descrTargets.get(be);
         if (target != null) {
-            
+
             // Add all dependencies of original files to generated .descr cpp file
             dependencyBuffer.clear();
             for (SrcFile sf : target.originalSourceFiles) {
