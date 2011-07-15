@@ -112,7 +112,12 @@ if ($init_complete) {
     print STDOUT "//----------------------------------------------------------------------\n\n";
 
     my ($head, $include_file_name) = split ("/", $input_file_name, 2);
-    print STDOUT "#include \"".$include_file_name."\"\n\n" if defined $include_file_name;
+    if ($head eq "rrlib") {
+	print STDOUT "#include \"".$input_file_name."\"\n\n" if defined $include_file_name;
+    }
+    else {
+	print STDOUT "#include \"".$include_file_name."\"\n\n" if defined $include_file_name;
+    }
     print STDOUT "#include \<cstring\>\n\n";
     print STDOUT "#include \<cstdio\>\n\n";
 
