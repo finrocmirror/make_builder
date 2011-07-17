@@ -48,10 +48,10 @@
 
 #ifdef __WIN32__
 # pragma warning(disable: 4002)
-# define _DESCR_(storage,class,name,ignore,type) storage const char* name[]
+# define _DESCR_(storage,class,name,ignore,type) storage const char* const name[]
 #else
 #define _DESCR_(storage,class,name,ignore,type) \
-  storage const char* name[];
+  storage const char* const name[];
 #endif
 
 //----------------------------------------------------------------------
