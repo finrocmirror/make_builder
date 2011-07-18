@@ -21,8 +21,9 @@
  */
 package makebuilder.ext.finroc;
 
-import makebuilder.SourceFileHandler;
-import makebuilder.handler.CppHandler;
+import makebuilder.Makefile;
+import makebuilder.StartScript;
+import makebuilder.handler.JavaHandler;
 
 /**
  * @author max
@@ -36,13 +37,26 @@ public class FinrocProgram extends FinrocBuildEntity {
         return "";
     }
 
-    @Override
-    public String getTarget() {
-        return "$(TARGET_BIN)/" + getTargetPrefix() + name;
+    public boolean isLibrary() {
+        return false;
     }
 
     @Override
-    public Class <? extends SourceFileHandler > getFinalHandler() {
-        return CppHandler.class;
+    public String getTarget() {
+        String result = "$(TARGET_BIN)/" + getTargetPrefix() + name;
+        if (getFinalHandler() == JavaHandler.class) {
+            return result.replace("$(TARGET_BIN)", "$(TARGET_JAVA)") + ".jar";
+        }
+        return result;
+    }
+
+    @Override
+    public void initTarget(Makefile makefile) {
+        if (getFinalHandler() == JavaHandler.class) {
+            if (startScripts.size() == 0 && params.containsKey("main-class")) {
+                startScripts.add(new StartScript(getTargetFilename().replaceAll("[.]jar$", ""), null));
+            }
+        }
+        super.initTarget(makefile);
     }
 }

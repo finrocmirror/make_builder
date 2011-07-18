@@ -25,7 +25,11 @@ import java.io.File;
 
 import makebuilder.BuildEntity;
 import makebuilder.Makefile;
+import makebuilder.SourceFileHandler;
+import makebuilder.SrcFile;
 import makebuilder.StartScript;
+import makebuilder.handler.CppHandler;
+import makebuilder.handler.JavaHandler;
 
 /**
  * @author max
@@ -36,6 +40,27 @@ import makebuilder.StartScript;
 public abstract class FinrocBuildEntity extends BuildEntity {
 
     protected Makefile.Target startScriptTarget;
+
+    private Class <? extends SourceFileHandler > finalHandler;
+
+    @Override
+    public Class <? extends SourceFileHandler > getFinalHandler() {
+        if (finalHandler == null) {
+            for (SrcFile sf : sources) {
+                if (sf.hasExtension("java")) {
+                    finalHandler = JavaHandler.class;
+                    break;
+                } else if (sf.hasExtension("c", "cpp", "h", "hpp")) {
+                    finalHandler = CppHandler.class;
+                    break;
+                }
+            }
+        }
+        if (finalHandler == null) {
+            System.out.println("warning: cannot determine final handler for target " + toString());
+        }
+        return finalHandler;
+    }
 
     @Override
     public void initTarget(Makefile makefile) {
