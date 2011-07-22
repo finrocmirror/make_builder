@@ -115,6 +115,10 @@ if ($init_complete) {
     if ($head eq "rrlib") {
 	print STDOUT "#include \"".$input_file_name."\"\n\n" if defined $include_file_name;
     }
+    elsif ($head eq "sources") {
+        my ($cpp, $include_file_name2) = split ("/", $include_file_name, 2); # cut off remaining "cpp" of "sources/cpp" when using with finroc
+	print STDOUT "#include \"".$include_file_name2."\"\n\n" if defined $include_file_name2;
+    }
     else {
 	print STDOUT "#include \"".$include_file_name."\"\n\n" if defined $include_file_name;
     }
