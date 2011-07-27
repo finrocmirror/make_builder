@@ -7,6 +7,17 @@ if [ -d $MCAHOME/libraries/physics_simulation_physx ]
     find -L $MCAHOME/libraries/physics_simulation_physx -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 fi
 
+find -L /home/daniel/AMD-APP-SDK-v2.4-lnx32/include/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)' 
+find -L /home/daniel/AMD-APP-SDK-v2.4-lnx32/lib/x86/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)' 
+find -L /home/daniel/AMD-APP-SDK-v2.4-lnx32/TempSDKUtil/lib/x86/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)' 
+
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/common/inc/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/common/lib/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/shared/inc/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/shared/lib/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/shared/obj/i386/release/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/OpenCL/common/inc/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /home/d_smith/NVIDIA_GPU_Computing_SDK/OpenCL/common/lib/ -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 
 set +o verbose #echo off
 
