@@ -21,6 +21,7 @@ find -L /usr/share/java -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/share/jogl -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/share/gluegen -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/share/xstream -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /usr/share/xpp3 -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 
 set +o verbose #echo off
 
