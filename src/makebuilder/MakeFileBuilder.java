@@ -173,6 +173,16 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         // find local dependencies in "external libraries"
         LibDB.findLocalDependencies(buildEntities);
 
+        // Check for duplicate targets
+        for (BuildEntity be : buildEntities) {
+        	for (BuildEntity be2 : buildEntities) {
+        		if (be != be2 && be.getTarget().equals(be2.getTarget())) {
+        			System.out.println(Util.color("Two build entities with same target: " + be.getTarget() + "  (from " + be.buildFile.toString() + " and " + be2.buildFile.toString() + ")", Util.Color.RED, true));
+        			System.exit(1);
+        		}
+        	}
+        }
+        
         // process dependencies
         System.out.println("Processing dependencies...");
         for (BuildEntity be : buildEntities) {
