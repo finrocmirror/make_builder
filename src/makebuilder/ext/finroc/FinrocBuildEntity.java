@@ -22,6 +22,7 @@
 package makebuilder.ext.finroc;
 
 import java.io.File;
+import java.util.List;
 
 import makebuilder.BuildEntity;
 import makebuilder.Makefile;
@@ -30,6 +31,7 @@ import makebuilder.SrcFile;
 import makebuilder.StartScript;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.JavaHandler;
+import makebuilder.util.Files;
 
 /**
  * @author max
@@ -104,4 +106,23 @@ public abstract class FinrocBuildEntity extends BuildEntity {
             }
         }
     }
+
+    @Override
+    protected String getHintForMissingDependency(SrcFile sf) {
+        String miss = sf.getMissingDependency();
+        try {
+            Process p = Runtime.getRuntime().exec("finroc_search -f " + miss);
+            p.waitFor();
+            List<String> lines = Files.readLines(p.getInputStream());
+            if (lines.size() > 0) {
+                return lines.get(0).split(" ")[0] + " repository";
+            } else {
+                return "file is not known";
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+
 }

@@ -276,8 +276,9 @@ public abstract class BuildEntity {
             missingDep = true;
             String miss = sf.getMissingDependency();
             String msg = miss + " in " + sf.relative;
-            if (miss.contains("/")) {
-                msg += " (possibly " + miss.substring(0, miss.indexOf("/")) + " repository)";
+            String hint = getHintForMissingDependency(sf);
+            if (hint != null) {
+                msg += " (" + hint + ")";
             }
             builder.printCannotBuildError(this, " due to missing dependency " + msg, Color.RED);
             return;
@@ -291,6 +292,16 @@ public abstract class BuildEntity {
         }
         checkForDependencies2(sf, builder, true, sf.optionalDependencies);
         sf.processing = false;
+    }
+
+    /**
+     * If dependency is missing, provide hint for user
+     *
+     * @param sf Missing dependency
+     * @return Hint (as string - will be put in brackets) - null if there's no hint
+     */
+    protected String getHintForMissingDependency(SrcFile sf) {
+        return null;
     }
 
     /**
