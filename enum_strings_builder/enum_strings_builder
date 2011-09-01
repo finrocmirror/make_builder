@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+#----------------------------------------------------------------------
+# \file    enum_strings_builder
+#
+# \author  Max Reichardt
+#
+# \date    2011-08-24
+#
+# Script to auto-generate port names for finroc modules in the build process.
+# It operates on doxygen perlmod output.
+#
+# It creates a .cpp file with port names for all modules and groups that contain ports.
+#----------------------------------------------------------------------
+
+use strict;
+use DoxyDocs;
+
+my $classes = $::doxydocs->{classes};
+my $files = $::doxydocs->{files};
+my $namespaces = $::doxydocs->{namespaces};
+my $enum_count = 0;
+
+# generate header comment
+printf "/*\n * This file was automatically generated from the source file%s", scalar @$files > 1 ? "s" : "";
+printf "\n * %s", join "\n * ", (map { $_->{'name'} } @$files);
+print "\n * using enum_strings_builder.";
+print "\n * This code is released under the same license as the source files.\n */\n\n";
+
+# namespace
+print "namespace make_builder\n{\nnamespace generated\n{\n\n";
+
+# Gets common prefix of enum constants
+sub GetCommonEnumPrefix(@) {
+    my @parts_list = ();
+    my $result = "";
+    foreach my $name (@_) {
+        my @temp = split('_', $name);
+        push @parts_list, \@temp;
+    }
+    for my $i (0..1000) {
+        my $first_parts = $parts_list[0];
+        my $part = @$first_parts[$i];
+        foreach my $parts (@parts_list) {
+            if (@$parts <= $i || !(@$parts[$i] eq $part)) {
+                return $result;
+            }
+        }
+        $result = $result . $part . "_";
+    }
+    return $result;
+}
+
+# Performs 'natural' formatting (code from original description_builder)
+sub FormatEnum {
+    my $enum_value = shift;
+    my @words = split ("_", $enum_value);
+    @words = map lc, @words;
+    @words = map ucfirst, @words;
+    $enum_value = join (" ", @words);
+    return $enum_value;
+}
+
+# Takes namespace (&class) name, enum name and 'values' array and writes code to C++ file
+sub ProcessEnum {
+    my $namespace_name = shift;
+    my $enum_name = shift;
+    my $values = shift;
+
+    if ((!defined($values)) or @$values <= 1 or substr($enum_name, 0, 1) eq "@") {
+        return;
+    }
+
+    $enum_count++;
+    my $const = "strings" . $enum_count;
+    print "const char* " . $const . "[] = {\n";
+
+    my @names = ();
+    foreach my $value (@$values) {
+        push @names, $value->{name};
+    }
+    my $common_prefix = GetCommonEnumPrefix(@names);
+    foreach my $name (@names) {
+        my $s = substr($name, length($common_prefix));
+        if ($s eq "DIMENSION" && $name eq $names[-1]) { 
+            next;
+        }
+        $s = FormatEnum($s);
+        print "  \"$s\",\n";
+    }
+    print "  NULL\n};\n";
+    print "tRegisterEnumStrings init_strings$enum_count(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
+    print "\n";
+}
+
+# generate code for outer-class enum strings
+foreach my $namespace (@$namespaces) {
+    my $namespace_name = $namespace->{name};
+    my $enums = $namespace->{enums}->{members};
+    foreach my $enum (@$enums) {
+        my $enum_name = $enum->{name};
+        my $values = $enum->{values};
+        ProcessEnum($namespace_name, $enum_name, $values);
+    }
+}
+
+# generate code for enums defined in classes
+foreach my $class (@$classes) {
+    my $members = $class->{public_typedefs}->{members};
+    my $class_name = $class->{name};
+    foreach my $member (@$members) {
+        my $kind = $member->{kind};
+        my $name = $member->{name};
+        if (!($kind eq "enum") or (length($name) <= 0)) {
+            next;
+        }
+        my $values = $member->{values};
+        ProcessEnum($class_name, $name, $values);
+    }
+}
+
+print "}\n}\n";
+

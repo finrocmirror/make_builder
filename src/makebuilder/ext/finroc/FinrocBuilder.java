@@ -43,6 +43,7 @@ import makebuilder.ext.mca.MCASystemLibLoader;
 import makebuilder.ext.mca.SConscriptParser;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.CppMerger;
+import makebuilder.handler.EnumStringsBuilderHandler;
 import makebuilder.handler.JavaHandler;
 import makebuilder.handler.MakeXMLLoader;
 import makebuilder.handler.NvccHandler;
@@ -127,6 +128,10 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
         if (BUILDING_FINROC) {
+            globalDefine.add("_LIB_ENUM_STRINGS_PRESENT_");
+            addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
+        }
+        if (BUILDING_FINROC) {
             addHandler(new PortDescriptionBuilderHandler());
         }
         if (getOptions().combineCppFiles) {
@@ -143,7 +148,7 @@ public class FinrocBuilder extends MakeFileBuilder {
                 sysLinkPath = " -L" + sysLinkPath;
             }
         }
-        addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h",
+        addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h -include make_builder/enum_strings_builder/enum_strings.h",
                                   "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2,
                                   !opts.combineCppFiles));
         addHandler(new JavaHandler());
