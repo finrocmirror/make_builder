@@ -128,7 +128,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
         if (BUILDING_FINROC) {
-            globalDefine.add("_LIB_ENUM_STRINGS_PRESENT_");
+            globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
             addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
         }
         if (BUILDING_FINROC) {
