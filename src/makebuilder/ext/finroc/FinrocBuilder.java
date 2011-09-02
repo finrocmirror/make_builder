@@ -127,8 +127,10 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new Qt4Handler());
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
+        String cflags = "-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h";
         if (BUILDING_FINROC) {
             globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
+            cflags += " -include make_builder/enum_strings_builder/enum_strings.h";
             addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
         }
         if (BUILDING_FINROC) {
@@ -148,9 +150,7 @@ public class FinrocBuilder extends MakeFileBuilder {
                 sysLinkPath = " -L" + sysLinkPath;
             }
         }
-        addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h -include make_builder/enum_strings_builder/enum_strings.h",
-                                  "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2,
-                                  !opts.combineCppFiles));
+        addHandler(new CppHandler(cflags, "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2, !opts.combineCppFiles));
         addHandler(new JavaHandler());
         addHandler(new CakeHandler());
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
