@@ -49,6 +49,9 @@ sub GetCommonEnumPrefix(@) {
     my @parts_list = ();
     my $result = "";
     foreach my $name (@_) {
+        if ($name =~ /^e\u.*/) { # cut off leading e in any case
+            $name = substr($name, 1); 
+        }
         my @temp = split('_', $name);
         push @parts_list, \@temp;
     }
