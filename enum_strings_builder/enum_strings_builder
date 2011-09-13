@@ -33,7 +33,6 @@ use DoxyDocs;
 my $classes = $::doxydocs->{classes};
 my $files = $::doxydocs->{files};
 my $namespaces = $::doxydocs->{namespaces};
-my $enum_count = 0;
 
 # generate header comment
 printf "/*\n * This file was automatically generated from the source file%s", scalar @$files > 1 ? "s" : "";
@@ -88,8 +87,9 @@ sub ProcessEnum {
         return;
     }
 
-    $enum_count++;
-    my $const = "strings" . $enum_count;
+    my $postfix = lc($namespace_name . "::" . $enum_name);
+    $postfix =~ s/::/_/g;
+    my $const = "strings_" . $postfix;
     print "const char* " . $const . "[] = {\n";
 
     my @names = ();
@@ -106,7 +106,7 @@ sub ProcessEnum {
         print "  \"$s\",\n";
     }
     print "  NULL\n};\n";
-    print "tRegisterEnumStrings init_strings$enum_count(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
+    print "tRegisterEnumStrings init_strings_$postfix(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
     print "\n";
 }
 
