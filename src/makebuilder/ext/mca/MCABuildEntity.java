@@ -28,6 +28,7 @@ import makebuilder.BuildEntity;
 import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
+import makebuilder.ext.finroc.FinrocBuildEntity;
 import makebuilder.handler.CppHandler;
 import makebuilder.util.Files;
 
@@ -71,7 +72,7 @@ public abstract class MCABuildEntity extends BuildEntity {
     protected String getHintForMissingDependency(SrcFile sf) {
       String miss = sf.getMissingDependency();
       try {
-          Process p = Runtime.getRuntime().exec("mca_search -f " + miss);
+          Process p = Runtime.getRuntime().exec(FinrocBuildEntity.SEARCH_BIN + " -f " + miss);
           p.waitFor();
           List<String> lines = Files.readLines(p.getInputStream());
           if (lines.size() > 0) {

@@ -44,6 +44,8 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     protected Makefile.Target startScriptTarget;
 
     private Class <? extends SourceFileHandler > finalHandler;
+    
+    public static final String SEARCH_BIN = FinrocBuilder.BUILDING_FINROC ? "finroc_search" : "mca_search";
 
     @Override
     public Class <? extends SourceFileHandler > getFinalHandler() {
@@ -111,7 +113,7 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     protected String getHintForMissingDependency(SrcFile sf) {
         String miss = sf.getMissingDependency();
         try {
-            Process p = Runtime.getRuntime().exec("finroc_search -f " + miss);
+            Process p = Runtime.getRuntime().exec(SEARCH_BIN + " -f " + miss);
             p.waitFor();
             List<String> lines = Files.readLines(p.getInputStream());
             if (lines.size() > 0) {
