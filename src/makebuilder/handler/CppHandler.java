@@ -44,7 +44,7 @@ import makebuilder.util.ToStringComparator;
 public class CppHandler implements SourceFileHandler {
 
     /** Standard compile and linke options (included in every compile/link) */
-    private final String compileOptions, linkOptions;
+    private final String cCompileOptions, cxxCompileOptions, linkOptions;
 
     /** Do compiling and linking separately (or rather in one gcc call)? */
     private final boolean separateCompileAndLink;
@@ -59,12 +59,26 @@ public class CppHandler implements SourceFileHandler {
     private final boolean debug = MakeFileBuilder.getOptions().containsKey("debug_cpp_handler");
 
     /**
-     * @param compileOptions Standard compile options (included in every compile)
+     * @param compileOptions Standard compile options (included in every compile; C and C++)
      * @param linkOptions Standard linker options (in every link)
      * @param separateCompileAndLink Do compiling and linking separately (or rather in one gcc call)?
      */
     public CppHandler(String compileOptions, String linkOptions, boolean separateCompileAndLink) {
-        this.compileOptions = compileOptions;
+        this.cCompileOptions = compileOptions;
+        this.cxxCompileOptions = compileOptions;
+        this.linkOptions = linkOptions;
+        this.separateCompileAndLink = separateCompileAndLink;
+    }
+    
+    /**
+     * @param cCompileOptions Standard compile options (included in every compile of C file)
+     * @param cxxCompileOptions Standard compile options (included in every compile of C++ file)
+     * @param linkOptions Standard linker options (in every link)
+     * @param separateCompileAndLink Do compiling and linking separately (or rather in one gcc call)?
+     */
+    public CppHandler(String cCompileOptions, String cxxCompileOptions, String linkOptions, boolean separateCompileAndLink) {
+        this.cCompileOptions = cCompileOptions;
+        this.cxxCompileOptions = cxxCompileOptions;
         this.linkOptions = linkOptions;
         this.separateCompileAndLink = separateCompileAndLink;
     }
@@ -76,10 +90,10 @@ public class CppHandler implements SourceFileHandler {
         makefile.addVariable("GCC_VERSION=");
         makefile.addVariable("CC=gcc$(GCC_VERSION)");
         makefile.addVariable("CCFLAGS=$(CFLAGS)");
-        makefile.addVariable("CC_OPTS=$(CCFLAGS) " + compileOptions);
+        makefile.addVariable("CC_OPTS=$(CCFLAGS) " + cCompileOptions);
         makefile.addVariable("CXX=g++$(GCC_VERSION)");
         makefile.addVariable("CXXFLAGS=$(CFLAGS)");
-        makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + compileOptions);
+        makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + cxxCompileOptions);
         makefile.addVariable("LINK_OPTS=$(LDFLAGS) " + linkOptions);
     }
 
