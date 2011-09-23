@@ -161,7 +161,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             inputFiles = '"' + inputFiles.trim() + '"';
             String outputDir = builder.getTempBuildDir(be) + "/" + be.getTargetFilename() + "_enum_strings";
             target.target.addCommand("mkdir -p " + outputDir, false);
-            target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen etc/port_descriptions_doxygen.conf", false);
+            target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen make_builder/enum_strings_builder/doxygen.conf", false);
             target.target.addCommand("perl -I" + outputDir + "/perlmod " + DESCRIPTION_BUILDER_BIN + " > " + target.target.getName(), false);
         }
     }
