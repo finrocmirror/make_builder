@@ -128,12 +128,10 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
         String cflags = "-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h";
-        String cxxflags = cflags;
-        if (BUILDING_FINROC) {
-            globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
-            cxxflags += " -include make_builder/enum_strings_builder/enum_strings.h";
-            addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
-        }
+        String cxxflags = cflags + " -include make_builder/enum_strings_builder/enum_strings.h";
+        globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
+        addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
+        
         if (BUILDING_FINROC) {
             addHandler(new PortDescriptionBuilderHandler());
         }
