@@ -33,6 +33,7 @@
 
 #include <map>
 #include <cxxabi.h>
+#include <cstdlib>
 
 namespace make_builder
 {
