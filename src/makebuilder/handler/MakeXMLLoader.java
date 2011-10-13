@@ -158,10 +158,10 @@ public class MakeXMLLoader implements BuildFileLoader {
 
                 // Source files are a little more complicated
                 for (String s : asStringList(params.get("sources"))) {
-                    be.sources.addAll(new FileSet(be, file.dir, s, scanner).files);
+                    be.sources.addAll(new FileSet(be, file.dir, s, scanner, true).files);
                 }
                 for (String s : asStringList(params.get("exclude"))) {
-                    be.sources.removeAll(new FileSet(be, file.dir, s, scanner).files);
+                    be.sources.removeAll(new FileSet(be, file.dir, s, scanner, false).files);
                 }
             }
         }
@@ -210,8 +210,9 @@ public class MakeXMLLoader implements BuildFileLoader {
          * @param be BuildEntity files will be added to
          * @param dir Directory to search in
          * @param pattern Pattern (* means anything except of / - ** means anything - similar as in Apache Ant)
+         * @param critical Is it critical for build entity if no files matching pattern exist? 
          */
-        private FileSet(BuildEntity be, SrcDir dir, String pattern, SourceScanner sources) {
+        private FileSet(BuildEntity be, SrcDir dir, String pattern, SourceScanner sources, boolean critical) {
 
             // no-wildcard optimization
             if (!pattern.contains("*")) {
@@ -238,7 +239,7 @@ public class MakeXMLLoader implements BuildFileLoader {
                 }
             }
 
-            if (files.isEmpty()) {
+            if (files.isEmpty() && critical) {
                 be.missingDep = true;
                 sources.builder.printCannotBuildError(be, ": Pattern '" + pattern + "': no files found", Util.Color.RED);
             }
