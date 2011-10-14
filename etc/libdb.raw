@@ -100,7 +100,7 @@ sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
 soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4
 soqt:       -I<Inventor/Qt/SoQt.h> -include Qt/qglobal.h -lSoQt
-sopas:      -I/usr/local/sopas/include -ISopasBasicTypes.h -L/usr/local/sopas/lib -lsopas_communication -lsopas_lms100 -lsopas_framer
+sopas:      -I<SopasBasicTypes.h> -lsopas_communication -lsopas_lms100 -lsopas_framer
 speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 usb:        -I<libusb.h> -lusb
