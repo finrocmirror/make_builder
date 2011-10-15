@@ -71,6 +71,7 @@ opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> 
 opencl: -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
 opencl:  -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
+openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
@@ -97,6 +98,7 @@ quarter:    -I<Quarter/Quarter.h> -lQuarter
 qwt:        -lqwt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt-qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
+rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
 soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4

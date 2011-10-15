@@ -246,11 +246,11 @@ public class CppHandler implements SourceFileHandler {
         for (SrcDir path : be.getRootDir().defaultIncludePaths) {
             options.includePaths.add(path.relative);
         }
-        for (SrcFile sf : be.sources) { // add directories of all source files - not especially nice - but required for some MCA2 libraries
+        /*for (SrcFile sf : be.sources) { // add directories of all source files - not especially nice - but required for some MCA2 libraries
             if (sf.hasExtension("c", "cpp") && (!sf.dir.isTempDir())) {
                 options.includePaths.add(sf.dir.relative);
             }
-        }
+        }*/
 
         if (separateCompileAndLink) {
             ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
