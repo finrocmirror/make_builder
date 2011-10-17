@@ -96,12 +96,12 @@ sub ProcessEnum {
     foreach my $value (@$values) {
         push @names, $value->{name};
     }
+    if ($names[-1] =~ /_DIMENSION$/) { # remove any last _DIMENSION element
+        pop(@names);
+    }
     my $common_prefix = GetCommonEnumPrefix(@names);
     foreach my $name (@names) {
         my $s = substr($name, length($common_prefix));
-        if ($s eq "DIMENSION" && $name eq $names[-1]) { 
-            next;
-        }
         $s = FormatEnum($s);
         print "  \"$s\",\n";
     }
