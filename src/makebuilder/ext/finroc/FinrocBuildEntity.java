@@ -44,7 +44,7 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     protected Makefile.Target startScriptTarget;
 
     private Class <? extends SourceFileHandler > finalHandler;
-    
+
     public static final String SEARCH_BIN = FinrocBuilder.BUILDING_FINROC ? "finroc_search" : "mca_search";
 
     @Override
@@ -91,6 +91,10 @@ public abstract class FinrocBuildEntity extends BuildEntity {
         String targetFile = getTarget();
         targetFile = targetFile.substring(targetFile.lastIndexOf(File.separator) + 1);
         addToPhony(targetFile + ((isLibrary() || targetFile.endsWith(".jar")) ? "" : "-bin"));
+
+        if (getFinalHandler() == JavaHandler.class) {
+            target.addDependency("$(TARGET_DIR)/share/java");
+        }
     }
 
     /**

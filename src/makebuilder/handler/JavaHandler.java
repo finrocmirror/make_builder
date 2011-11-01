@@ -31,7 +31,6 @@ import makebuilder.BuildEntity;
 import makebuilder.SourceFileHandler;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
-import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.libdb.LibDB;
@@ -42,58 +41,9 @@ import makebuilder.util.Files;
  *
  * Responsible for building executables and libraries from Java source files
  */
-public class JavaHandler implements SourceFileHandler {
-
-//  /** Standard compile and linke options (included in every compile/link) */
-//  private final String compileOptions, linkOptions;
-//
-//  /** Do compiling and linking separately (or rather in one gcc call)? */
-//  private final boolean separateCompileAndLink;
-//
-//  /** Dependency buffer */
-//  private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
-//
-//
-//  /** Jar files that we found in source tree */
-//  private final List<String> jars = new ArrayList<String>();
-//
-//
-//  /**
-//   * @param compileOptions Standard compile options (included in every compile)
-//   * @param linkOptions Standard linker options (in every link)
-//   * @param separateCompileAndLink Do compiling and linking separately (or rather in one gcc call)?
-//   */
-//  public JavaHandler(String compileOptions, String linkOptions, boolean separateCompileAndLink) {
-//      this.compileOptions = compileOptions;
-//      this.linkOptions = linkOptions;
-//      this.separateCompileAndLink = separateCompileAndLink;
-//  }
+public class JavaHandler extends SourceFileHandler.Impl {
 
     private static final Pattern packagePattern = Pattern.compile("\\s*package\\s+(.*)\\s*;");
-
-    @Override
-    public void init(Makefile makefile) {
-//      // add variables to makefile
-//      makefile.addVariable("CFLAGS=-g2");
-//      makefile.addVariable("GCC_VERSION=");
-//      makefile.addVariable("CC=gcc$(GCC_VERSION)");
-//      makefile.addVariable("CCFLAGS=$(CFLAGS)");
-//      makefile.addVariable("CC_OPTS=$(CCFLAGS) " + compileOptions);
-//      makefile.addVariable("CXX=g++$(GCC_VERSION)");
-//      makefile.addVariable("CXXFLAGS=$(CFLAGS)");
-//      makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + compileOptions);
-//      makefile.addVariable("LINK_OPTS=$(LDFLAGS) " + linkOptions);
-    }
-
-    @Override
-    public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner sources, MakeFileBuilder builder) {
-//      if (file.hasExtension("jar")) {
-//          if (!file.isInfoUpToDate()) {
-//              processIncludes(file, sources);
-//          }
-//          file.resolveDependencies(true);
-//      }
-    }
 
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {

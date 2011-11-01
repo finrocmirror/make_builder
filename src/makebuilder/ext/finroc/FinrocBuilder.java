@@ -47,6 +47,7 @@ import makebuilder.handler.EnumStringsBuilderHandler;
 import makebuilder.handler.JavaHandler;
 import makebuilder.handler.MakeXMLLoader;
 import makebuilder.handler.NvccHandler;
+import makebuilder.handler.PkgConfigFileHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.util.CodeBlock;
@@ -131,7 +132,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         String cxxflags = cflags + " -include make_builder/enum_strings_builder/enum_strings.h";
         globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
         addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
-        
+
         if (BUILDING_FINROC) {
             addHandler(new PortDescriptionBuilderHandler());
         }
@@ -149,6 +150,21 @@ public class FinrocBuilder extends MakeFileBuilder {
                 sysLinkPath = " -L" + sysLinkPath;
             }
         }
+
+        // generate system installation?
+        if (getOptions().containsKey("systeminstall")) {
+            makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
+            makefile.addVariable("TARGET_PKGINFO:=$(TARGET_DIR)/lib/pkgconfig");
+            makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
+            makefile.addVariable("TARGET_ETC:=$(TARGET_DIR)/etc");
+            addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
+            addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
+            addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
+            addHandler(new EtcDirCopier("$(TARGET_ETC)"));
+            Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools", "test");
+            t.addCommand("echo success > $(TARGET_DIR)/success", true);
+        }
+
         addHandler(new CppHandler(cflags, cxxflags, "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2, !opts.combineCppFiles));
         addHandler(new JavaHandler());
         addHandler(new CakeHandler());
@@ -160,18 +176,6 @@ public class FinrocBuilder extends MakeFileBuilder {
             addHandler(systemInstall);
         }
 
-        // generate library info files?
-        if (getOptions().containsKey("systeminstall")) {
-            makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
-            makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
-            makefile.addVariable("TARGET_ETC:=$(TARGET_DIR)/etc");
-            addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
-            addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
-            addHandler(new EtcDirCopier("$(TARGET_ETC)"));
-            Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools", "test");
-            t.addCommand("echo success > $(TARGET_DIR)/success", true);
-        }
-
         // Calculate dependencies option?
         if (getOptions().calculateDependencies) {
             addHandler((dependencyHandler = new DependencyHandler()));
@@ -181,6 +185,10 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (makefile.getPhonyTarget("tools") == null) {
             makefile.addPhonyTarget("tools");
         }
+
+        // generate $(TARGET_DIR)/share/java symbolic link
+        Makefile.Target shareJava = makefile.addTarget("$(TARGET_DIR)/share/java", false, null);
+        shareJava.addCommand("ln -s ../../../$(TARGET_JAVA) $(TARGET_DIR)/share/java", true);
     }
 
     @Override

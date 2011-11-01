@@ -45,9 +45,9 @@ public abstract class BuildEntity {
 
     /** File separator short cut */
     protected static final String FS = File.separator;
-    
+
     /** Are we linking with --as-needed flag? */
-    protected static final boolean LINKING_AS_NEEDED = true;
+    public static final boolean LINKING_AS_NEEDED = true;
 
     /** name of entity to be built */
     public String name;
@@ -194,13 +194,13 @@ public abstract class BuildEntity {
             target.addDependency(s);
             s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
             opts.libs.add(s);
-            
+
             if (LINKING_AS_NEEDED) {
                 addIndirectDependencyLibs(be);
             }
         }
     }
-    
+
     public void addIndirectDependencyLibs(BuildEntity be) {
         for (BuildEntity be2 : be.dependencies) {
             String s = be.getTarget();
