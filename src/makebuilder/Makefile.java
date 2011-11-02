@@ -228,11 +228,24 @@ public class Makefile {
      * @return Created Target object
      */
     public Target addTarget(String name, boolean secondary, Object srcRootDir) {
+        return addTarget(name, secondary, srcRootDir, true);
+    }
+
+    /**
+     * Add target with specified name
+     *
+     * @param target Target name
+     * @param secondary Secondary Target (intermediate file - doesn't matter if it is deleted; see GNU documentation for details ".SECONDARY")
+     * @param srcRootDir directory containing relevant source files (used for .phony target; must be in the same repository!)
+     * @param includeInAllTarget Include this target in 'all' phony target (usually true)
+     * @return Created Target object
+     */
+    public Target addTarget(String name, boolean secondary, Object srcRootDir, boolean includeInAllTarget) {
         Target t = new Target(name, srcRootDir == null ? null : srcRootDir.toString());
         targets.add(t);
         if (secondary) {
             t.addToPhony(".SECONDARY");
-        } else {
+        } else if (includeInAllTarget) {
             all.addDependency(name);
         }
         return t;
