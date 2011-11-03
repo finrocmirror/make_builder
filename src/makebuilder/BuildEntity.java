@@ -47,7 +47,7 @@ public abstract class BuildEntity {
     protected static final String FS = File.separator;
 
     /** Are we linking with --as-needed flag? */
-    public static final boolean LINKING_AS_NEEDED = true;
+    public static boolean LINKING_AS_NEEDED = true;
 
     /** name of entity to be built */
     public String name;

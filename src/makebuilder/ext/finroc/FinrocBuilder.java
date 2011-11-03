@@ -150,15 +150,17 @@ public class FinrocBuilder extends MakeFileBuilder {
                 sysLinkPath = " -L" + sysLinkPath;
             }
         }
+        
+        // generate pkg-config files
+        makefile.addVariable("TARGET_PKGINFO:=export/pkgconfig");
+        addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
 
         // generate system installation?
         if (getOptions().containsKey("systeminstall")) {
             makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
-            makefile.addVariable("TARGET_PKGINFO:=$(TARGET_DIR)/lib/pkgconfig");
             makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
             makefile.addVariable("TARGET_ETC:=$(TARGET_DIR)/etc");
             addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
-            addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
             addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
             addHandler(new EtcDirCopier("$(TARGET_ETC)"));
             Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools", "test");

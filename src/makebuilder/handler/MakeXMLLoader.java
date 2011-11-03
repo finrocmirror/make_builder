@@ -155,6 +155,10 @@ public class MakeXMLLoader implements BuildFileLoader {
                 be.opts.addOptions(params.get("cflags"), be.opts.cCompileOptions);
                 be.opts.addOptions(params.get("ldflags"), be.opts.linkOptions);
                 be.params = params;
+                if (params.get("uses-broken-proprietary-libraries-and-requires-old-style-linking") != null) {
+                    System.err.println("Target " + be.name + " uses broken proprietary libraries and requires old-style linking. Note, that compilation will fail on newer operating systems with linking 'as-needed' set by default (e.g. Ubuntu >= 11.10).");
+                    BuildEntity.LINKING_AS_NEEDED = false;
+                }
 
                 // Source files are a little more complicated
                 for (String s : asStringList(params.get("sources"))) {

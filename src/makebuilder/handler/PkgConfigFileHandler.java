@@ -22,15 +22,12 @@
 package makebuilder.handler;
 
 import java.io.File;
-import java.util.Set;
-import java.util.TreeSet;
 
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
-import makebuilder.util.ToStringComparator;
 
 /**
  * @author max
@@ -65,15 +62,6 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
         beTarget = beTarget.substring(0, beTarget.length() - 3);
 
         final String pcFile = outputDir + File.separator + beTarget.substring(3) + ".pc";
-        Makefile.Target t = makefile.addTarget(pcFile, false, be.getRootDir());
-        be.target.addOrderOnlyDependency(pcFile);
-
-        // add all build files as dependencies - and collect all external libraries
-        Set<SrcFile> buildFiles = new TreeSet<SrcFile>(ToStringComparator.instance);
-        collectBuildFilesAndExtLibs(be, buildFiles);
-        for (SrcFile sf : buildFiles) {
-            t.addDependency(sf.relative);
-        }
 
         // C++ target?
         boolean cxx = false;
@@ -82,34 +70,46 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
                 cxx = true;
             }
         }
+        
+        // find all header files belonging to target
+        StringBuilder sb = new StringBuilder();
+        for (SrcFile sf : builder.getSources().getAllFiles()) {
+            if (sf.getOwner() == be && (sf.relative.endsWith(".h") || sf.relative.endsWith(".hpp"))) {
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                String s = sf.relative;
+                if (s.startsWith("sources/cpp/")) {
+                    s = s.substring("sources/cpp/".length());
+                }
+                sb.append(s);
+            }
+        }
 
         String cflags = be.opts.createOptionString(true, false, cxx).replaceAll(" -fPIC", "");
         String ldflags = be.opts.createOptionString(false, true, cxx).replaceAll("-shared ", "");
 
         // create .pc file
-        t.addCommand("echo 'prefix=" + systemInstallationRoot + "' >> " + pcFile, false);
-        t.addCommand("echo 'exec_prefix=$${prefix}' >> " + pcFile, false);
-        t.addCommand("echo 'libdir=$${exec_prefix}/lib' >> " + pcFile, false);
-        t.addCommand("echo 'includedir=$${prefix}/include' >> " + pcFile, false);
-        t.addCommand("echo '' >> " + pcFile, false);
-        t.addCommand("echo 'Name: " + beTarget + "' >> " + pcFile, false);
-        t.addCommand("echo 'Description: " + beTarget + "' >> " + pcFile, false);
-        t.addCommand("echo 'Version: 1.0' >> " + pcFile, false);
-        t.addCommand("echo 'Libs: -L$${libdir} -l" + beTarget.substring(3) + " " + ldflags + "' >> " + pcFile, false);
-        t.addCommand("echo 'Cflags: -I$${includedir} " + cflags + "' >> " + pcFile, false);
+        be.target.addCommand("mkdir -p " + outputDir, false);
+        be.target.addCommand("echo 'prefix=" + systemInstallationRoot + "' > " + pcFile, false);
+        be.target.addCommand("echo 'exec_prefix=$${prefix}' >> " + pcFile, false);
+        be.target.addCommand("echo 'libdir=$${exec_prefix}/lib' >> " + pcFile, false);
+        be.target.addCommand("echo 'includedir=$${prefix}/include' >> " + pcFile, false);
+        be.target.addCommand("echo 'headerlist=" + sb.toString() + "' >> " + pcFile, false);
+        be.target.addCommand("echo '' >> " + pcFile, false);
+        be.target.addCommand("echo 'Name: " + beTarget + "' >> " + pcFile, false);
+        be.target.addCommand("echo 'Description: " + beTarget + "' >> " + pcFile, false);
+        be.target.addCommand("echo 'Version: " + getVersionString() + "' >> " + pcFile, false);
+        be.target.addCommand("echo 'Libs: -L$${libdir} -l" + beTarget.substring(3) + " " + ldflags + "' >> " + pcFile, false);
+        be.target.addCommand("echo 'Cflags: -I$${includedir} " + cflags + "' >> " + pcFile, false);
     }
 
     /**
-     * Collect build files of this build entity and all of its dependencies
-     * (recursive function)
-     *
-     * @param be Current build entity
-     * @param buildFiles Set with results
+     * TODO: implement properly
+     * 
+     * @return Version string for .pc file
      */
-    private void collectBuildFilesAndExtLibs(BuildEntity be, Set<SrcFile> buildFiles) {
-        buildFiles.add(be.buildFile);
-        for (BuildEntity be2 : be.dependencies) {
-            collectBuildFilesAndExtLibs(be2, buildFiles);
-        }
+    private String getVersionString() {
+        return "1.0";
     }
 }
