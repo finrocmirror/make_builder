@@ -140,6 +140,8 @@ public class FinrocBuilder extends MakeFileBuilder {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
         }
+
+        // (OUTDATED)
         String sysLinkPath = "";
         String sysLinkPath2 = "";
         if (getOptions().containsKey("usesysteminstall")) {
@@ -150,12 +152,15 @@ public class FinrocBuilder extends MakeFileBuilder {
                 sysLinkPath = " -L" + sysLinkPath;
             }
         }
-        
+
         // generate pkg-config files
         makefile.addVariable("TARGET_PKGINFO:=export/pkgconfig");
         addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
 
-        // generate system installation?
+        // look for any system-installed libraries
+        addHandler(new FinrocSystemLibLoader());
+
+        // generate system installation? (OUTDATED)
         if (getOptions().containsKey("systeminstall")) {
             makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
             makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
@@ -173,7 +178,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
 
-        // is MCA installed system-wide?
+        // is MCA installed system-wide? (OUTDATED)
         if (systemInstall != null) {
             addHandler(systemInstall);
         }
@@ -255,6 +260,10 @@ public class FinrocBuilder extends MakeFileBuilder {
                 }
                 dir.defaultIncludePaths.add(sources.findDir(p + s, true));
             }
+        }
+        dir.defaultIncludePaths.add(sources.findDir("/usr/include", true));
+        if (new File("/usr/include/finroc").exists()) {
+            dir.defaultIncludePaths.add(sources.findDir("/usr/include/finroc", true));
         }
 
         if (dir.relative.startsWith(tempBuildPath.relative) && dir.relative.startsWith("/")) {
