@@ -93,7 +93,7 @@ public abstract class FinrocBuildEntity extends BuildEntity {
         addToPhony(targetFile + ((isLibrary() || targetFile.endsWith(".jar")) ? "" : "-bin"));
 
         if (getFinalHandler() == JavaHandler.class) {
-            target.addDependency("$(TARGET_DIR)/share/java");
+            target.addDependency("$(TARGET_DIR)/share/java.created");
         }
     }
 

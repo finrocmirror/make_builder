@@ -189,8 +189,9 @@ public class FinrocBuilder extends MakeFileBuilder {
         }
 
         // generate $(TARGET_DIR)/share/java symbolic link
-        Makefile.Target shareJava = makefile.addTarget("$(TARGET_DIR)/share/java", false, null, false);
+        Makefile.Target shareJava = makefile.addTarget("$(TARGET_DIR)/share/java.created", false, null, false);
         shareJava.addCommand("ln -f -s ../../../$(TARGET_JAVA) $(TARGET_DIR)/share/java", true);
+        shareJava.addCommand("echo done > $(TARGET_DIR)/share/java.created", true);
     }
 
     @Override
