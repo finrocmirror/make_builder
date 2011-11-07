@@ -310,7 +310,7 @@ public class FinrocBuilder extends MakeFileBuilder {
                 } else if (be instanceof MCALibrary) {
                     // _LIB_MCA2_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_MCA2_" + be.name.toUpperCase() + "_PRESENT_");
-                } else if ((be instanceof MCASystemLibLoader.SystemLibrary) && be.getTarget().endsWith(".so")) {
+                } else if (((be instanceof MCASystemLibLoader.SystemLibrary) || (be instanceof FinrocSystemLibLoader.SystemLibrary)) && be.getTarget().endsWith(".so")) {
                     String def = be.getTargetFilename().toUpperCase();
                     def = def.substring(0, def.length() - 3); // cut off ".SO"
                     if (def.startsWith("LIB")) {

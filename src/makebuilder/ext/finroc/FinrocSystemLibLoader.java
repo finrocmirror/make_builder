@@ -81,7 +81,7 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
                     // Get compile options
                     Process p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
                     p.waitFor();
-                    be.opts.addOptions(Files.readLines(p.getInputStream()).get(0));
+                    be.opts.addOptions(Files.readLines(p.getInputStream()).get(0).replace("_PRESENT_ _LIB_", "_PRESENT_ -D _LIB_")); // string replacement because of pkgconfig glitch
 
                     // Get headers belonging to lib
                     List<String> lines = Files.readLines(f);
