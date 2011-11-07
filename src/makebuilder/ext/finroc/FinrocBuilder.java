@@ -320,7 +320,7 @@ public class FinrocBuilder extends MakeFileBuilder {
             }
         }
 
-        if (systemInstall != null && systemInstall.systemInstallExists) {
+        if (FinrocSystemLibLoader.areSystemLibsLoaded() || (systemInstall != null && systemInstall.systemInstallExists)) {
             globalDefine.add("#define _FINROC_SYSTEM_INSTALLATION_PRESENT_");
         }
 

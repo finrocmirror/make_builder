@@ -48,7 +48,17 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
     /** Location of pkgconfig files */
     private static final String PKG_CONFIG_DIR = "/usr/lib/pkgconfig";
 
+    /** Have any system libraries been loaded ? */
+    private static boolean systemLibsLoaded = false;
+
     public FinrocSystemLibLoader() {}
+
+    /**
+     * @return Have any system libraries been loaded ?
+     */
+    public static boolean areSystemLibsLoaded() {
+        return systemLibsLoaded;
+    }
 
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
@@ -109,6 +119,10 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
     public class SystemLibrary extends BuildEntity {
 
         private String targetName;
+
+        public SystemLibrary() {
+            systemLibsLoaded = true;
+        }
 
         public String getTarget() {
             return targetName;
