@@ -23,6 +23,8 @@ package makebuilder.ext.finroc;
 
 import java.io.File;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
@@ -31,6 +33,7 @@ import makebuilder.SourceFileHandler;
 import makebuilder.SourceScanner;
 import makebuilder.SrcFile;
 import makebuilder.util.Files;
+import makebuilder.util.Util;
 
 /**
  * @author max
@@ -50,6 +53,9 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
 
     /** Have any system libraries been loaded ? */
     private static boolean systemLibsLoaded = false;
+
+    /** Have system libs been printed to console ? */
+    private static boolean systemLibsPrinted = false;
 
     public FinrocSystemLibLoader() {}
 
@@ -136,5 +142,31 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         public Class <? extends SourceFileHandler > getFinalHandler() {
             return null;
         }
+
+        @Override
+        public void resolveDependencies(List<BuildEntity> buildEntities, MakeFileBuilder builder) throws Exception {
+            super.resolveDependencies(buildEntities, builder);
+            if (!systemLibsPrinted) {
+                printSystemLibs(builder);
+                systemLibsPrinted = true;
+            }
+        }
+
     }
+
+    public static void printSystemLibs(MakeFileBuilder builder) {
+        SortedSet<String> set = new TreeSet<String>();
+        for (BuildEntity be : builder.buildEntities) {
+            set.add(be.getReferenceName());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String s : set) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(s);
+        }
+        System.out.println(Util.color("Using system libraries: " + sb.toString(), Util.Color.Y, false));
+    }
+
 }

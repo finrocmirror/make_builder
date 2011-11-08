@@ -158,7 +158,9 @@ public class FinrocBuilder extends MakeFileBuilder {
         addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
 
         // look for any system-installed libraries
-        addHandler(new FinrocSystemLibLoader());
+        if (BUILDING_FINROC) {
+            addHandler(new FinrocSystemLibLoader());
+        }
 
         // generate system installation? (OUTDATED)
         if (getOptions().containsKey("systeminstall")) {

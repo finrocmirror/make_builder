@@ -175,14 +175,14 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // Check for duplicate targets
         for (BuildEntity be : buildEntities) {
-        	for (BuildEntity be2 : buildEntities) {
-        		if (be != be2 && be.getTarget().equals(be2.getTarget())) {
-        			System.out.println(Util.color("Two build entities with same target: " + be.getTarget() + "  (from " + be.buildFile.toString() + " and " + be2.buildFile.toString() + ")", Util.Color.RED, true));
-        			System.exit(1);
-        		}
-        	}
+            for (BuildEntity be2 : buildEntities) {
+                if (be != be2 && be.getTarget().equals(be2.getTarget())) {
+                    System.out.println(Util.color("Two build entities with same target: " + be.getTarget() + "  (from " + be.buildFile.toString() + " and " + be2.buildFile.toString() + ")", Util.Color.RED, true));
+                    System.exit(1);
+                }
+            }
         }
-        
+
         // process dependencies
         System.out.println("Processing dependencies...");
         for (BuildEntity be : buildEntities) {
@@ -272,7 +272,9 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      * @param be Build entity to build
      */
     private void build(final BuildEntity be) throws Exception {
-        System.out.println(Util.color("Processing " + be.getReferenceName(), Util.Color.GREEN, false));
+        if (!be.getTargetPath().startsWith("/")) {
+            System.out.println(Util.color("Processing " + be.getReferenceName(), Util.Color.GREEN, false));
+        }
         be.initTarget(makefile);
         be.computeOptions();
 
