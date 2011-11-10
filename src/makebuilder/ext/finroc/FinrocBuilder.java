@@ -73,7 +73,7 @@ public class FinrocBuilder extends MakeFileBuilder {
     /** Source directories to use */
     private final static String[] SOURCE_PATHS = BUILDING_FINROC ?
             new String[] {"sources"} :
-            new String[] {"libraries", "projects", "tools", "rrlib", "make_builder"};
+            new String[] {"libraries", "projects", "tools", "rrlib"};
 
     /** Include paths to use */
     private final static String[] INCLUDE_PATHS = BUILDING_FINROC ?
