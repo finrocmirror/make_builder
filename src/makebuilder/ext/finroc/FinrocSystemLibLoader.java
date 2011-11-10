@@ -157,7 +157,9 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
     public static void printSystemLibs(MakeFileBuilder builder) {
         SortedSet<String> set = new TreeSet<String>();
         for (BuildEntity be : builder.buildEntities) {
-            set.add(be.getReferenceName());
+            if (be instanceof FinrocSystemLibLoader.SystemLibrary) {
+                set.add(be.getReferenceName());
+            }
         }
         StringBuilder sb = new StringBuilder();
         for (String s : set) {
