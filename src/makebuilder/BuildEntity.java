@@ -353,16 +353,7 @@ public abstract class BuildEntity {
      * @param builder MakeFileBuilder instance
      */
     private void resolveDependency(boolean optional, List<BuildEntity> buildEntities, String dep, MakeFileBuilder builder) throws Exception {
-        if (LibDB.available(dep)) { // External library dependency?
-            LibDB.ExtLib xl = LibDB.getLib(dep);
-            directExtlibs.add(xl);
-            for (BuildEntity be : xl.dependencies) {
-                if (!dependencies.contains(be)) {
-                    dependencies.add(be);
-                }
-            }
-            return;
-        }
+        
         for (BuildEntity be : buildEntities) { // local dependency?
             if (be.getReferenceName().equals(dep)) {
                 if (optional) {
@@ -372,6 +363,17 @@ public abstract class BuildEntity {
                 }
                 return;
             }
+        }
+
+        if (LibDB.available(dep)) { // External library dependency?
+            LibDB.ExtLib xl = LibDB.getLib(dep);
+            directExtlibs.add(xl);
+            for (BuildEntity be : xl.dependencies) {
+                if (!dependencies.contains(be)) {
+                    dependencies.add(be);
+                }
+            }
+            return;
         }
 
         // not found...
