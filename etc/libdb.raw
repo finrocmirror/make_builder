@@ -53,6 +53,7 @@ ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
 lxrt:       N/A
+mpfr:	    -lmpfr
 mysqlcppconn: -I<mysql_driver.h> -lmysqlcppconn
 netpbm:     -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
