@@ -139,6 +139,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
         CppDescrTarget target = descrTargets.get(be);
+        getEnumStringsLib(makefile); // make sure we always build enum string lib - also when using system installation
         if (target != null) {
 
             // Add dependency to libenum_strings.so
