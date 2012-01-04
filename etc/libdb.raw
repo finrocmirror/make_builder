@@ -7,7 +7,6 @@ asn:        -I/usr/include/asn1c -lasn1c
 asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:    -I<AX10420.h>
-bdbxml:     -I<dbxml/DbXml.hpp> -I/usr/include/db4.8/ -ldbxml-2.5 -ldb_cxx-4.8 -lxqilla
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
@@ -28,6 +27,9 @@ curses:     -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil
 cutil:      -I<cutil.h> -lcutil_i386
 crypt:      -I<crypt.h> -lcrypt
+db++:       -I<db_cxx.h> -ldb_cxx
+db++:       -I<db4.8/db_cxx.h> -ldb_cxx
+dbxml:      -I<dbxml/DbXml.hpp> -ldbxml
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dl:         -ldl
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
@@ -111,5 +113,4 @@ usb:        -I<libusb.h> -lusb
 v4l1:        -I<libv4l1-videodev.h>
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
-xml++:      -lxml++-1.0 -I<libxml++/libxml++.h>
 z:          -I<zlib.h> -lz 
