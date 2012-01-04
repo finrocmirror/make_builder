@@ -22,6 +22,7 @@
 package makebuilder.ext.finroc;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -74,6 +75,11 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         }
         loaded = true;
 
+        // find all locally installed components
+        Process p = Runtime.getRuntime().exec("finroc_status -c ");
+        p.waitFor();
+        List<String> localComponents = Files.readLines(p.getInputStream());
+
         // find/load all libraries that contain system information
         for (File f : new File(PKG_CONFIG_DIR).listFiles()) {
             if (f.getName().startsWith("rrlib_") || f.getName().startsWith("finroc_") || f.getName().startsWith("mca2_")) {
@@ -85,23 +91,37 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
                 } else if (rawName.startsWith("mca2_")) {
                     includeDir += "/mca2";
                 }
-                boolean exists = false;
-                for (BuildEntity be : builder.buildEntities) {
-                    exists |= be.getTargetFilename().equals(libName);
+
+                List<String> pkglines = Files.readLines(f);
+                String component = null;
+                for (String line : pkglines) {
+                    if (line.startsWith("component=")) {
+                        component = line.substring("component=".length());
+                        break;
+                    }
                 }
+                if (component == null) {
+                    System.err.println("Cannot find component that " + f.getAbsolutePath() + " belongs to. Skipping.");
+                    continue;
+                }
+
+                boolean exists = false;
+                for (String localComponent : localComponents) {
+                    exists |= localComponent.split(" ")[0].equals(component);
+                }
+
                 if (!exists) {
                     SystemLibrary be = new SystemLibrary();
                     be.name = libName;
                     be.buildFile = scanner.registerBuildProduct(f.getAbsolutePath());
 
                     // Get compile options
-                    Process p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
+                    p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
                     p.waitFor();
                     be.opts.addOptions(Files.readLines(p.getInputStream()).get(0).replace("_PRESENT_ _LIB_", "_PRESENT_ -D _LIB_")); // string replacement because of pkgconfig glitch
 
                     // Get headers belonging to lib
-                    List<String> lines = Files.readLines(f);
-                    for (String line : lines) {
+                    for (String line : pkglines) {
                         if (line.startsWith("headerlist=")) {
                             String[] headers = line.substring("headerlist=".length()).split(" ");
                             for (String header : headers) {
