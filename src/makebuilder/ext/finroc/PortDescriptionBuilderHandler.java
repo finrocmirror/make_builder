@@ -73,8 +73,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
         if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g"))) {
 
             BuildEntity be = file.getOwner();
-            if (be == null || !(be instanceof FinrocLibrary || be instanceof FinrocProgram || be instanceof FinrocPlugin)) { // we don't know where generated code belongs
-                //System.out.println("warning: found DESCR macros in " + file.relative + " but don't know which build entity it belongs to => won't process it");
+            if (be == null || !(be instanceof FinrocLibrary || be instanceof FinrocProgram || be instanceof FinrocPlugin || (be instanceof TestProgram && be.getTargetFilename().startsWith("finroc_")))) { // we don't know where generated code belongs
                 return;
             }
 

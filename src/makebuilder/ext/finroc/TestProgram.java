@@ -41,15 +41,15 @@ public class TestProgram extends FinrocBuildEntity {
             rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
         }
         if (rootDir2.startsWith("libraries")) {
-            return "finroc_library_" + getSecondDir(rootDir2) + "_test_";
+            return "finroc_libraries_" + getSecondDir(rootDir2) + "_test_";
         } else if (rootDir2.startsWith("plugins")) {
-            return "finroc_plugin_" + getSecondDir(rootDir2) + "_test_";
+            return "finroc_plugins_" + getSecondDir(rootDir2) + "_test_";
         } else if (rootDir2.startsWith("rrlib")) {
             return "rrlib_" + getSecondDir(rootDir2) + "_test_";
         } else if (rootDir2.startsWith("core")) {
             return "finroc_core_test_";
-        } else if (rootDir2.startsWith("jcore")) {
-            return "finroc_jcore_test_";
+        } else if (rootDir2.startsWith("org")) {
+            return rootDir2.substring(4).replace('/', '_') + "_test_";
         }
         return "";
     }
@@ -57,6 +57,9 @@ public class TestProgram extends FinrocBuildEntity {
     @Override
     public String getTarget() {
         String result = "$(TARGET_BIN)/" + getTargetPrefix() + name;
+        if (name.length() == 0) {
+            result = result.substring(0, result.length() - 1); // cut off any "_" at end
+        }
         if (getFinalHandler() == JavaHandler.class) {
             return result.replace("$(TARGET_BIN)", "$(TARGET_JAVA)") + ".jar";
         }
