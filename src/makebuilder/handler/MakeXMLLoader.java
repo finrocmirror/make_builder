@@ -214,7 +214,7 @@ public class MakeXMLLoader implements BuildFileLoader {
          * @param be BuildEntity files will be added to
          * @param dir Directory to search in
          * @param pattern Pattern (* means anything except of / - ** means anything - similar as in Apache Ant)
-         * @param critical Is it critical for build entity if no files matching pattern exist? 
+         * @param critical Is it critical for build entity if no files matching pattern exist?
          */
         private FileSet(BuildEntity be, SrcDir dir, String pattern, SourceScanner sources, boolean critical) {
 

@@ -157,7 +157,7 @@ public class SConscriptParser implements BuildFileLoader {
                             String s2 = s.substring(s.indexOf("(") + 1, s.lastIndexOf(")"));
                             String[] s3 = s2.split("=");
                             for (int i = 1; i < s3.length; i++) {
-                                String key = s3[i-1].trim();
+                                String key = s3[i - 1].trim();
                                 key = key.substring(key.lastIndexOf(i == 1 ? "(" : ",") + 1).trim();
                                 String[] values = null;
                                 if (s3[i].contains("[")) {

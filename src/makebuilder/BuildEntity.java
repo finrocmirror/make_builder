@@ -353,7 +353,7 @@ public abstract class BuildEntity {
      * @param builder MakeFileBuilder instance
      */
     private void resolveDependency(boolean optional, List<BuildEntity> buildEntities, String dep, MakeFileBuilder builder) throws Exception {
-        
+
         for (BuildEntity be : buildEntities) { // local dependency?
             if (be.getReferenceName().equals(dep)) {
                 if (optional) {

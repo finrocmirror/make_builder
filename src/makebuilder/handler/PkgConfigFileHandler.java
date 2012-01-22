@@ -70,7 +70,7 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
                 cxx = true;
             }
         }
-        
+
         // find all header files belonging to target
         StringBuilder sb = new StringBuilder();
         for (SrcFile sf : builder.getSources().getAllFiles()) {
@@ -106,7 +106,7 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
 
     /**
      * TODO: implement properly
-     * 
+     *
      * @return Version string for .pc file
      */
     private String getVersionString() {

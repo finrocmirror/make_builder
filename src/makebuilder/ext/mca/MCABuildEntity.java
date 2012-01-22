@@ -70,19 +70,19 @@ public abstract class MCABuildEntity extends BuildEntity {
 
     @Override
     protected String getHintForMissingDependency(SrcFile sf) {
-      String miss = sf.getMissingDependency();
-      try {
-          Process p = Runtime.getRuntime().exec(FinrocBuildEntity.SEARCH_BIN + " -f " + miss);
-          p.waitFor();
-          List<String> lines = Files.readLines(p.getInputStream());
-          if (lines.size() > 0) {
-              return lines.get(0).split(" ")[0] + " repository";
-          } else {
-              return "file is not known";
-          }
-      } catch (Exception e) {
-      }
-      return null;
+        String miss = sf.getMissingDependency();
+        try {
+            Process p = Runtime.getRuntime().exec(FinrocBuildEntity.SEARCH_BIN + " -f " + miss);
+            p.waitFor();
+            List<String> lines = Files.readLines(p.getInputStream());
+            if (lines.size() > 0) {
+                return lines.get(0).split(" ")[0] + " repository";
+            } else {
+                return "file is not known";
+            }
+        } catch (Exception e) {
+        }
+        return null;
     }
 
 
