@@ -202,16 +202,16 @@ public abstract class BuildEntity {
     }
 
     public void addIndirectDependencyLibs(BuildEntity be) {
+        String s = be.getTarget();
+        s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
+        opts.libs.add(s);
         for (BuildEntity be2 : be.dependencies) {
-            String s = be.getTarget();
-            s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
-            opts.libs.add(s);
             addIndirectDependencyLibs(be2);
         }
     }
 
     /**
-     * Recursice helper function for above
+     * Recursive helper function for above
      *
      * @param extLibs2 List of external libraries
      */
