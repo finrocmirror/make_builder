@@ -130,8 +130,21 @@ public abstract class BuildEntity {
     public void checkForCycles() {
         if (cycleCheckStack.contains(this)) {
             System.out.println("Detected cyclic dependency: ");
-            for (BuildEntity be : cycleCheckStack) {
-                System.out.println("-> " + be.toString() +  " [" + be.getRootDir().toString() + "]");
+            for (int i = 0; i < cycleCheckStack.size(); i++) {
+                BuildEntity be = cycleCheckStack.get(i);
+                BuildEntity next = i + 1 < cycleCheckStack.size() ? cycleCheckStack.get(i + 1) : this;
+                SrcFile srcFile = null;
+                SrcFile srcFileDep = null;
+                for (SrcFile sf : be.sources) {
+                    for (SrcFile sfdep : sf.dependencies) {
+                        if (next.sources.contains(sfdep)) {
+                            srcFile = sf;
+                            srcFileDep = sfdep;
+                            break;
+                        }
+                    }
+                }
+                System.out.println("-> " + be.toString() +  " [" + be.getRootDir().toString() + "]" + (srcFile == null ? "" : ("   (" + srcFile.toString() + "  includes  " + srcFileDep.toString() + ")")));
             }
             System.out.println("-> " + toString() +  " [" + getRootDir().toString() + "]");
             System.exit(-1);
