@@ -133,14 +133,18 @@ public abstract class BuildEntity {
             for (int i = 0; i < cycleCheckStack.size(); i++) {
                 BuildEntity be = cycleCheckStack.get(i);
                 BuildEntity next = i + 1 < cycleCheckStack.size() ? cycleCheckStack.get(i + 1) : this;
+                ArrayList<SrcFile> filesToCheck = new ArrayList<SrcFile>(be.sources);
                 SrcFile srcFile = null;
                 SrcFile srcFileDep = null;
-                for (SrcFile sf : be.sources) {
+                for (int j = 0; j < filesToCheck.size(); j++) {
+                    SrcFile sf = filesToCheck.get(j);
                     for (SrcFile sfdep : sf.dependencies) {
-                        if (next.sources.contains(sfdep)) {
+                        if (sfdep.getOwner() == next) {
                             srcFile = sf;
                             srcFileDep = sfdep;
                             break;
+                        } else if (sfdep.getOwner() == this && (!filesToCheck.contains(sfdep))) {
+                            filesToCheck.add(sfdep);
                         }
                     }
                 }
