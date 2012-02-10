@@ -67,6 +67,32 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         return systemLibsLoaded;
     }
 
+    /**
+     * Collects CFLAGS and LDFLAGS from any System library the specified build entity depends on.
+     *
+     * @param be Build Entity
+     */
+    public static void processOptions(BuildEntity be) {
+        ArrayList<BuildEntity> deps = new ArrayList<BuildEntity>(be.dependencies);
+        boolean first = true;
+        for (int i = 0; i < deps.size(); i++) {
+            BuildEntity dep = deps.get(i);
+            if (dep instanceof FinrocSystemLibLoader.SystemLibrary) {
+                be.opts.merge(dep.opts, true);
+                if (first) {
+                    be.target.addDependency("export/$(TARGET)/lib/libenum_strings.so");
+                    first = false;
+                }
+            } else {
+                for (BuildEntity depdep : dep.dependencies) {
+                    if (!deps.contains(depdep)) {
+                        deps.add(depdep);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         // Do this only once

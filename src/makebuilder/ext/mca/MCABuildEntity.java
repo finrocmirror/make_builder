@@ -29,6 +29,7 @@ import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
 import makebuilder.ext.finroc.FinrocBuildEntity;
+import makebuilder.ext.finroc.FinrocSystemLibLoader;
 import makebuilder.handler.CppHandler;
 import makebuilder.util.Files;
 
@@ -85,5 +86,12 @@ public abstract class MCABuildEntity extends BuildEntity {
         return null;
     }
 
+    @Override
+    public void computeOptions() {
+        super.computeOptions();
+        if (FinrocSystemLibLoader.areSystemLibsLoaded()) {
+            FinrocSystemLibLoader.processOptions(this);
+        }
+    }
 
 }

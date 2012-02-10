@@ -133,15 +133,8 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     @Override
     public void computeOptions() {
         super.computeOptions();
-        for (BuildEntity be : dependencies) {
-            boolean first = true;
-            if (be instanceof FinrocSystemLibLoader.SystemLibrary) {
-                opts.merge(be.opts, true);
-                if (first) {
-                    this.target.addDependency("export/$(TARGET)/lib/libenum_strings.so");
-                    first = false;
-                }
-            }
+        if (FinrocSystemLibLoader.areSystemLibsLoaded()) {
+            FinrocSystemLibLoader.processOptions(this);
         }
     }
 }
