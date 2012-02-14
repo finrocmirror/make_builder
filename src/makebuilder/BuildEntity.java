@@ -64,13 +64,16 @@ public abstract class BuildEntity {
     /** Involved libraries */
     public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscript/make.xml)
     public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript/make.xml)
-    public final AddOrderSet<LibDB.ExtLib> extlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
+    public AddOrderSet<LibDB.ExtLib> extlibs; // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
     public final AddOrderSet<LibDB.ExtLib> directExtlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; only from build entity itself)
     public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
     public final List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>(); // resolved optional local (mca2) dependencies (from optionalLibs)
 
     /** are any dependencies missing? */
     public boolean missingDep;
+    
+    /** Has missing dependency check been performed for this build entity? */
+    private boolean missingDepCheckPerformed = false;
 
     /** Final target in makefile for this build entity - will create library or executable */
     public Makefile.Target target;
@@ -89,6 +92,9 @@ public abstract class BuildEntity {
 
     /** Error message id */
     public int errorMessageId = -1;
+    
+    /** Stores result of cycle checks: 1 if first cycle check was successful; 2 after second test was successful */
+    private int checkedForCycles = 0;
 
     /**
      * @param tb Reference to main builder instance
@@ -126,8 +132,14 @@ public abstract class BuildEntity {
 
     /**
      * Check dependency tree for cycles
+     * 
+     * @param cycleCheckRun Number of cycle check run
      */
-    public void checkForCycles() {
+    public void checkForCycles(int cycleCheckRun) {
+        if (cycleCheckRun == checkedForCycles) {
+            return;
+        }
+        
         if (cycleCheckStack.contains(this)) {
             System.out.println("Detected cyclic dependency: ");
             for (int i = 0; i < cycleCheckStack.size(); i++) {
@@ -156,9 +168,10 @@ public abstract class BuildEntity {
 
         cycleCheckStack.add(this);
         for (BuildEntity be : dependencies) {
-            be.checkForCycles();
+            be.checkForCycles(cycleCheckRun);
         }
         cycleCheckStack.remove(this);
+        checkedForCycles = cycleCheckRun;
     }
 
     /**
@@ -169,6 +182,9 @@ public abstract class BuildEntity {
         if (missingDep) {
             return;
         }
+        if (missingDepCheckPerformed) {
+            return;
+        }
         for (BuildEntity be : dependencies) {
             be.checkDependencies(mfb);
             if (be.missingDep) {
@@ -177,6 +193,7 @@ public abstract class BuildEntity {
                 return;
             }
         }
+        missingDepCheckPerformed = true;
     }
 
     /**
@@ -187,7 +204,15 @@ public abstract class BuildEntity {
      * Their options are added to opts
      */
     public void mergeExtLibs() {
-        mergeExtLibs(extlibs);
+        if (extlibs != null) {
+            return;
+        }
+        extlibs = new AddOrderSet<LibDB.ExtLib>();
+        extlibs.addAll(directExtlibs);
+        for (BuildEntity be : dependencies) {
+            be.mergeExtLibs();
+            extlibs.addAll(be.extlibs);
+        }
     }
 
     /**
@@ -213,29 +238,23 @@ public abstract class BuildEntity {
             opts.libs.add(s);
 
             if (LINKING_AS_NEEDED) {
-                addIndirectDependencyLibs(be);
+                ArrayList<BuildEntity> visited = new ArrayList<BuildEntity>();
+                addIndirectDependencyLibs(be, visited);
             }
         }
     }
 
-    public void addIndirectDependencyLibs(BuildEntity be) {
+    public void addIndirectDependencyLibs(BuildEntity be, ArrayList<BuildEntity> visited) {
+        if (visited.contains(be)) {
+            return;
+        }
+        
         String s = be.getTarget();
         s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
         opts.libs.add(s);
+        visited.add(be);
         for (BuildEntity be2 : be.dependencies) {
-            addIndirectDependencyLibs(be2);
-        }
-    }
-
-    /**
-     * Recursive helper function for above
-     *
-     * @param extLibs2 List of external libraries
-     */
-    private void mergeExtLibs(Set<LibDB.ExtLib> extLibs2) {
-        extLibs2.addAll(directExtlibs);
-        for (BuildEntity be : dependencies) {
-            be.mergeExtLibs(extLibs2);
+            addIndirectDependencyLibs(be2, visited);
         }
     }
 

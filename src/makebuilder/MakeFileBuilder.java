@@ -197,7 +197,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // check whether all dependencies are met
         for (BuildEntity be : buildEntities) {
-            be.checkForCycles();
+            be.checkForCycles(1);
             be.checkDependencies(this);
         }
 
@@ -208,7 +208,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // check for new cycles
         for (BuildEntity be : buildEntities) {
-            be.checkForCycles();
+            be.checkForCycles(2);
         }
 
         // collect external libraries needed for building
