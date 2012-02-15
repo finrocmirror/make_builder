@@ -88,6 +88,12 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
 
         String cflags = be.opts.createOptionString(true, false, cxx).replaceAll(" -fPIC", "");
         String ldflags = be.opts.createOptionString(false, true, cxx).replaceAll("-shared ", "");
+        if (cflags.equals("-fPIC")) {
+            cflags = "";
+        }
+        if (ldflags.equals("-shared")) {
+            ldflags = "";
+        }
 
         // create .pc file
         be.target.addCommand("mkdir -p " + outputDir, false);
