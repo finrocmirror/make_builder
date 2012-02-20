@@ -96,17 +96,20 @@ sub ProcessEnum {
     foreach my $value (@$values) {
         push @names, $value->{name};
     }
+    my $common_prefix = GetCommonEnumPrefix(@names);
+    if (@names <= 1) {
+        $common_prefix = $names[0] =~ /^e\u.*/ ? "e" : "";
+    }
     if ($names[-1] =~ /_DIMENSION$/) { # remove any last _DIMENSION element
         pop(@names);
     }
-    my $common_prefix = GetCommonEnumPrefix(@names);
     foreach my $name (@names) {
         my $s = substr($name, length($common_prefix));
         $s = FormatEnum($s);
         print "  \"$s\",\n";
     }
     print "  NULL\n};\n";
-    print "tRegisterEnumStrings init_strings_$postfix(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
+    print "static tRegisterEnumStrings init_strings_$postfix(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
     print "\n";
 }
 
