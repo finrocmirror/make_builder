@@ -34,6 +34,7 @@
 #include <map>
 #include <cxxabi.h>
 #include <cstdlib>
+#include <iostream>
 
 namespace make_builder
 {
@@ -45,6 +46,16 @@ std::map<std::string, std::vector<const char*>>& GetRegister()
 {
   static std::map<std::string, std::vector<const char*>> enum_strings_register;
   return enum_strings_register;
+}
+
+void PrintRegister()
+{
+  std::map<std::string, std::vector<const char*>>& temp(GetRegister());
+
+  for (auto iter = temp.begin(); iter != temp.end(); ++iter)
+  {
+    fprintf(stderr, "\t%s\n", iter->first.c_str());
+  }
 }
 
 const std::vector<const char*>* GetEnumStrings(const char* type_id)
@@ -85,6 +96,13 @@ const std::vector<const char*>* GetEnumStrings(const char* type_id)
   if (count == 1)
   {
     return &(GetRegister()[demangled]);
+  }
+  else
+  {
+    fprintf(stderr, "Could not find type_id: '%s'\nCandidates are:\n\n", demangled.c_str());
+
+    PrintRegister();
+    fprintf(stderr, "\n\n");
   }
   return NULL;
 }
