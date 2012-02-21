@@ -26,12 +26,16 @@ import makebuilder.StartScript;
 import makebuilder.handler.JavaHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
- * Finroc library
+ * Test program
  */
 public class TestProgram extends FinrocBuildEntity {
 
+    public TestProgram() {
+        opts.addOptions("-Wl,--no-as-needed");
+    }
+    
     @Override
     public String getTargetPrefix() {
         String rootDir2 = this.getRootDir().relative;

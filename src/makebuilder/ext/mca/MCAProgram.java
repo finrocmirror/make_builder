@@ -28,6 +28,10 @@ package makebuilder.ext.mca;
  */
 public class MCAProgram extends MCABuildEntity {
 
+    public MCAProgram() {
+        opts.addOptions("-Wl,--no-as-needed");
+    }
+    
     @Override
     public String getTarget() {
         String rootDir2 = this.getRootDir().relative;
