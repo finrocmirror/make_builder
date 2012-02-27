@@ -236,9 +236,12 @@ public abstract class BuildEntity {
             target.addDependency(s);
             s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
             opts.libs.add(s);
+            
+            ArrayList<BuildEntity> visited = new ArrayList<BuildEntity>();
+            addIndirectIncludePaths(be, visited);
 
             if (LINKING_AS_NEEDED) {
-                ArrayList<BuildEntity> visited = new ArrayList<BuildEntity>();
+                visited.clear();
                 addIndirectDependencyLibs(be, visited);
             }
         }
@@ -255,6 +258,19 @@ public abstract class BuildEntity {
         visited.add(be);
         for (BuildEntity be2 : be.dependencies) {
             addIndirectDependencyLibs(be2, visited);
+        }
+    }
+
+    public void addIndirectIncludePaths(BuildEntity be, ArrayList<BuildEntity> visited) {
+        if (visited.contains(be)) {
+            return;
+        }
+        
+        String s = be.getTarget();
+        opts.includePaths.addAll(be.opts.includePaths);
+        visited.add(be);
+        for (BuildEntity be2 : be.dependencies) {
+            addIndirectIncludePaths(be2, visited);
         }
     }
 
