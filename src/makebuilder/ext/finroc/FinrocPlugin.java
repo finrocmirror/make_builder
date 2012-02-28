@@ -31,7 +31,7 @@ import makebuilder.handler.JavaHandler;
 public class FinrocPlugin extends FinrocBuildEntity {
 
     public FinrocPlugin() {
-        opts.addOptions("-shared -fPIC");
+        opts.addOptions("-shared -fPIC -Wl,--no-as-needed");
     }
 
     @Override
