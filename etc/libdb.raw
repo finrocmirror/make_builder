@@ -11,13 +11,14 @@ bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -l
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
 boost_filesystem: -I<boost/filesystem.hpp> -lboost_filesystem
+boost_iostreams: -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 can_cc_systems:    -I<cccan_public.h> -D _MCA_CC_CAN_ 
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
-cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core
+cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda
 cudart:     -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUDART)
@@ -84,7 +85,7 @@ Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL: -lpq -I<pg_config.h,postgres.h>
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
-plotter:    -I<plotter.h> -lplotter
+plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
 pwc:        -I<pwc-ioctl.h>
 pthread:    -I<pthread.h> -lpthread
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
