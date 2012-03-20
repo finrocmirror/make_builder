@@ -259,6 +259,9 @@ public abstract class BuildEntity {
         for (BuildEntity be2 : be.dependencies) {
             addIndirectDependencyLibs(be2, visited);
         }
+        for (String lib : be.opts.libs) {
+            opts.libs.add(lib);
+        }
     }
 
     public void addIndirectIncludePaths(BuildEntity be, ArrayList<BuildEntity> visited) {
