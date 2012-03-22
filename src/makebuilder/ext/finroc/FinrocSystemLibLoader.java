@@ -144,7 +144,17 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
                     // Get compile options
                     p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
                     p.waitFor();
-                    be.opts.addOptions(Files.readLines(p.getInputStream()).get(0).replace("_PRESENT_ _LIB_", "_PRESENT_ -D _LIB_")); // string replacement because of pkgconfig glitch
+                    String options = Files.readLines(p.getInputStream()).get(0).replaceAll("\\s+", " ");
+
+                    // string replacement because of pkgconfig glitch (add missing '-D's that are present in .pc files)
+                    for (int i = 0; i < options.length() - 1; i++) {
+                        if (options.charAt(i) == '-' && options.charAt(i + 1) == 'D') {
+                            i += 3;
+                        } else if (options.charAt(i) == ' ' && options.charAt(i + 1) != '-') {
+                            options = options.substring(0, i) + " -D" + options.substring(i);
+                        }
+                    }
+                    be.opts.addOptions(options);
 
                     // Get headers belonging to lib
                     for (String line : pkglines) {
