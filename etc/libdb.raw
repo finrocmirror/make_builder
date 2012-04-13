@@ -29,8 +29,7 @@ cutil:      -I<cutil.h> -lcutil
 cutil:      -I<cutil.h> -lcutil_i386
 crypt:      -I<crypt.h> -lcrypt
 db++:       -I<db_cxx.h> -ldb_cxx
-db++:       -I<db4.8/db_cxx.h> -ldb_cxx
-dbxml:      -I<dbxml/DbXml.hpp> -ldbxml
+dbxml:      -I<DbXml.hpp> -ldbxml
 dc1394:     -I<dc1394/control.h> -D _LIB_DC1394_PRESENT_ -ldc1394
 dl:         -ldl
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>

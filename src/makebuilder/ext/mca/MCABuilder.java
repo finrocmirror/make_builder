@@ -132,11 +132,16 @@ public class MCABuilder extends MakeFileBuilder {
         // apply options for specific target?
         String target = System.getenv("MCATARGET");
         if (target != null) {
-            File targetFile = Util.getFileInEtcDir("../targets/" + target);
+	    System.out.println("found target: " + target);
+//            File targetFile = Util.getFileInEtcDir("../targets/" + target);
+	    File targetFile = new File(System.getenv("MCAHOME") + 
+	    "/etc/targets/" + target);
             if (targetFile.exists()) {
                 System.out.println("Using custom options from target config file: " + targetFile.getCanonicalPath());
                 makefile.applyVariablesFromFile(targetFile);
             }
+	    else
+    	        System.out.println("Coulnd not find target config file: " + targetFile.getCanonicalPath());
         }
 
         if (getOptions().containsKey("usesysteminstall")) {
