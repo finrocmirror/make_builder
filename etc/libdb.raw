@@ -10,6 +10,7 @@ ax10420:    -I<AX10420.h>
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
+boost_date_time: -I<boost/date_time.hpp> -lboost_date_time
 boost_filesystem: -I<boost/filesystem.hpp> -lboost_filesystem
 boost_iostreams: -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
