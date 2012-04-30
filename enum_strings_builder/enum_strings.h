@@ -94,7 +94,7 @@ const char* GetEnumString(ENUM value)
   const std::vector<const char*>* strings = GetEnumStrings<ENUM>();
   if (strings != NULL)
   {
-    assert(value < strings->size());
+    assert(static_cast<size_t>(value) < strings->size());
     return (*strings)[static_cast<size_t>(value)];
   }
   return NULL;

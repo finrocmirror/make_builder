@@ -112,7 +112,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 target.target.addMessage("Creating " + sft.relative);
                 target.target.addDependency(DESCRIPTION_BUILDER_BIN);
                 //target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
-                be.sources.add(sft);
+                be.sources.add(0, sft);
                 be.opts.libs.add("enum_strings");
                 descrTargets.put(be, target);
             }
