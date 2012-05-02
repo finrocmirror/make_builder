@@ -109,6 +109,7 @@ sub ProcessEnum {
         print "  \"$s\",\n";
     }
     print "  NULL\n};\n";
+    print "__attribute__ ((init_priority (101)))";
     print "static tRegisterEnumStrings init_strings_$postfix(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
     print "\n";
 }
