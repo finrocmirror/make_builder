@@ -102,7 +102,7 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         loaded = true;
 
         // find all locally installed components
-        Process p = Runtime.getRuntime().exec(System.getenv("FINROC_HOME") + "/scripts/finroc_status -c ");
+        Process p = Runtime.getRuntime().exec(new String[] {System.getenv("FINROC_HOME") + "/scripts/finroc_status", "-c"});
         p.waitFor();
         List<String> localComponents = Files.readLines(p.getInputStream());
 

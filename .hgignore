@@ -1,0 +1,9 @@
+syntax: glob
+
+etc/libdb.java
+etc/libdb.txt
+
+# build directories
+bin
+dist
+
