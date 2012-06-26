@@ -123,8 +123,11 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // init handlers
         addLoader(new SConscriptParser());
-        addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class,
-                                    RRLib.class, FinrocProgram.class));
+        if (BUILDING_FINROC) {
+            addLoader(new MakeXMLLoader(MCALibrary.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
+        } else {
+            addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
+        }
         addHandler(new Qt4Handler());
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
