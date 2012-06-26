@@ -24,7 +24,6 @@ package makebuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedMap;
 
 import makebuilder.handler.CppHandler;
@@ -55,6 +54,9 @@ public abstract class BuildEntity {
     /** Build file */
     public SrcFile buildFile;
 
+    /** Line number in build file */
+    public int lineNumber;
+
     /** Involved source files */
     public final List<SrcFile> sources = new ArrayList<SrcFile>();
 
@@ -71,7 +73,7 @@ public abstract class BuildEntity {
 
     /** are any dependencies missing? */
     public boolean missingDep;
-    
+
     /** Has missing dependency check been performed for this build entity? */
     private boolean missingDepCheckPerformed = false;
 
@@ -92,7 +94,7 @@ public abstract class BuildEntity {
 
     /** Error message id */
     public int errorMessageId = -1;
-    
+
     /** Stores result of cycle checks: 1 if first cycle check was successful; 2 after second test was successful */
     private int checkedForCycles = 0;
 
@@ -132,14 +134,14 @@ public abstract class BuildEntity {
 
     /**
      * Check dependency tree for cycles
-     * 
+     *
      * @param cycleCheckRun Number of cycle check run
      */
     public void checkForCycles(int cycleCheckRun) {
         if (cycleCheckRun == checkedForCycles) {
             return;
         }
-        
+
         if (cycleCheckStack.contains(this)) {
             System.out.println("Detected cyclic dependency: ");
             for (int i = 0; i < cycleCheckStack.size(); i++) {
@@ -189,7 +191,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.name + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
+                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.name + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
                 return;
             }
         }
@@ -236,7 +238,7 @@ public abstract class BuildEntity {
             target.addDependency(s);
             s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
             opts.libs.add(s);
-            
+
             ArrayList<BuildEntity> visited = new ArrayList<BuildEntity>();
             addIndirectIncludePaths(be, visited);
 
@@ -251,7 +253,7 @@ public abstract class BuildEntity {
         if (visited.contains(be)) {
             return;
         }
-        
+
         String s = be.getTarget();
         s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
         opts.libs.add(s);
@@ -268,7 +270,7 @@ public abstract class BuildEntity {
         if (visited.contains(be)) {
             return;
         }
-        
+
         String s = be.getTarget();
         opts.includePaths.addAll(be.opts.includePaths);
         visited.add(be);

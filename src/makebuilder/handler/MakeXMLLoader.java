@@ -31,11 +31,16 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 
 import makebuilder.BuildEntity;
 import makebuilder.BuildFileLoader;
@@ -61,6 +66,7 @@ public class MakeXMLLoader implements BuildFileLoader {
 
     /** Objects for parsing XML */
     static private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    static private final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     static private DocumentBuilder dbuilder;
 
     static {
@@ -89,10 +95,11 @@ public class MakeXMLLoader implements BuildFileLoader {
     }
 
     @Override
-    public void process(SrcFile file, List<BuildEntity> result, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
+    public void process(SrcFile file, final List<BuildEntity> result, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         if (!isMakeXMLFile(file)) {
             return;
         }
+        final int originalElementCount = result.size();
 
         // parse XML
         Document doc = null;
@@ -169,6 +176,29 @@ public class MakeXMLLoader implements BuildFileLoader {
                 }
             }
         }
+
+        saxFactory.setValidating(false);
+        saxFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        SAXParser saxParser = saxFactory.newSAXParser();
+        saxParser.parse(file.absolute, new DefaultHandler() {
+
+            Locator l;
+
+            @Override
+            public void setDocumentLocator(Locator locator) {
+                super.setDocumentLocator(locator);
+                l = locator;
+            }
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes attributes) {
+                for (int i = originalElementCount; i < result.size(); i++) {
+                    if (qName.equals(result.get(i).getClass().getSimpleName().toLowerCase()) && (result.get(i).name.equals(attributes.getValue("name")))) {
+                        result.get(i).lineNumber = l.getLineNumber();
+                    }
+                }
+            }
+        });
     }
 
     /**
