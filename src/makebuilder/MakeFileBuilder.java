@@ -183,6 +183,23 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
             }
         }
 
+        // Check for files without owner
+        if (opts.get("report-unmanaged-files") != null) {
+            ArrayList<SrcFile> ownerLess = new ArrayList<SrcFile>();
+            for (SrcFile sf : sources.getAllFiles()) {
+                String e = sf.getExtension();
+                if (sf.getOwner() == null && sf.relative.startsWith("sources/cpp/") && (e.equals("h") || e.equals("hpp") || e.equals("cpp") || e.equals("java"))) {
+                    ownerLess.add(sf);
+                }
+            }
+            if (ownerLess.size() > 0) {
+                System.err.println(Util.color("Found " + ownerLess.size() + " source files that do not belong to a target. These will not be (properly) included in a system installation:", Util.Color.Y, true));
+                for (SrcFile sf : ownerLess) {
+                    System.err.println(Util.color("  " + sf.relative, Util.Color.Y, false));
+                }
+            }
+        }
+
         // process dependencies
         System.out.println("Processing dependencies...");
         for (BuildEntity be : buildEntities) {
