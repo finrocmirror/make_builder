@@ -31,44 +31,76 @@
  */
 //----------------------------------------------------------------------
 
+//----------------------------------------------------------------------
+// External includes (system with <>, local with "")
+//----------------------------------------------------------------------
 #include <map>
 #include <cxxabi.h>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 
+//----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// Namespace usage
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// Namespace declaration
+//----------------------------------------------------------------------
 namespace make_builder
 {
+
+//----------------------------------------------------------------------
+// Forward declarations / typedefs / enums
+//----------------------------------------------------------------------
+typedef std::map<std::string, const tEnumStrings * const> tEnumStringsRegister;
+
+//----------------------------------------------------------------------
+// Const values
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// Implementation
+//----------------------------------------------------------------------
+
 namespace internal
 {
 
-/*! lookup typeid (without template parameters) => enum strings */
-std::map<std::string, std::vector<const char*>>& GetRegister()
+//----------------------------------------------------------------------
+// EnumStringsRegister
+//----------------------------------------------------------------------
+tEnumStringsRegister &EnumStringsRegister()
 {
-  static std::map<std::string, std::vector<const char*>> enum_strings_register;
+  static tEnumStringsRegister enum_strings_register;
   return enum_strings_register;
 }
 
-void PrintRegister()
+//----------------------------------------------------------------------
+// RegisterEnumStrings
+//----------------------------------------------------------------------
+void RegisterEnumStrings(const char *type_name, const tEnumStrings &strings)
 {
-  std::map<std::string, std::vector<const char*>>& temp(GetRegister());
-
-  for (auto iter = temp.begin(); iter != temp.end(); ++iter)
-  {
-    fprintf(stderr, "\t%s\n", iter->first.c_str());
-  }
+  assert(EnumStringsRegister().count(type_name) == 0 && "may only be initialized once");
+  EnumStringsRegister().insert(std::make_pair(type_name, &strings));
 }
 
-const std::vector<const char*>* GetEnumStrings(const char* type_id)
+//----------------------------------------------------------------------
+// GetEnumStrings
+//----------------------------------------------------------------------
+const tEnumStrings &GetEnumStrings(const char *type_name)
 {
   // normalize type_id string
   // demangle...
   int status = 0;
-  char* tmp = abi::__cxa_demangle(type_id, 0, 0, &status);
+  char* tmp = abi::__cxa_demangle(type_name, 0, 0, &status);
   std::string demangled(tmp);
   free(tmp);
 
   // remove everything inside and including <>-brackets
-  //printf("Pre-remove: %s\n", demangled.c_str());
   size_t pos;
   while ((pos = demangled.find('<')) != std::string::npos)
   {
@@ -89,40 +121,33 @@ const std::vector<const char*>* GetEnumStrings(const char* type_id)
     }
     demangled.erase(pos, (cur_pos - pos) + 1);
   }
-  //printf("Post-remove: %s\n", demangled.c_str());
 
   // actual lookup
-  size_t count = GetRegister().count(demangled);
-  if (count == 1)
+  if (EnumStringsRegister().count(demangled) != 1)
   {
-    return &(GetRegister()[demangled]);
-  }
-  else
-  {
-    fprintf(stderr, "Could not find type_id: '%s'\nCandidates are:\n\n", demangled.c_str());
-
-    PrintRegister();
-    fprintf(stderr, "\n\n");
-  }
-  return NULL;
-}
-
-void RegisterEnumStrings(const char* type_name, const char* const* strings)
-{
-  assert(GetRegister().count(type_name) == 0 && "may only be initialized once");
-  std::vector<const char*> vec;
-  for (size_t i = 0;; i++)
-  {
-    const char* s = strings[i];
-    if (s == NULL)
+    std::stringstream message;
+    message << "Could not find type_id: '" << demangled.c_str() << "'\nCandidates are:\n\n";
+    for (auto it = EnumStringsRegister().begin(); it != EnumStringsRegister().end(); ++it)
     {
-      break;
+      message << "\t" << it->first.c_str() << "\n";
     }
-    vec.push_back(s);
+    throw std::runtime_error(message.str());
   }
-  GetRegister().insert(std::pair<std::string, std::vector<const char*>>(type_name, vec));
+
+  return *EnumStringsRegister()[demangled];
 }
 
-} // namespace
-} // namespace
+}
 
+//----------------------------------------------------------------------
+// tRegisterEnumStrings constructors
+//----------------------------------------------------------------------
+tRegisterEnumStrings::tRegisterEnumStrings(const char* type_name, const tEnumStrings &strings)
+{
+  internal::RegisterEnumStrings(type_name, strings);
+}
+
+//----------------------------------------------------------------------
+// End of namespace declaration
+//----------------------------------------------------------------------
+}

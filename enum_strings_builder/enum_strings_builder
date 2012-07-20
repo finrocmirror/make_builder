@@ -89,8 +89,6 @@ sub ProcessEnum {
 
     my $postfix = lc($namespace_name . "::" . $enum_name);
     $postfix =~ s/::/_/g;
-    my $const = "strings_" . $postfix;
-    print "const char* " . $const . "[] = {\n";
 
     my @names = ();
     foreach my $value (@$values) {
@@ -103,14 +101,10 @@ sub ProcessEnum {
     if ($names[-1] =~ /_DIMENSION$/) { # remove any last _DIMENSION element
         pop(@names);
     }
-    foreach my $name (@names) {
-        my $s = substr($name, length($common_prefix));
-        $s = FormatEnum($s);
-        print "  \"$s\",\n";
-    }
-    print "  NULL\n};\n";
-    print "__attribute__ ((init_priority (101)))";
-    print "static tRegisterEnumStrings init_strings_$postfix(\"", $namespace_name, "::", $enum_name, "\", $const);\n";
+
+    printf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $postfix, join "\",\n  \"", map { FormatEnum(substr $_, length $common_prefix) } @names;
+    printf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $postfix, $postfix, scalar @names;
+    printf "__attribute__ ((init_priority (101))) static tRegisterEnumStrings init_strings_%s(\"%s::%s\", enum_strings_%s);\n", $postfix, $namespace_name, $enum_name, $postfix;
     print "\n";
 }
 

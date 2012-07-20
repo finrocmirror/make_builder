@@ -31,74 +31,43 @@
  */
 //----------------------------------------------------------------------
 
-#ifndef __make_builder__enum_strings_builder__h_
-#define __make_builder__enum_strings_builder__h_
+#ifndef __make_builder__enum_strings_builder_h__
+#define __make_builder__enum_strings_builder_h__
 
+//----------------------------------------------------------------------
+// External includes (system with <>, local with "")
+//----------------------------------------------------------------------
 #include <vector>
 #include <string>
 #include <typeinfo>
-#include <assert.h>
+#include <stdexcept>
 
+//----------------------------------------------------------------------
+// Debugging
+//----------------------------------------------------------------------
+#include <cassert>
+
+//----------------------------------------------------------------------
+// Namespace declaration
+//----------------------------------------------------------------------
 namespace make_builder
 {
+
+//----------------------------------------------------------------------
+// Forward declarations / typedefs / enums
+//----------------------------------------------------------------------
+struct tEnumStrings;
+
 namespace internal
 {
+const tEnumStrings &GetEnumStrings(const char *type_name);
+}
 
-/*!
- * \param type_id Type id of enum type
- * \return Enum strings for this enum data type - or NULL if enum strings are unknown
- */
-const std::vector<const char*>* GetEnumStrings(const char* type_id);
-
-/*!
- * \param type_id Type id of enum type
- * \param strings Enum strings to register (should be terminated with null pointer)
- */
-void RegisterEnumStrings(const char* type_id, const char* const* strings);
-
-/*!
- * Helper struct to accelerate lookup
- */
-template <typename ENUM>
-struct tQuickLookup
+struct tEnumStrings
 {
-  static const std::vector<const char*>* cached;
+  const char * const *strings;
+  const size_t size;
 };
-
-template <typename ENUM>
-const std::vector<const char*>* tQuickLookup<ENUM>::cached = NULL;
-
-}
-
-/*!
- * \return Enum strings for this enum data type - or NULL if enum strings are unknown
- */
-template<typename ENUM>
-const std::vector<const char*>* GetEnumStrings()
-{
-  const std::vector<const char*>*& b = internal::tQuickLookup<ENUM>::cached;
-  if (b == NULL)
-  {
-    b = internal::GetEnumStrings(typeid(ENUM).name()); // always produces same result, so concurrency is not an issue
-  }
-  return b;
-}
-
-/*!
- * \param value enum constant
- * \return Enum string for this enum constant - or NULL if enum strings are unknown
- */
-template<typename ENUM>
-const char* GetEnumString(ENUM value)
-{
-  const std::vector<const char*>* strings = GetEnumStrings<ENUM>();
-  if (strings != NULL)
-  {
-    assert(static_cast<size_t>(value) < strings->size());
-    return (*strings)[static_cast<size_t>(value)];
-  }
-  return NULL;
-}
 
 /*!
  * (Typically, only used in generated code)
@@ -111,13 +80,56 @@ struct tRegisterEnumStrings
    * \param type_name Normalized namespace and typename (normalized = without any template arguments)
    * \param strings Enum strings to register (should be terminated with null pointer)
    */
-  tRegisterEnumStrings(const char* type_name, const char* const* strings)
-  {
-    internal::RegisterEnumStrings(type_name, strings);
-  }
+  tRegisterEnumStrings(const char* type_name, const tEnumStrings &strings);
 };
 
-} // namespace
+//----------------------------------------------------------------------
+// Function declaration
+//----------------------------------------------------------------------
+
+/*!
+ * \return Enum strings for this enum data type
+ */
+template <typename TEnum>
+const tEnumStrings &GetEnumStrings()
+{
+  static const tEnumStrings &enum_strings(internal::GetEnumStrings(typeid(TEnum).name()));
+  return enum_strings;
+}
+
+/*!
+ * \param value enum constant
+ * \return Enum string for this enum constant
+ */
+template <typename TEnum>
+inline const char *GetEnumString(TEnum value)
+{
+  assert(static_cast<size_t>(value) < GetEnumStrings<TEnum>().size);
+  return GetEnumStrings<TEnum>().strings[static_cast<size_t>(value)];
+}
+
+//template <typename TEnum>
+//inline TEnum GetEnumValueFromString(const std::string &string)
+//{
+//  TEnum result;
+//  const tEnumStrings &enum_strings(GetEnumStrings<TEnum>());
+//  for (size_t i = 0; i < enum_strings.size; ++i)
+//  {
+//    if (string == enum_strings.strings[i])
+//    {
+//      result = static_cast<TEnum>(i);
+//      break;
+//    }
+//  }
+//
+//  throw std::runtime_error("Could not find enum value for invalid string '" + string + "'!");
+//
+//  return result;
+//}
+
+//----------------------------------------------------------------------
+// End of namespace declaration
+//----------------------------------------------------------------------
+}
 
 #endif
-
