@@ -34,14 +34,11 @@ my $classes = $::doxydocs->{classes};
 my $files = $::doxydocs->{files};
 my $namespaces = $::doxydocs->{namespaces};
 
-# generate header comment
-printf "/*\n * This file was automatically generated from the source file%s", scalar @$files > 1 ? "s" : "";
-printf "\n * %s", join "\n * ", (map { $_->{'name'} } @$files);
-print "\n * using enum_strings_builder.";
-print "\n * This code is released under the same license as the source files.\n */\n\n";
+my $output_filename = $ARGV[0] or die "Output filename not specified!\n";
 
-# namespace
-print "namespace make_builder\n{\nnamespace generated\n{\n\n";
+unlink $output_filename;
+
+my $output = "";
 
 # Gets common prefix of enum constants
 sub GetCommonEnumPrefix(@) {
@@ -102,10 +99,16 @@ sub ProcessEnum {
         pop(@names);
     }
 
-    printf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $postfix, join "\",\n  \"", map { FormatEnum(substr $_, length $common_prefix) } @names;
-    printf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $postfix, $postfix, scalar @names;
-    printf "__attribute__ ((init_priority (101))) static tRegisterEnumStrings init_strings_%s(\"%s::%s\", enum_strings_%s);\n", $postfix, $namespace_name, $enum_name, $postfix;
-    print "\n";
+    foreach my $name (@names)
+    {
+#        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
+	return;
+    }
+
+    $output .= sprintf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $postfix, join "\",\n  \"", map { FormatEnum(substr($_, length $common_prefix)) } @names;
+    $output .= sprintf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $postfix, $postfix, scalar @names;
+    $output .= sprintf "__attribute__ ((init_priority (101))) static tRegisterEnumStrings init_strings_%s(\"%s::%s\", enum_strings_%s);\n", $postfix, $namespace_name, $enum_name, $postfix;
+    $output .= sprintf "\n";
 }
 
 # generate code for outer-class enum strings
@@ -134,5 +137,21 @@ foreach my $class (@$classes) {
     }
 }
 
-print "}\n}\n";
+open OUTPUT, ">$output_filename" or die "Could not open '$output_filename' for writing: $!\n";
 
+# generate header comment
+printf OUTPUT "/*\n";
+printf OUTPUT " * This file was automatically generated from the source file%s\n", scalar @$files > 1 ? "s" : "";
+printf OUTPUT " * %s\n", join "\n * ", (map { $_->{'name'} } @$files);
+printf OUTPUT " * using enum_strings_builder.\n";
+printf OUTPUT " * This code is released under the same license as the source files.\n";
+printf OUTPUT " */\n\n";
+
+# namespace
+printf OUTPUT "namespace make_builder\n{\nnamespace generated\n{\n\n";
+
+print OUTPUT $output;
+
+printf OUTPUT "}\n}\n";
+
+close OUTPUT;
