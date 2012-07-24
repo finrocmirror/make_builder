@@ -101,7 +101,7 @@ sub ProcessEnum {
 
     foreach my $name (@names)
     {
-        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
+#        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
 	return unless length $name > length $common_prefix;
     }
 
