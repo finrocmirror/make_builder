@@ -101,8 +101,8 @@ sub ProcessEnum {
 
     foreach my $name (@names)
     {
-#        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
-	return;
+        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
+	return unless length $name > length $common_prefix;
     }
 
     $output .= sprintf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $postfix, join "\",\n  \"", map { FormatEnum(substr($_, length $common_prefix)) } @names;
