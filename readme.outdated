@@ -6,17 +6,17 @@ Brief commands:
 --initialisation--
 cd $MCAHOME && svn co https://agrosy.informatik.uni-kl.de/svn/mca2_make_builder/trunk make_builder && cd - && cd $MCAHOME/make_builder && ant && cd - && cd $MCAHOME/script/ && rm mcasetenv.py && ln -s ../make_builder/script/mcasetenv.py && cd - && cd $MCAHOME && source script/mcasetenv -t make && cd - && updatelibdb && makeMakefile && cd $MCAHOME && make && cd -
 
---compilation (mcasetenv is assumed to have been correctly called)--
+--compilation (setenv is assumed to have been correctly called)--
 cd $MCAHOME && makeMakefile && make && cd -
 
 --compilation after changes in libraries--
 cd $MCAHOME && updatelibdb && makeMakefile && make && cd -
 
 --compilation after changes in make_builder svn--
-cd $MCAHOME/make_builder && svn up && ant && cd - && cd $MCAHOME && source script/mcasetenv -t make && cd - && updatelibdb && makeMakefile && cd $MCAHOME && make && cd -
+cd $MCAHOME/make_builder && svn up && ant && cd - && cd $MCAHOME && source script/setenv -t make && cd - && updatelibdb && makeMakefile && cd $MCAHOME && make && cd -
 
 --reset to scons--
-cd $MCAHOME && source script/mcasetenv --target= && cd -
+cd $MCAHOME && source script/setenv --target= && cd -
 
 
 Full documentation:
@@ -45,7 +45,7 @@ Instructions (for use with make):
    
    ant
    
-3) Replace the <MCAHOME>/script/mcasetenv.py script with the 
+3) Replace the <MCAHOME>/script/setenv.py script with the 
    modified version found in <MCAHOME>/make_builder/script/ .
    
    It has two modifications:
@@ -55,20 +55,20 @@ Instructions (for use with make):
 
 4) Set MCA environment variable (in <MCAHOME> directory):
 
-   Syntax: source script/mcasetenv [-p <project>] [-t <target>]
+   Syntax: source script/setenv [-p <project>] [-t <target>]
    
    The [-t <target>] is new and allows specifying an alternative
    build target to avoid collisions with SCons.
    
-   source script/mcasetenv -t make
+   source script/setenv -t make
    
    This is necessary in every console dealing with MCA - 
-   just as MCA's ordinary mcasetenv command.
+   just as MCA's ordinary setenv command.
 
    To reset the target to the default call (any suggestions for 
    a nicer solution are appreciated):
 
-   source script/mcasetenv --target=
+   source script/setenv --target=
 
 5) Perform library check:
    
@@ -134,7 +134,7 @@ Instructions (for use with make):
    of this file is hopefully self-explanatory... generally, the
    listed source files are compiled separately).  
    
-   Default target is $MCATARGET which is set by the mcasetenv
+   Default target is $MCATARGET which is set by the setenv
    script. An alternative target can be set with the 
    --build=<target> command line option - e.g.
    

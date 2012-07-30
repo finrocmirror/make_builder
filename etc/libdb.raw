@@ -42,7 +42,6 @@ ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMultiTypePortDataBufferPool.h> -I<finroc_core_utils/tAtomicDoubleInt.h,finroc_core_utils/container/tBoundedQElementContainer.h> -I<blackboard/tSingleBufferedBlackboardServer.h,tcp/tTCPServerConnection.h> -lfinroc_plugin_tcp -lfinroc_plugin_blackboard -lfinroc_core -lrrlib_finroc_core_utils
 flycap:     -lflycapture -I<FlyCapture2.h>
-freenect:   -I<libfreenect.h> -lfreenect
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 glui:       -I<GL/glui.h> -lglui -lGLU -IGL
@@ -63,6 +62,7 @@ mysqlcppconn: -I<mysql_driver.h> -lmysqlcppconn
 netpbm:     -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -I<Newton.h> -lNewton
+NITE:       -I/usr/include/ni -lOpenNI XnVNite_1_5_2
 npp32:      -I<npp.h> -lnpp32 -D_LIB_NPP_PRESENT_
 npp32:      -I<npp.h> -lnpp -D_LIB_NPP_PRESENT_
 npp32util:  -lUtilNPP32 -I<ImagesNPP.h>
