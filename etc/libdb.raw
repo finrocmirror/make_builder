@@ -36,6 +36,7 @@ dl:         -ldl
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
 easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca2-legacy/libraries/audio/easy_vad -lVAD
+eigen:      -I/usr/include/eigen3/
 esd:        -lesd
 festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -lesd -leststring -lestools -lcurses 
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
@@ -80,6 +81,7 @@ openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
+pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl-1.6/pcl/
 parapin:    -I<parapin.h,parapindriver.h>
 PhysX:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
 Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
