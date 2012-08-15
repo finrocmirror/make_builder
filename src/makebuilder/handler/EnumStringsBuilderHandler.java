@@ -90,7 +90,6 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 for (String s : file.getCppLines()) {
                     s = s.trim();
                     if (s.startsWith("enum") && (s.length() <= 4 || (!Character.isLetter(s.charAt(4))))) {
-                        // template headers with _DESCR_ need to be handled differently
                         file.mark("enum");
                         break;
                     }
