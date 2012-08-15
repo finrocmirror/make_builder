@@ -357,6 +357,9 @@ public class FinrocBuilder extends MakeFileBuilder {
         if (relative.startsWith("sources/cpp/")) {
             return relative.substring("sources/cpp/".length());
         }
+        if (relative.startsWith("build/$(TARGET)")) {
+            return relative.substring("build/$(TARGET)".length());
+        }
         return relative;
     }
 
