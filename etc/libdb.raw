@@ -82,7 +82,7 @@ openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
-pdcom:      -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom
+pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom -lethercat
 PhysX:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
 Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 PostgreSQL: -lpq -I<pg_config.h,postgres.h>
