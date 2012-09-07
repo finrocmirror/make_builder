@@ -40,9 +40,9 @@ my $output = "";
 
 
 
-sub GetCommonEnumPrefix($$)
+sub GetCommonEnumPrefix($)
 {
-    my ($enum, $values) = @_;
+    my ($values) = @_;
 
     return "" unless $$values[0] =~ /^e/;
     return "e" if @$values == 1;
@@ -65,14 +65,14 @@ sub ValidateEnumValue($$)
     my ($value, $common_prefix) = @_;
 
     my $upper_case_part = substr $value, $common_prefix ne "";
-
-    return $upper_case_part eq uc $upper_case_part and $value =~ /^$common_prefix/ and length $value > length $common_prefix;
+    
+    return ($upper_case_part eq uc $upper_case_part and $value =~ /^$common_prefix/ and length $value > length $common_prefix);
 }
 
 sub ReportInvalidEnumerationAndDie($$)
 {
     my ($enum, $names) = @_;
-    
+
     my @enum_name_parts = split "::", $enum;
 
     my $find_files_command = sprintf "find -L -name %s", join " -o -name ", map { $$_{'name'}; } @{$$::doxydocs{'files'}};
@@ -88,8 +88,12 @@ sub ReportInvalidEnumerationAndDie($$)
         }
         next unless $file_found;
         
-        my ($filename, $line) = split ":", `grep -Hn $enum_name_parts[-1] $file`;
-        die sprintf "$filename:$line: error: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
+        my $extract_declaration_command = sprintf "grep -Hn 'enum.* %s' %s", $enum_name_parts[-1], $file;
+        if (my $declaration = `$extract_declaration_command`)
+        {
+            my ($filename, $line) = split ":", $declaration;
+            die sprintf "$filename:$line: error: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
+        }
     }
 
     die sprintf "unknown file: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
@@ -98,17 +102,20 @@ sub ReportInvalidEnumerationAndDie($$)
 sub ProcessEnum($$$)
 {
     my ($namespace, $enum, $values) = @_;
-    
+
     return unless defined $values and @$values;
     return if "@" eq substr $enum, 0, 1;
+
+    my @names = map { $$_{'name'} } @$values;
+
+    ReportInvalidEnumerationAndDie $enum, \@names unless $enum =~ /^t[A-Z][^_]*$/;
 
     $enum = sprintf "%s::%s", $namespace, $enum;
 
     my $array_name = $enum;
     $array_name =~ s/::/_/g;
 
-    my @names = map { $$_{'name'} } @$values;
-    my $common_prefix = GetCommonEnumPrefix $enum, \@names;
+    my $common_prefix = GetCommonEnumPrefix \@names;
     foreach my $name (@names)
     {
         ReportInvalidEnumerationAndDie $enum, \@names unless ValidateEnumValue $name, $common_prefix;
@@ -117,7 +124,7 @@ sub ProcessEnum($$$)
     return unless @names;
 
     @names = map { substr $_, length $common_prefix; } @names;
-    pop @names if $names[-1] eq "DIMENSION"; #=~ /^dimension$/i;
+    pop @names if $names[-1] eq "DIMENSION";
 
     $output .= sprintf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $array_name, join "\",\n  \"", map { join " ", map ucfirst, map lc, split "_" } @names;
     $output .= sprintf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $array_name, $array_name, scalar @names;
