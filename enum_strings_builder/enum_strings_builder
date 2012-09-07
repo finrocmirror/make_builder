@@ -18,6 +18,7 @@
 # \file    enum_strings_builder
 #
 # \author  Max Reichardt
+# \author  Tobias Föhst
 #
 # \date    2011-08-24
 #
@@ -30,9 +31,6 @@
 use strict;
 use DoxyDocs;
 
-my $classes = $::doxydocs->{classes};
-my $files = $::doxydocs->{files};
-my $namespaces = $::doxydocs->{namespaces};
 
 my $output_filename = $ARGV[0] or die "Output filename not specified!\n";
 
@@ -40,110 +38,124 @@ unlink $output_filename;
 
 my $output = "";
 
-# Gets common prefix of enum constants
-sub GetCommonEnumPrefix(@) {
-    my @parts_list = ();
-    my $result = "";
-    foreach my $name (@_) {
-        if ($name =~ /^e\u.*/) { # cut off leading e in any case
-            $name = substr($name, 1); 
+
+
+sub GetCommonEnumPrefix($$)
+{
+    my ($enum, $values) = @_;
+
+    return "" unless $$values[0] =~ /^e/;
+    return "e" if @$values == 1;
+
+    my $common_prefix = $$values[0];
+    foreach my $value (@$values)
+    {
+        while (length $common_prefix)
+        {
+            last if $common_prefix eq substr $value, 0, length $common_prefix;
+            $common_prefix = substr $common_prefix, 0, -1 + length $common_prefix;
         }
-        my @temp = split('_', $name);
-        push @parts_list, \@temp;
     }
-    for my $i (0..1000) {
-        my $first_parts = $parts_list[0];
-        my $part = @$first_parts[$i];
-        foreach my $parts (@parts_list) {
-            if (@$parts <= $i || !(@$parts[$i] eq $part)) {
-                return $result;
-            }
-        }
-        $result = $result . $part . "_";
-    }
-    return $result;
+
+    return $common_prefix;
 }
 
-# Performs 'natural' formatting (code from original description_builder)
-sub FormatEnum {
-    my $enum_value = shift;
-    my @words = split ("_", $enum_value);
-    @words = map lc, @words;
-    @words = map ucfirst, @words;
-    $enum_value = join (" ", @words);
-    return $enum_value;
+sub ValidateEnumValue($$)
+{
+    my ($value, $common_prefix) = @_;
+
+    my $upper_case_part = substr $value, $common_prefix ne "";
+
+    return $upper_case_part eq uc $upper_case_part and $value =~ /^$common_prefix/ and length $value > length $common_prefix;
 }
 
-# Takes namespace (&class) name, enum name and 'values' array and writes code to C++ file
-sub ProcessEnum {
-    my $namespace_name = shift;
-    my $enum_name = shift;
-    my $values = shift;
+sub ReportInvalidEnumerationAndDie($$)
+{
+    my ($enum, $names) = @_;
+    
+    my @enum_name_parts = split "::", $enum;
 
-    if ((!defined($values)) or @$values <= 1 or substr($enum_name, 0, 1) eq "@") {
-        return;
+    my $find_files_command = sprintf "find -L -name %s", join " -o -name ", map { $$_{'name'}; } @{$$::doxydocs{'files'}};
+    my $filter_files_command = sprintf "grep -l %s", $enum_name_parts[0];
+    foreach my $file (`$find_files_command | xargs $filter_files_command`)
+    {
+        $file =~ s/^.\///;
+
+        my $file_found = 1;
+        foreach my $enum_name_part (@enum_name_parts)
+        {
+            $file_found = 0 unless `grep $enum_name_part $file`;
+        }
+        next unless $file_found;
+        
+        my ($filename, $line) = split ":", `grep -Hn $enum_name_parts[-1] $file`;
+        die sprintf "$filename:$line: error: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
     }
 
-    my $postfix = lc($namespace_name . "::" . $enum_name);
-    $postfix =~ s/::/_/g;
+    die sprintf "unknown file: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
+}
 
-    my @names = ();
-    foreach my $value (@$values) {
-        push @names, $value->{name};
-    }
-    my $common_prefix = GetCommonEnumPrefix(@names);
-    if (@names <= 1) {
-        $common_prefix = $names[0] =~ /^e\u.*/ ? "e" : "";
-    }
-    if ($names[-1] =~ /_DIMENSION$/) { # remove any last _DIMENSION element
-        pop(@names);
-    }
+sub ProcessEnum($$$)
+{
+    my ($namespace, $enum, $values) = @_;
+    
+    return unless defined $values and @$values;
+    return if "@" eq substr $enum, 0, 1;
 
+    $enum = sprintf "%s::%s", $namespace, $enum;
+
+    my $array_name = $enum;
+    $array_name =~ s/::/_/g;
+
+    my @names = map { $$_{'name'} } @$values;
+    my $common_prefix = GetCommonEnumPrefix $enum, \@names;
     foreach my $name (@names)
     {
-#        die sprintf "Illegal enum declaration { %s }\n", join ", ", @names unless length $name > length $common_prefix;
-	return unless length $name > length $common_prefix;
+        ReportInvalidEnumerationAndDie $enum, \@names unless ValidateEnumValue $name, $common_prefix;
     }
 
-    $output .= sprintf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $postfix, join "\",\n  \"", map { FormatEnum(substr($_, length $common_prefix)) } @names;
-    $output .= sprintf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $postfix, $postfix, scalar @names;
-    $output .= sprintf "__attribute__ ((init_priority (101))) static tRegisterEnumStrings init_strings_%s(\"%s::%s\", enum_strings_%s);\n", $postfix, $namespace_name, $enum_name, $postfix;
+    return unless @names;
+
+    @names = map { substr $_, length $common_prefix; } @names;
+    pop @names if $names[-1] eq "DIMENSION"; #=~ /^dimension$/i;
+
+    $output .= sprintf "const char *strings_%s[] = {\n  \"%s\"\n};\n", $array_name, join "\",\n  \"", map { join " ", map ucfirst, map lc, split "_" } @names;
+    $output .= sprintf "const tEnumStrings enum_strings_%s = { strings_%s, %d };\n", $array_name, $array_name, scalar @names;
+    $output .= sprintf "__attribute__ ((init_priority (101))) static tRegisterEnumStrings init_strings_%s(\"%s\", enum_strings_%s);\n", $array_name, $enum, $array_name;
     $output .= sprintf "\n";
 }
 
+
 # generate code for outer-class enum strings
-foreach my $namespace (@$namespaces) {
-    my $namespace_name = $namespace->{name};
-    my $enums = $namespace->{enums}->{members};
-    foreach my $enum (@$enums) {
-        my $enum_name = $enum->{name};
-        my $values = $enum->{values};
-        ProcessEnum($namespace_name, $enum_name, $values);
+foreach my $namespace (@{$$::doxydocs{'namespaces'}})
+{
+    foreach my $enum (@{$$namespace{'enums'}{'members'}})
+    {
+        ProcessEnum $$namespace{'name'}, $$enum{'name'}, $$enum{'values'};
     }
 }
 
 # generate code for enums defined in classes
-foreach my $class (@$classes) {
-    my $members = $class->{public_typedefs}->{members};
-    my $class_name = $class->{name};
-    foreach my $member (@$members) {
-        my $kind = $member->{kind};
-        my $name = $member->{name};
-        if (!($kind eq "enum") or (length($name) <= 0)) {
-            next;
-        }
-        my $values = $member->{values};
-        ProcessEnum($class_name, $name, $values);
+foreach my $class (@{$$::doxydocs{'classes'}})
+{
+    foreach my $member (@{$$class{'public_typedefs'}{'members'}})
+    {
+        next unless $$member{'kind'} eq "enum" and length $$member{'name'};
+        ProcessEnum $$class{'name'}, $$member{'name'}, $$member{'values'};
     }
 }
+
+
 
 open OUTPUT, ">$output_filename" or die "Could not open '$output_filename' for writing: $!\n";
 
 # generate header comment
+my @files = @{$$::doxydocs{'files'}};
 printf OUTPUT "/*\n";
-printf OUTPUT " * This file was automatically generated from the source file%s\n", scalar @$files > 1 ? "s" : "";
-printf OUTPUT " * %s\n", join "\n * ", (map { $_->{'name'} } @$files);
-printf OUTPUT " * using enum_strings_builder.\n";
+printf OUTPUT " * This file was automatically generated by enum_strings_builder from\n";
+printf OUTPUT " * the following source file%s:\n", scalar @files > 1 ? "s" : "";
+printf OUTPUT " * %s\n", join "\n * ", (map { $$_{'name'} } @files);
+printf OUTPUT " *\n";
 printf OUTPUT " * This code is released under the same license as the source files.\n";
 printf OUTPUT " */\n\n";
 
