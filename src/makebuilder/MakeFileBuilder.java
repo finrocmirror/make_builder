@@ -208,7 +208,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // dump dependency graph to dot file?
         if (getOptions().outputDotFile) {
-            DotFile.write(new File("targets.dot"), buildEntities);
+            DotFile.write(new File("targets.dot"), buildEntities, sources);
             return;
         }
 
