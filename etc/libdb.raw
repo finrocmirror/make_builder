@@ -106,6 +106,13 @@ qwt:        -lqwt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt-qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 qwt6:       -I<qwt_abstract_scale.h> -lqwt6 -I/usr/include/qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
+ros-ros:    -lros -I<ros/ros.h>
+ros-cpp_serialization:	-lroscpp_serialization
+ros-console:-lrosconsole
+ros-time:   -lrostime
+ros-roslib: -lroslib
+ros-rospack:	-lrospack
+ros-rosstack:	-lrosstack
 rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
