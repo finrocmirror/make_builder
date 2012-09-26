@@ -129,7 +129,8 @@ tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 triclops:   -I<pnmutils.h,triclops3d.h,triclopsbuffer.h,triclopscontext.h,triclops.h,triclopsimageio.h,triclopsrectify.h,triclopsstereo.h,triclopsvalidation.h> -ltriclops -lpnmutils
 usb:        -I<libusb.h> -lusb
 uuid:       -I<uuid/uuid.h> -luuid
-v4l1:        -I<libv4l1-videodev.h>
+v4l1:       -I<libv4l1-videodev.h>
+x264:       -I<x264.h>
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
-z:          -I<zlib.h> -lz 
+z:          -I<zlib.h> -lz
