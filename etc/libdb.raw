@@ -117,6 +117,7 @@ ros-rosstack:	-lrosstack -L/opt/ros/diamondback/ros/tools/rospack/lib/
 ros-cpp_traits: -I<ros/message_traits.h>
 ros-comm_xmlrpcpp: -I<XmlRpcValue.h>
 ros-comm_messages: -I<std_msgs/String.h>
+ros-turtlesim: -I<turtlesim/Pose.h>
 rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
