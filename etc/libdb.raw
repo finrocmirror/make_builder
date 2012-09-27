@@ -27,7 +27,7 @@ cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil
-cutil:      -I<cutil.h> -lcutil_i386
+cutil:      -I<cutil.h> -lcutil_i386 -lm
 crypt:      -I<crypt.h> -lcrypt
 db++:       -I<db_cxx.h> -ldb_cxx
 dbxml:      -I<DbXml.hpp> -ldbxml
@@ -71,9 +71,9 @@ obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm
 ode:        -I<ode/ode.h> -lode
 oiv:        -D _LIB_OIV_PRESENT_  -I<Inventor/SoDB.h> -lCoin
 opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
-opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
+opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux
 opencv_core:-D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
-opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui
+opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video
 opencl: -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
 opencl:  -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
