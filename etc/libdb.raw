@@ -123,6 +123,8 @@ ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h>
 ros-geometry_msgs: -I<geometry_msgs/Pose.h>
 ros-tf:	-I<tf/tfMessage.h>
 ros-turtlesim: -I<turtlesim/Pose.h>
+ros-geometry-tf: -I<tf/tf.h>
+ros-geometry-bullet: -I<LinearMath/btTransform.h>
 rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
