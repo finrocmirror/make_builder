@@ -125,6 +125,7 @@ ros-tf:	-I<tf/tfMessage.h>
 ros-turtlesim: -I<turtlesim/Pose.h>
 ros-geometry-tf: -I<tf/tf.h>
 ros-geometry-bullet: -I<LinearMath/btTransform.h>
+ros-p2os_driver_msgs: -I<p2os_driver/SonarArray.h>
 rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
