@@ -75,6 +75,8 @@ sub ReportInvalidEnumerationAndDie($$)
 
     my @enum_name_parts = split "::", $enum;
 
+    my ($filename, $line) = ("unknown file", "?");
+
     my $find_files_command = sprintf "find -L -name %s", join " -o -name ", map { $$_{'name'}; } @{$$::doxydocs{'files'}};
     my $filter_files_command = sprintf "grep -l %s", $enum_name_parts[0];
     foreach my $file (`$find_files_command | xargs $filter_files_command`)
@@ -91,12 +93,13 @@ sub ReportInvalidEnumerationAndDie($$)
         my $extract_declaration_command = sprintf "grep -Hn 'enum.* %s' %s", $enum_name_parts[-1], $file;
         if (my $declaration = `$extract_declaration_command`)
         {
-            my ($filename, $line) = split ":", $declaration;
-            die sprintf "$filename:$line: error: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
+            ($filename, $line) = split ":", $declaration;
+	    last;
         }
     }
 
-    die sprintf "unknown file: malformed enumeration: %s = { %s }\n", $enum, join ", ", @$names;
+    die sprintf "$filename:$line: error: enumeration violates code conventions: %s = { %s }\n".
+		        "$filename:$line: note: see http://www.finroc.org/wiki/Code%%20Conventions for more information\n", $enum, join ", ", @$names;
 }
 
 sub ProcessEnum($$$)
