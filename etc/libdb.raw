@@ -10,14 +10,14 @@ ax10420:    -I<AX10420.h>
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl
 boost:      -I<boost/any.hpp>
-boost_date_time: -I<boost/date_time.hpp> -lboost_date_time
-boost_filesystem: -I<boost/filesystem.hpp> -lboost_filesystem
-boost_iostreams: -I<boost/iostreams/stream.hpp> -lboost_iostreams
+boost_date_time:    -I<boost/date_time.hpp> -lboost_date_time
+boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem
+boost_iostreams:    -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
-can_cc_systems:    -I<cccan_public.h> -D _MCA_CC_CAN_ 
+can_cc_systems: -I<cccan_public.h> -D _MCA_CC_CAN_ 
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 cppunit:    -lcppunit
@@ -27,7 +27,7 @@ cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
 cutil:      -I<cutil.h> -lcutil
-cutil:      -I<cutil.h> -lcutil_i386
+cutil:      -I<cutil.h> -lcutil_i386 -lm
 crypt:      -I<crypt.h> -lcrypt
 db++:       -I<db_cxx.h> -ldb_cxx
 dbxml:      -I<DbXml.hpp> -ldbxml
@@ -42,7 +42,6 @@ ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMultiTypePortDataBufferPool.h> -I<finroc_core_utils/tAtomicDoubleInt.h,finroc_core_utils/container/tBoundedQElementContainer.h> -I<blackboard/tSingleBufferedBlackboardServer.h,tcp/tTCPServerConnection.h> -lfinroc_plugin_tcp -lfinroc_plugin_blackboard -lfinroc_core -lrrlib_finroc_core_utils
 flycap:     -lflycapture -I<FlyCapture2.h>
-freenect:   -I<libfreenect.h> -lfreenect
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 glui:       -I<GL/glui.h> -lglui -lGLU -IGL
@@ -54,36 +53,38 @@ java:       -I<jni.h,jawt.h,jni_md.h> -ljava
 jni:        -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h>
 jni:        -I<jni.h,jawt.h,jni_md.h>
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
+lti:        -I/usr/include/ltilib -L/usr/lib/ltilib -lltir.a
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
-lxrt:       N/A
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 mpfr:	    -lmpfr
-mysqlcppconn: -I<mysql_driver.h> -lmysqlcppconn
+mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
 netpbm:     -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -I<Newton.h> -lNewton
+nite:       -I/usr/include/ni -lOpenNI
 npp32:      -I<npp.h> -lnpp32 -D_LIB_NPP_PRESENT_
 npp32:      -I<npp.h> -lnpp -D_LIB_NPP_PRESENT_
 npp32util:  -lUtilNPP32 -I<ImagesNPP.h>
 nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
-obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lfedm -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h','FEDM_Functions.h','FEDM_ISCReader.h','FEDM_ISCReaderID_LRU1000.h','FEDM_ISOTabItem.h','fefu.h','FEDM_Base.h','FEDM.h','FEDM_ISCReaderID.h','FEDM_ISCReaderID_LRU2000.h','FEDM_XmlBase.h','feisc.h','FEDM_BRMTabItem.h','FEDM_ISCFunctionUnit.h','FEDM_ISCReaderID_LR2000.h','FEDM_ISCReaderID_MR200.h','FEDM_Xml.h','fetcp.h','FEDM_DataBase.h','FEDM_ISCFunctionUnitID.h','FEDM_ISCReaderID_LR200.h','FEDM_ISCReaderModule.h','FEDM_XmlReaderCfgDataModul.h','feusb.h'>
+obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lFedmIscCore -lfetcl -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h'>
 ode:        -I<ode/ode.h> -lode
 oiv:        -D _LIB_OIV_PRESENT_  -I<Inventor/SoDB.h> -lCoin
-opencv_core:-D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
-opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui
-opencv_core:-D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
-opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui 
-opencl: -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
-opencl:  -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
+opencv_core:    -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
+opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video
+opencv_core:    -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
+opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui
+opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
+opencl:     -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
-PhysX:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
-Poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
-PostgreSQL: -lpq -I<pg_config.h,postgres.h>
+pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl-1.6/pcl/ -I/usr/include/eigen3/ -lpcl_filters
+physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
+poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
+postgres:   -lpq -I<pg_config.h,postgres.h>
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
@@ -97,7 +98,7 @@ qt4xml:     -D _MCA_QT_4_ -D _MCA_QT_4_XML_ -D QT_THREAD_SUPPORT -I<QtXml/qxml.h
 qt4opengl:  -D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
 qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -I<QtWebKit/qwebview.h> -lQtCore -lQtWebKit
 qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
-qt4_no_debug: -D QT_NO_DEBUG_OUTPUT
+qt4_no_debug:   -D QT_NO_DEBUG_OUTPUT
 qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
 quarter:    -I<Quarter/Quarter.h> -lQuarter
@@ -115,7 +116,9 @@ speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 triclops:   -I<pnmutils.h,triclops3d.h,triclopsbuffer.h,triclopscontext.h,triclops.h,triclopsimageio.h,triclopsrectify.h,triclopsstereo.h,triclopsvalidation.h> -ltriclops -lpnmutils
 usb:        -I<libusb.h> -lusb
-v4l1:        -I<libv4l1-videodev.h>
+uuid:       -I<uuid/uuid.h> -luuid
+v4l1:       -I<libv4l1-videodev.h>
+x264:       -I<x264.h>
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
-z:          -I<zlib.h> -lz 
+z:          -I<zlib.h> -lz
