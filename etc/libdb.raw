@@ -106,8 +106,8 @@ qwt:        -lqwt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 qwt5:       -I<qwt_abstract_scale.h> -lqwt-qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
 qwt6:       -I<qwt_abstract_scale.h> -lqwt6 -I/usr/include/qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/Qt
-ros:    -lros -I<ros/ros.h> -L/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp/lib/ -Wl,-rpath,/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp/lib
-ros-cpp_common: -I<ros/exception.h>
+ros:    -I<ros/ros.h> -lroslib -L/opt/ros/fuerte/lib/ -Wl,-rpath,/opt/ros/fuerte/lib
+ros-cpp_common: -I<ros/exception.h> -lroscpp
 ros-cpp_serialization:	-lroscpp_serialization -I<ros/serialized_message.h> -L/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp_serialization/lib/ -Wl,-rpath,/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp_serialization/lib
 ros-console:-lrosconsole -I<ros/console.h> -L/opt/ros/diamondback/stacks/ros_comm/tools/rosconsole/lib/ -Wl,-rpath,/opt/ros/diamondback/stacks/ros_comm/tools/rosconsole/lib
 ros-time:   -lrostime -I<ros/time.h> -L/opt/ros/diamondback/stacks/ros_comm/utilities/rostime/lib/ -Wl,-rpath,/opt/ros/diamondback/stacks/ros_comm/utilities/rostime/lib
