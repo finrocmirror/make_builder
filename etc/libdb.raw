@@ -137,7 +137,7 @@ sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
 soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4
 soqt:       -I<Inventor/Qt/SoQt.h> -include Qt/qglobal.h -lSoQt
-sopas:      -I<SopasBasicTypes.h> -lsopas_communication -lsopas_lms100 -lsopas_framer
+sopas:      -I<SopasBasicTypes.h> -lsopas_communication -lsopas_lms100 -lsopas_framer -lsopas_com
 speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 triclops:   -I<pnmutils.h,triclops3d.h,triclopsbuffer.h,triclopscontext.h,triclops.h,triclopsimageio.h,triclopsrectify.h,triclopsstereo.h,triclopsvalidation.h> -ltriclops -lpnmutils
