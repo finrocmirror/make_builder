@@ -18,6 +18,7 @@ boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 can_cc_systems: -I<cccan_public.h> -D _MCA_CC_CAN_ 
+canfestival_peak: -I<canfestival/canfestival.h> -lcanfestival_can_peak_linux -D _CANFESTIVAL_PEAK_ -I /usr/local/include/canfestival
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 cppunit:    -lcppunit
@@ -37,6 +38,7 @@ dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
 easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca2-legacy/libraries/audio/easy_vad -lVAD
 esd:        -lesd
+ethercat:   -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lethercat
 festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -lesd -leststring -lestools -lcurses 
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
@@ -85,6 +87,7 @@ pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 postgres:   -lpq -I<pg_config.h,postgres.h>
+pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom -lethercat
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
@@ -137,6 +140,7 @@ speex:      -I<speex/speex.h> -lspeex -lspeexdsp
 tbb:        -I<tbb/spin_mutex.h,tbb/concurrent_hash_map.h> -ltbb
 triclops:   -I<pnmutils.h,triclops3d.h,triclopsbuffer.h,triclopscontext.h,triclops.h,triclopsimageio.h,triclopsrectify.h,triclopsstereo.h,triclopsvalidation.h> -ltriclops -lpnmutils
 usb:        -I<libusb.h> -lusb
+usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
 x264:       -I<x264.h>
