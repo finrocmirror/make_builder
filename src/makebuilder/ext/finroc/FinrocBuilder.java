@@ -302,7 +302,7 @@ public class FinrocBuilder extends MakeFileBuilder {
 
         // create additional defines
         for (BuildEntity be : buildEntities) {
-            if (!be.missingDep) {
+            if (!be.missingDep && be.getFinalHandler() == CppHandler.class) {
                 if (be instanceof RRLib) {
                     // _RRLIB_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_RRLIB_" + be.name.toUpperCase() + "_PRESENT_");
