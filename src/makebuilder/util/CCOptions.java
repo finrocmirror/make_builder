@@ -203,7 +203,9 @@ public class CCOptions implements Comparator<String> {
         }
         if (compile) {
             for (String s : includePaths) {
-                result += " -I" + s;
+                if (!(s.equals("/usr/include") || s.equals("/usr/local/include"))) {
+                    result += " -I" + s;
+                }
             }
         }
         if (link) {
