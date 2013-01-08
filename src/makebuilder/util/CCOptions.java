@@ -203,7 +203,9 @@ public class CCOptions implements Comparator<String> {
         }
         if (compile) {
             for (String s : includePaths) {
-                result += " -I" + s;
+                if (!(s.equals("/usr/include") || s.equals("/usr/local/include"))) {
+                    result += " -I" + s;
+                }
             }
         }
         if (link) {
@@ -254,7 +256,7 @@ public class CCOptions implements Comparator<String> {
      * @return GCC Compilter call for makefile
      */
     public String createCompileCommand(String inputs, String output, boolean cxx) {
-        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c -o " + output + " " + inputs + " " + createOptionString(true, false, cxx));
+        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c " + createOptionString(true, false, cxx)) + " -o " + output + " " + inputs;
     }
 
     /**
