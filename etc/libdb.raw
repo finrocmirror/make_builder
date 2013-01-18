@@ -61,6 +61,7 @@ loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -l
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 mpfr:	    -lmpfr
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
+mxpeg:	    -I<mxpeg_sdk/static_component_bootstrap.h> -I/usr/include/qt4/QtCore -I/usr/include/qt4 -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtOpenGL -lmxFramework -lmxm_core -lmxmQt
 netpbm:     -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -I<Newton.h> -lNewton
