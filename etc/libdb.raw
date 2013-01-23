@@ -47,6 +47,7 @@ flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 glui:       -I<GL/glui.h> -lglui -lGLU -IGL
+gmapping:   -I<gridfastslam/gridslamprocessor.h> -lgridfastslam -lconfigfile -llog -lscanmatcher -lsensor_base -lsensor_odometry -lsensor_range -lutils -L/usr/lib/gmapping -Wl,-rpath,/usr/lib/gmapping/
 gsl:        -lgsl -lgslcblas
 hokuyo:     -I<urg_sensor.h,urg_connection.h,urg_tcpclient.h,urg_utils.h> -lurg_c
 jack:       -I<jack/jack.h> -ljack
