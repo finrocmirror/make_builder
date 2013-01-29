@@ -57,7 +57,7 @@ namespace make_builder
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
-typedef std::map<std::string, const tEnumStrings * const> tEnumStringsRegister;
+typedef std::map<std::string, const internal::tEnumStrings * const> tEnumStringsRegister;
 
 //----------------------------------------------------------------------
 // Const values
@@ -82,7 +82,7 @@ tEnumStringsRegister &EnumStringsRegister()
 //----------------------------------------------------------------------
 // RegisterEnumStrings
 //----------------------------------------------------------------------
-void RegisterEnumStrings(const char *type_name, const tEnumStrings &strings)
+void RegisterEnumStrings(const char *type_name, const internal::tEnumStrings &strings)
 {
   assert(EnumStringsRegister().count(type_name) == 0 && "may only be initialized once");
   EnumStringsRegister().insert(std::make_pair(type_name, &strings));
@@ -142,9 +142,9 @@ const tEnumStrings &GetEnumStrings(const char *type_name)
 //----------------------------------------------------------------------
 // tRegisterEnumStrings constructors
 //----------------------------------------------------------------------
-tRegisterEnumStrings::tRegisterEnumStrings(const char* type_name, const tEnumStrings &strings)
+internal::tRegisterEnumStrings::tRegisterEnumStrings(const char* type_name, const tEnumStrings &strings)
 {
-  internal::RegisterEnumStrings(type_name, strings);
+  RegisterEnumStrings(type_name, strings);
 }
 
 //----------------------------------------------------------------------
