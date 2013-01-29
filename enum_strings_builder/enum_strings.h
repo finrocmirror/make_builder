@@ -56,18 +56,33 @@ namespace make_builder
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
 //----------------------------------------------------------------------
-struct tEnumStrings;
+
+enum class tEnumStringsFormat
+{
+  NATURAL,
+  UPPER,
+  LOWER,
+  CAMEL,
+  DIMENSION
+};
 
 namespace internal
 {
-const tEnumStrings &GetEnumStrings(const char *type_name);
-}
 
 struct tEnumStrings
 {
-  const char * const *strings;
+  const char * const *strings[static_cast<size_t>(tEnumStringsFormat::DIMENSION)];
   const size_t size;
 };
+
+const tEnumStrings &GetEnumStrings(const char *type_name);
+
+template <typename TEnum>
+const tEnumStrings &GetEnumStrings()
+{
+  static const tEnumStrings &enum_strings(GetEnumStrings(typeid(TEnum).name()));
+  return enum_strings;
+}
 
 /*!
  * (Typically, only used in generated code)
@@ -80,21 +95,29 @@ struct tRegisterEnumStrings
    * \param type_name Normalized namespace and typename (normalized = without any template arguments)
    * \param strings Enum strings to register (should be terminated with null pointer)
    */
-  tRegisterEnumStrings(const char* type_name, const tEnumStrings &strings);
+  tRegisterEnumStrings(const char *type_name, const tEnumStrings &strings);
 };
+
+}
 
 //----------------------------------------------------------------------
 // Function declaration
 //----------------------------------------------------------------------
 
+template <typename TEnum>
+inline size_t GetEnumStringsDimension()
+{
+  return internal::GetEnumStrings<TEnum>().size;
+}
+
 /*!
  * \return Enum strings for this enum data type
  */
 template <typename TEnum>
-const tEnumStrings &GetEnumStrings()
+const char * const *GetEnumStrings(tEnumStringsFormat format = tEnumStringsFormat::NATURAL)
 {
-  static const tEnumStrings &enum_strings(internal::GetEnumStrings(typeid(TEnum).name()));
-  return enum_strings;
+  assert(static_cast<size_t>(format) < static_cast<size_t>(tEnumStringsFormat::DIMENSION));
+  return internal::GetEnumStrings<TEnum>().strings[static_cast<size_t>(format)];
 }
 
 /*!
@@ -102,30 +125,43 @@ const tEnumStrings &GetEnumStrings()
  * \return Enum string for this enum constant
  */
 template <typename TEnum>
-inline const char *GetEnumString(TEnum value)
+inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumStringsFormat::NATURAL)
 {
-  assert(static_cast<size_t>(value) < GetEnumStrings<TEnum>().size);
-  return GetEnumStrings<TEnum>().strings[static_cast<size_t>(value)];
+  assert(static_cast<size_t>(value) < GetEnumStringsDimension<TEnum>());
+  return GetEnumStrings<TEnum>(format)[static_cast<size_t>(value)];
 }
 
-//template <typename TEnum>
-//inline TEnum GetEnumValueFromString(const std::string &string)
-//{
-//  TEnum result;
-//  const tEnumStrings &enum_strings(GetEnumStrings<TEnum>());
-//  for (size_t i = 0; i < enum_strings.size; ++i)
-//  {
-//    if (string == enum_strings.strings[i])
-//    {
-//      result = static_cast<TEnum>(i);
-//      break;
-//    }
-//  }
-//
-//  throw std::runtime_error("Could not find enum value for invalid string '" + string + "'!");
-//
-//  return result;
-//}
+template <typename TEnum>
+inline TEnum GetEnumValueFromString(const std::string &string, tEnumStringsFormat expected_format = tEnumStringsFormat::DIMENSION)
+{
+  TEnum result;
+
+  size_t format_begin = static_cast<size_t>(expected_format);
+  size_t format_end = format_begin + 1;
+  if (expected_format == tEnumStringsFormat::DIMENSION)
+  {
+    format_begin = 0;
+    format_end = static_cast<size_t>(tEnumStringsFormat::DIMENSION);
+  }
+
+  for (size_t format = format_begin; format != format_end; ++format)
+  {
+    const char * const *enum_strings(GetEnumStrings<TEnum>(static_cast<tEnumStringsFormat>(format)));
+
+    for (size_t i = 0; i < GetEnumStringsDimension<TEnum>(); ++i)
+    {
+      if (string == enum_strings[i])
+      {
+        return static_cast<TEnum>(i);
+        break;
+      }
+    }
+  }
+
+  throw std::runtime_error("Could not find enum value for string '" + string + "'!");
+
+  return result;
+}
 
 //----------------------------------------------------------------------
 // End of namespace declaration
