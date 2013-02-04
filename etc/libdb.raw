@@ -55,7 +55,7 @@ java:       -I<jni.h,jawt.h,jni_md.h> -ljava
 jni:        -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h>
 jni:        -I<jni.h,jawt.h,jni_md.h>
 ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
-lti:        -I/usr/include/ltilib -L/usr/lib/ltilib -lltir.a
+lti:        -I/usr/include/ltilib -L/usr/lib/ltilib -lltir
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
