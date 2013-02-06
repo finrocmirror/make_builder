@@ -78,7 +78,7 @@ opencv_core:    -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cx
 opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video -lopencv_ml
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
 opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lcxcore -lcv -lcvaux -lhighgui -lml
-opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
+opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h>  -lOpenCL
 opencl:     -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
