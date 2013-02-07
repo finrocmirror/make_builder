@@ -63,7 +63,7 @@ magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 mpfr:	    -lmpfr
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
 mxpeg:	    -I<mxpeg_sdk/static_component_bootstrap.h> -I/usr/include/qt4/QtCore -I/usr/include/qt4 -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtOpenGL -lmxFramework -lmxm_core -lmxmQt
-netpbm:     -I<pam.h> -lnetpbm
+netpbm:     -D _LIB_NETPBM_PRESENT_ -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -I<Newton.h> -lNewton
 nite:       -I/usr/include/ni -lOpenNI
