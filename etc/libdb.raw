@@ -93,14 +93,14 @@ phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperiment
 plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
 pwc:        -I<pwc-ioctl.h>
 pthread:    -I<pthread.h> -lpthread
-qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
-qt4core:    -D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -I<QtCore/qcoreapplication.h> -lQtCore
-qt4gui:     -D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -I<QtGui/qapplication.h> -lQtCore -lQtGui
-qt4sql:     -D _MCA_QT_4_ -D _MCA_QT_4_SQL_ -D QT_THREAD_SUPPORT -I<QtSql/qsqldatabase.h> -lQtCore -lQtSql
-qt4xml:     -D _MCA_QT_4_ -D _MCA_QT_4_XML_ -D QT_THREAD_SUPPORT -I<QtXml/qxml.h> -lQtCore -lQtXml
-qt4opengl:  -D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
-qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -I<QtWebKit/qwebview.h> -lQtCore -lQtWebKit
-qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
+qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
+qt4core:    -D _MCA_QT_4_ -D _MCA_QT_4_CORE_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtCore/qcoreapplication.h> -lQtCore
+qt4gui:     -D _MCA_QT_4_ -D _MCA_QT_4_GUI_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtGui/qapplication.h> -lQtCore -lQtGui
+qt4sql:     -D _MCA_QT_4_ -D _MCA_QT_4_SQL_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtSql/qsqldatabase.h> -lQtCore -lQtSql
+qt4xml:     -D _MCA_QT_4_ -D _MCA_QT_4_XML_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtXml/qxml.h> -lQtCore -lQtXml
+qt4opengl:  -D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
+qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtWebKit/qwebview.h> -lQtCore -lQtWebKit
+qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
 qt4_no_debug:   -D QT_NO_DEBUG_OUTPUT
 qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
