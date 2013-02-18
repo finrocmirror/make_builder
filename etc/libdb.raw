@@ -18,7 +18,7 @@ boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 can_cc_systems: -I<cccan_public.h> -D _MCA_CC_CAN_ 
-canfestival_peak: -I<canfestival/canfestival.h> -lcanfestival_can_peak_linux -D _CANFESTIVAL_PEAK_ -I /usr/local/include/canfestival
+canfestival: -I<canfestival/canfestival.h> -lcanfestival_unix -lcanfestival -I /usr/local/include/canfestival
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 cppunit:    -lcppunit
