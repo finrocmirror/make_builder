@@ -8,7 +8,7 @@ asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 ax10420:    -I<AX10420.h>
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
-bfl:        -I<filter/filter.h> -lorocos-bfl
+bfl:        -I<filter/filter.h> -lorocos-bfl -lginac
 boost:      -I<boost/any.hpp>
 boost_date_time:    -I<boost/date_time.hpp> -lboost_date_time
 boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem
