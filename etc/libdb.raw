@@ -108,29 +108,19 @@ qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
 quarter:    -I<Quarter/Quarter.h> -lQuarter
 qwt:        -I/usr/include/qwt -I<qwt_abstract_scale.h> -lqwt -I /usr/include/qt4/Qt -I /usr/include/qt4/QtGui
-ros-core:   -D _ROS_CORE_PRESENT_ -I<ros/ros.h,ros/exception.h,ros/serialized_message.h,ros/console.h,ros/time.h> -lroslib -lroscpp -lroscpp_serialization -lrosconsole -lrostime -lrospack -L/opt/ros/fuerte/lib/ -Wl,-rpath,/opt/ros/fuerte/lib
-ros-common_msgs: -D _ROS_COMMON_MSGS_PRESENT_ -I<sensor_msgs/LaserScan.h,nav_msgs/OccupancyGrid.h,geometry_msgs/Pose.h>
-<!-- ros:    -I<ros/ros.h> -lroslib -L/opt/ros/fuerte/lib/ -Wl,-rpath,/opt/ros/fuerte/lib -->
-<!-- ros-cpp_common: -I<ros/exception.h> -lroscpp -->
-<!-- ros-cpp_serialization:   -lroscpp_serialization -I<ros/serialized_message.h> -L/opt/ros/fuerte/stacks/ros_comm/clients/cpp/roscpp_serialization/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/clients/cpp/roscpp_serialization/lib -->
-<!-- ros-console:-lrosconsole -I<ros/console.h> -L/opt/ros/fuerte/stacks/ros_comm/tools/rosconsole/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/tools/rosconsole/lib -->
-<!-- ros-time:   -lrostime -I<ros/time.h> -L/opt/ros/fuerte/stacks/ros_comm/utilities/rostime/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/utilities/rostime/lib -->
-<!-- ros-roslib: -lroslib -L/opt/ros/fuerte/ros/core/roslib/lib/ -->
-<!-- ros-rospack: -lrospack -L/opt/ros/fuerte/ros/tools/rospack/lib/ -->
-ros-rosstack:    -lrosstack -L/opt/ros/fuerte/ros/tools/rospack/lib/
-<!-- ros-cpp_traits: -I<ros/message_traits.h> -->
-<!-- ros-comm_xmlrpcpp: -I<XmlRpcValue.h> -->
-<!-- ros-std_msgs: -I<std_msgs/String.h> -I<std_msgs/header_deprecated_def.h> -->
-<!-- ros-sensor_msgs: -I<sensor_msgs/LaserScan.h> -->
-<!-- ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h> -->
-<!-- ros-geometry_msgs: -I<geometry_msgs/Pose.h> -->
+ros:   -D _ROS_CORE_PRESENT_ \
+	-I<ros/ros.h,ros/exception.h,ros/serialized_message.h,ros/console.h,ros/time.h> -lroslib -lroscpp -lroscpp_serialization -lrosconsole -lrostime -lrospack -lxmlrpcpp -L/opt/ros/groovy/lib/ -Wl,-rpath,/opt/ros/groovy/lib
+ros-std_msgs: -I<std_msgs/String.h> -I<std_msgs/header_deprecated_def.h>
+ros-sensor_msgs: -I<sensor_msgs/LaserScan.h>
+ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h>
+ros-geometry_msgs: -I<geometry_msgs/Pose.h>
 ros-tf:  -I<tf/tfMessage.h>
 ros-turtlesim: -I<turtlesim/Pose.h>
 ros-geometry-tf: -I<tf/tf.h>
 ros-geometry-bullet: -I<LinearMath/btTransform.h>
 ros-p2os_driver_msgs: -I<p2os_driver/SonarArray.h>
-<!-- ros-cpp_srvs:    -I<roscpp/GetLoggers.h> -->
-<!-- ros-cpp_msgs:    -I<roscpp/Logger.h> -->
+ros-cpp_srvs:    -I<roscpp/GetLoggers.h>
+ros-cpp_msgs:    -I<roscpp/Logger.h>
 rt:         -lrt
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
