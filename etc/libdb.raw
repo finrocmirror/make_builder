@@ -27,8 +27,7 @@ cudart:     -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUDART)
 cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
-cutil:      -I<cutil.h> -lcutil
-cutil:      -I<cutil.h> -lcutil_i386 -lm
+cutil:      -Llibraries/camera_sensor/cuda/cutil -Ilibraries/camera_sensor/cuda/cutil -lcutil_i386 -lm
 crypt:      -I<crypt.h> -lcrypt
 db++:       -I<db_cxx.h> -ldb_cxx
 dbxml:      -I<DbXml.hpp> -ldbxml
@@ -69,7 +68,6 @@ newton:     -I<Newton.h> -lNewton
 nite:       -I/usr/include/ni -lOpenNI
 npp32:      -I<npp.h> -lnpp32 -D_LIB_NPP_PRESENT_
 npp32:      -I<npp.h> -lnpp -D_LIB_NPP_PRESENT_
-npp32util:  -lUtilNPP32 -I<ImagesNPP.h>
 nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lFedmIscCore -lfetcl -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h'>
 ode:        -I<ode/ode.h> -lode
