@@ -42,6 +42,7 @@ festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -les
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMultiTypePortDataBufferPool.h> -I<finroc_core_utils/tAtomicDoubleInt.h,finroc_core_utils/container/tBoundedQElementContainer.h> -I<blackboard/tSingleBufferedBlackboardServer.h,tcp/tTCPServerConnection.h> -lfinroc_plugin_tcp -lfinroc_plugin_blackboard -lfinroc_core -lrrlib_finroc_core_utils
+flann:      -I<flann.h,flann.hpp> -lflann -lflann_cpp 
 flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
@@ -83,7 +84,7 @@ openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
-pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl-1.6/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io
+pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl-1.6/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 postgres:   -lpq -I<pg_config.h,postgres.h>
