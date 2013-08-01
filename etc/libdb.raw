@@ -92,6 +92,7 @@ pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
+prrt:       -I<prrt/prrt_sockets.h> -lprrt
 pwc:        -I<pwc-ioctl.h>
 pthread:    -I<pthread.h> -lpthread
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
@@ -132,7 +133,7 @@ usb:        -I<libusb.h> -lusb
 usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
-x264:       -I<x264.h>
+x264:       -I<x264.h> -lx264
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
 z:          -I<zlib.h> -lz
