@@ -11,7 +11,7 @@ bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -l
 bfl:        -I<filter/filter.h> -lorocos-bfl -lginac
 boost:      -I<boost/any.hpp>
 boost_date_time:    -I<boost/date_time.hpp> -lboost_date_time
-boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem
+boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem -lboost_system
 boost_iostreams:    -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
