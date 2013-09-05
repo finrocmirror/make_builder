@@ -102,8 +102,10 @@ public class Makefile {
         ps.print(".PHONY: clean all init");
         for (Target t : phonyTargets.values()) {
             if (!t.name.startsWith(".")) {
-                ps.print(" " + t.name);
-                ps.print(" clean-" + t.name);
+                ps.print("\t");
+                ps.print(t.name);
+                ps.print("clean-" + t.name);
+                ps.print(" \\\n");
             }
         }
         ps.println("\n");
@@ -323,7 +325,7 @@ public class Makefile {
         private void writeTo(PrintStream ps) {
             ps.print(name + " :");
             for (String dep : dependencies) {
-                ps.print(" ");
+                ps.print(" \\\n\t");
                 ps.print(dep);
             }
             if (!ooDependencies.isEmpty()) {

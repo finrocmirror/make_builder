@@ -35,21 +35,16 @@ import makebuilder.util.Files;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * Get infos on libraries using the pkg-config tool
  *
- * Contains specific information about external libraries
- *
- * Handles/manages entries in libdb.txt
+ * @author Michael Arndt <m_arndt@cs.uni-kl.de>
  */
-public class LibDB {
+public class PkgConfig {
 
     /** Mapping: Library name => library */
-    private static Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
+    private static Map<String, ExtLib> known_packages = new HashMap<String, ExtLib>();
 
-    /** File names of files to process */
-    static final String LIBDB_RAW = "libdb.raw", LIBDB_TXT = "libdb.txt", LIBDB_JAVA = "libdb.java";
 
-    /** Load libdb.txt at the beginning */
     static {
         reinit();
     }
@@ -59,39 +54,25 @@ public class LibDB {
      * may be called again, if file changes
      */
     public static void reinit() {
-        libs.clear();
+        known_packages.clear();
         try {
-            loadLibDb(LIBDB_TXT, true);
-            if (Util.getFileInEtcDir(LIBDB_JAVA).exists()) {
-                loadLibDb(LIBDB_JAVA, false);
+            Process p = Runtime.getRuntime().exec("pkg-config --list-all");
+            p.waitFor();
+            if (p.exitValue() != 0) {
+                System.out.println(Util.color("Could not call pkg-config, will not attempt to make use of it.", Util.Color.RED, false));
+            }
+            for (String s : Files.readLines(p.getInputStream())) {
+                String[] spl = s.split("\\s");
+                if (spl.length > 0) {
+                    //System.out.println("Got package: " + spl[0]);
+                    known_packages.put(spl[0], null); // perform lazy lookup
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Loads libdb file
-     *
-     * @param libdbTxt file name (relative to make_builder/etc directory)
-     * @param cpp c/c++ library?
-     */
-    private static void loadLibDb(String libdbTxt, boolean cpp) throws IOException {
-
-        // external libraries
-        File f = Util.getFileInEtcDir(libdbTxt);
-        List<String> lines = Files.readLines(f);
-        for (String s : lines) {
-            if (s.trim().length() <= 1) {
-                continue;
-            }
-            //s = s.replace("$MCAHOME$", MakeFileBuilder.HOME.getAbsolutePath());
-            int split = s.indexOf(":");
-            String name =  s.substring(0, split).trim();
-            String flags = s.substring(split + 1).trim();
-            libs.put(name, new ExtLib(name, flags, cpp));
-        }
-    }
 
     /**
      * Add all available libraries to specified lines.
@@ -100,7 +81,9 @@ public class LibDB {
      * @param defines List with defines
      */
     public static void addDefines(List<String> defines) {
-        for (Map.Entry<String, ExtLib> e : libs.entrySet()) {
+        for (Map.Entry<String, ExtLib> e : known_packages.entrySet()) {
+            if (e.getValue() == null)
+                continue;
             String opts = e.getValue().options;
             if (!opts.contains("N/A")) {
                 // _LIB_OPENCV_PRESENT_
@@ -115,11 +98,36 @@ public class LibDB {
      * @throws Exception Thrown when not found
      */
     public static ExtLib getLib(String lib) throws Exception {
-        ExtLib el = libs.get(lib);
+
+        ExtLib el = known_packages.get(lib);
         if (el != null) {
-            return libs.get(lib);
+            return el;
+        } else {
+            // get the info from pkg-config
+            Process p = Runtime.getRuntime().exec(new String[] {"pkg-config", "--cflags", "--libs", lib});
+            String options = "";
+            p.waitFor();
+            if (p.exitValue() != 0) {
+                // looks like pkg-config has failed, that can e.g. happen if dependencies specified
+                // with "Requires:" cannot be satisfied. In this case, makeBuilder should fail
+                System.out.println(Util.color("Calling pkg-config for " + lib + " failed:", Util.Color.RED, true));
+                for (String s : Files.readLines(p.getErrorStream())) {
+                    System.out.println(Util.color(" " + s, Util.Color.RED, true));
+                }
+                System.out.println(Util.color("It is not safe to continue, so I am going to bail out now ...", Util.Color.RED, true));
+                System.exit(1);
+
+            }
+            for (String s : Files.readLines(p.getInputStream())) {
+                options = options + s + " ";
+            }
+            System.out.println("Options for package " + lib + ": " + options);
+            ExtLib library = new ExtLib(lib, options, true);
+            known_packages.put(lib, library);
+            return library;
+
         }
-        throw new Exception("cannot find entry for external library " + lib);
+
     }
 
     /**
@@ -127,11 +135,7 @@ public class LibDB {
      * @return Is library with this name available?
      */
     public static boolean available(String lib) {
-        ExtLib el = libs.get(lib);
-        if (el != null) {
-            return el.available();
-        }
-        return false;
+        return known_packages.containsKey(lib);
     }
 
     /**
@@ -141,10 +145,10 @@ public class LibDB {
      * @param bes All build entities
      */
     public static void findLocalDependencies(Collection<BuildEntity> bes) {
-        for (ExtLib el : libs.values()) {
-            el.findLocalDependencies(bes);
+        for (ExtLib el : known_packages.values()) {
+            if (el != null)
+                el.findLocalDependencies(bes);
         }
     }
-
 
 }
