@@ -2,7 +2,7 @@
  * You received this file as part of an experimental
  * build tool ('makebuilder') - originally developed for MCA2.
  *
- * Copyright (C) 2010 Max Reichardt,
+ * Copyright (C) 2010-2013 Max Reichardt,
  *   Robotics Research Lab, University of Kaiserslautern
  *
  * This program is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@ public class DotFile {
             ps.println("digraph makebuilder");
             ps.println("{");
             for (BuildEntity be : buildEntities) {
-                if (!be.isLibrary()) {
+                if (!be.isLibrary() || be.missingDep) {
                     continue;
                 }
                 for (BuildEntity dep : be.dependencies) {
@@ -113,6 +113,7 @@ public class DotFile {
         }
 
         try {
+            System.out.println("sloccount " + fileList);
             Process p = Runtime.getRuntime().exec("sloccount " + fileList);
             p.waitFor();
             List<String> lines = Files.readLines(p.getInputStream());
@@ -123,7 +124,7 @@ public class DotFile {
                 if (start && (line.startsWith("cpp:") || line.startsWith("ansic:"))) {
                     line = line.substring(line.indexOf(":") + 1);
                     line = line.substring(0, line.indexOf("(") - 1);
-                    count = Integer.parseInt(line.trim());
+                    count += Integer.parseInt(line.trim());
                 }
             }
             return "" + count;
