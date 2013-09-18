@@ -107,6 +107,7 @@ qt4xml:     -D _MCA_QT_4_ -D _MCA_QT_4_XML_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWOR
 qt4opengl:  -D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
 qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtWebKit/qwebview.h> -lQtCore -lQtWebKit
 qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
+qt4uitools: -D _MCA_QT_4_ -D _MCA_QT_4_UITOOLS_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtUiTools/quiloader.h> -lQtUiTools
 qt4_no_debug:   -D QT_NO_DEBUG_OUTPUT
 qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
