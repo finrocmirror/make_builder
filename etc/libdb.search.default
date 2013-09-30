@@ -2,9 +2,9 @@
 
 set -o verbose #echo on
 
-find -L /usr/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /usr/include
 find -L /usr/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /usr/local/include
 find -L /usr/local/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/local/cuda -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L /usr/local/sopas -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'

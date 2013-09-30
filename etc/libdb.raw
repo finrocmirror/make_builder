@@ -36,7 +36,7 @@ dl:         -ldl
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
 easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca2-legacy/libraries/audio/easy_vad -lVAD
-eigen:      -I<Eigen/src/Core/Array.h>
+eigen:      -I<Eigen/Eigen>
 esd:        -lesd
 espeak:     -I<speak_lib.h> -lespeak
 ethercat:   -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lethercat
