@@ -6,6 +6,7 @@ aria:       -I<Aria.h> -lAria -ldl
 asn:        -I/usr/include/asn1c -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
+assimp:	    -I/usr/include/assimp -lassimp
 ax10420:    -I<AX10420.h>
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
 bfl:        -I<filter/filter.h> -lorocos-bfl -lginac
@@ -90,6 +91,7 @@ OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 parapin:    -I<parapin.h,parapindriver.h>
 pcl:        -I<pcl-1.7/pcl/pcl_base.h> -I/usr/include/pcl-1.7 -I/usr/include/pcl-1.7/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
+physx33:    -DPHYSX_PROFILE_SDK -D_DEBUG -DPX_CHECKED -DPX_SUPPORT_VISUAL_DEBUGGER -I/usr/include/PhysX -L/usr/lib/PhysX/ -Wl,--start-group -lLowLevelCHECKED -lLowLevelClothCHECKED -lPhysX3CHECKED -lPhysX3CharacterKinematicCHECKED -lPhysX3CommonCHECKED -lPhysX3CookingCHECKED -lPhysX3ExtensionsCHECKED -lPhysX3VehicleCHECKED -lPhysXProfileSDKCHECKED -lPhysXVisualDebuggerSDKCHECKED -lPvdRuntimeCHECKED -lSimulationControllerCHECKED -lSceneQueryCHECKED -lPxTaskCHECKED -lrt -lpthread -Wl,--end-group
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 postgres:   -lpq -I<pg_config.h,postgres.h>
 pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom -lethercat
