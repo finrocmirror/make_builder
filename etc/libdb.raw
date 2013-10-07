@@ -128,6 +128,7 @@ ros-p2os_driver_msgs: -I<p2os_driver/SonarArray.h>
 ros-cpp_srvs:    -I<roscpp/GetLoggers.h>
 ros-cpp_msgs:    -I<roscpp/Logger.h>
 rt:         -lrt
+skyx:	    -I<SkyX.h> -lSkyX
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
 soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4
