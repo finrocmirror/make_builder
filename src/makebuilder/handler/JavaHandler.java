@@ -35,6 +35,7 @@ import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.Files;
+import makebuilder.libdb.ExtLib;
 
 /**
  * @author max
@@ -75,7 +76,7 @@ public class JavaHandler extends SourceFileHandler.Impl {
         }
 
         // add dependencies to jars
-        for (LibDB.ExtLib el : be.extlibs) {
+        for (ExtLib el : be.extlibs) {
             if (el.name.endsWith(".jar")) { // C++ dependencies are only relevant at runtime
                 jars += " " + el.options;
                 cpJars += ":" + el.options;
