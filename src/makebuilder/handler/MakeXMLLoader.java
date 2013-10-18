@@ -150,8 +150,8 @@ public class MakeXMLLoader implements BuildFileLoader {
                 }
 
                 // make sure we have a name and source files
-                if (!(params.containsKey("name") && params.containsKey("sources"))) {
-                    throw new Exception("Build entities in " + file.relative + " need at least name and sources");
+                if (!(params.containsKey("sources"))) {
+                    throw new Exception("Build entities in " + file.relative + " need at least sources");
                 }
 
                 // okay... now process parameters
@@ -193,7 +193,10 @@ public class MakeXMLLoader implements BuildFileLoader {
             @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
                 for (int i = originalElementCount; i < result.size(); i++) {
-                    if (qName.equals(result.get(i).getClass().getSimpleName().toLowerCase()) && (result.get(i).name.equals(attributes.getValue("name")))) {
+                    String name1 = result.get(i).name;
+                    String name2 = attributes.getValue("name");
+                    if (qName.equals(result.get(i).getClass().getSimpleName().toLowerCase()) &&
+                    ((name1 == null && name2 == null) || (name1 != null && name1.equals(name2)))) {
                         result.get(i).lineNumber = l.getLineNumber();
                     }
                 }

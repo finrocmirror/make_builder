@@ -37,8 +37,8 @@ public class FinrocLibrary extends FinrocBuildEntity {
     @Override
     public String getTarget() {
         if (getFinalHandler() == JavaHandler.class) {
-            return "$(TARGET_JAVA)/finroc_" + name + ".jar";
+            return "$(TARGET_JAVA)/" + createTargetPrefix() + createNameString() + ".jar";
         }
-        return "$(TARGET_LIB)/libfinroc_" + name + ".so";
+        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".so";
     }
 }
