@@ -137,4 +137,48 @@ public abstract class FinrocBuildEntity extends BuildEntity {
             FinrocSystemLibLoader.processOptions(this);
         }
     }
+
+    /**
+     * @return Prefix for target file (e.g. finroc_libraries_laser_scanner) as used for test programs and .so files
+     */
+    public String createTargetPrefix() {
+        String rootDir2 = this.getRootDir().relative;
+        if (FinrocBuilder.BUILDING_FINROC) {
+            assert(rootDir2.startsWith("sources"));
+            rootDir2 = rootDir2.substring(9);
+            rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
+        }
+        if (rootDir2.startsWith("libraries")) {
+            return "finroc_libraries_" + getSecondDir(rootDir2);
+        } else if (rootDir2.startsWith("plugins")) {
+            return "finroc_plugins_" + getSecondDir(rootDir2);
+        } else if (rootDir2.startsWith("projects")) {
+            return "finroc_projects_" + getSecondDir(rootDir2);
+        } else if (rootDir2.startsWith("rrlib")) {
+            return "rrlib_" + getSecondDir(rootDir2);
+        } else if (rootDir2.startsWith("core")) {
+            return "finroc_core";
+        } else if (rootDir2.startsWith("org")) {
+            return rootDir2.substring(4).replace('/', '_');
+        }
+        return "";
+    }
+
+    /**
+     * Helper function for createTargetPrefix()
+     */
+    private String getSecondDir(String rootDir2) {
+        String[] parts = rootDir2.split("/");
+        if (parts.length >= 2) {
+            return parts[1];
+        }
+        return "";
+    }
+
+    /**
+     * @return Returns empty string if no name has been set - otherwise "_name". This function is useful for creating target names
+     */
+    public String createNameString() {
+        return (name == null || name.length() == 0) ? "" : ("_" + name);
+    }
 }

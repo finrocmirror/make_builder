@@ -41,9 +41,9 @@ public class RRLib extends FinrocBuildEntity {
     @Override
     public String getTarget() {
         if (getFinalHandler() == JavaHandler.class) {
-            return "$(TARGET_JAVA)/rrlib_" + name + ".jar";
+            return "$(TARGET_JAVA)/" + createTargetPrefix() + createNameString() + ".jar";
         }
-        return "$(TARGET_LIB)/librrlib_" + name + ".so";
+        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".so";
     }
 
 }

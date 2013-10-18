@@ -35,47 +35,19 @@ public class TestProgram extends FinrocBuildEntity {
     public TestProgram() {
         opts.addOptions("-Wl,--no-as-needed");
     }
-    
+
     @Override
     public String getTargetPrefix() {
-        String rootDir2 = this.getRootDir().relative;
-        if (FinrocBuilder.BUILDING_FINROC) {
-            assert(rootDir2.startsWith("sources"));
-            rootDir2 = rootDir2.substring(9);
-            rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
-        }
-        if (rootDir2.startsWith("libraries")) {
-            return "finroc_libraries_" + getSecondDir(rootDir2) + "_test_";
-        } else if (rootDir2.startsWith("plugins")) {
-            return "finroc_plugins_" + getSecondDir(rootDir2) + "_test_";
-        } else if (rootDir2.startsWith("rrlib")) {
-            return "rrlib_" + getSecondDir(rootDir2) + "_test_";
-        } else if (rootDir2.startsWith("core")) {
-            return "finroc_core_test_";
-        } else if (rootDir2.startsWith("org")) {
-            return rootDir2.substring(4).replace('/', '_') + "_test_";
-        }
-        return "";
+        return createTargetPrefix() + "_test";
     }
 
     @Override
     public String getTarget() {
-        String result = "$(TARGET_BIN)/" + getTargetPrefix() + name;
-        if (name.length() == 0) {
-            result = result.substring(0, result.length() - 1); // cut off any "_" at end
-        }
+        String result = "$(TARGET_BIN)/" + getTargetPrefix() + createNameString();
         if (getFinalHandler() == JavaHandler.class) {
             return result.replace("$(TARGET_BIN)", "$(TARGET_JAVA)") + ".jar";
         }
         return result;
-    }
-
-    private String getSecondDir(String rootDir2) {
-        String[] parts = rootDir2.split("/");
-        if (parts.length >= 2) {
-            return parts[1];
-        }
-        return "";
     }
 
     @Override
