@@ -40,37 +40,12 @@ public class UnitTest extends FinrocBuildEntity {
 
     @Override
     public String getTargetPrefix() {
-        String rootDir2 = this.getRootDir().relative;
-        if (FinrocBuilder.BUILDING_FINROC) {
-            assert(rootDir2.startsWith("sources"));
-            rootDir2 = rootDir2.substring(9);
-            rootDir2 = rootDir2.substring(rootDir2.indexOf("/") + 1);
-        }
-        if (rootDir2.startsWith("libraries")) {
-            return "finroc_library_" + getSecondDir(rootDir2) + "_unit_test_";
-        } else if (rootDir2.startsWith("plugins")) {
-            return "finroc_plugin_" + getSecondDir(rootDir2) + "_unit_test_";
-        } else if (rootDir2.startsWith("rrlib")) {
-            return "rrlib_" + getSecondDir(rootDir2) + "_unit_test_";
-        } else if (rootDir2.startsWith("core")) {
-            return "finroc_core_unit_test_";
-        } else if (rootDir2.startsWith("jcore")) {
-            return "finroc_jcore_unit_test_";
-        }
-        return "";
+        return createTargetPrefix() + "_unit_test";
     }
 
     @Override
     public String getTarget() {
-        return "$(TARGET_BIN)/" + getTargetPrefix() + name;
-    }
-
-    private String getSecondDir(String rootDir2) {
-        String[] parts = rootDir2.split("/");
-        if (parts.length >= 2) {
-            return parts[1];
-        }
-        return "";
+        return "$(TARGET_BIN)/" + getTargetPrefix() + createNameString();
     }
 
     @Override

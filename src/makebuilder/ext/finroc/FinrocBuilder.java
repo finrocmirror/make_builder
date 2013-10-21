@@ -303,15 +303,11 @@ public class FinrocBuilder extends MakeFileBuilder {
         // create additional defines
         for (BuildEntity be : buildEntities) {
             if (!be.missingDep && be.getTargetFilename().endsWith(".so")) {
-                if (be instanceof RRLib) {
+                if (be instanceof RRLib || be instanceof FinrocLibrary || be instanceof FinrocPlugin) {
                     // _RRLIB_COMPUTER_VISION_BASE_PRESENT_
-                    globalDefine.add("#define _LIB_RRLIB_" + be.name.toUpperCase() + "_PRESENT_");
-                } else if (be instanceof FinrocLibrary) {
-                    // _LIB_FINROC_COMPUTER_VISION_BASE_PRESENT_
-                    globalDefine.add("#define _LIB_FINROC_" + be.name.toUpperCase() + "_PRESENT_");
-                } else if (be instanceof FinrocPlugin) {
-                    // _FINROC_PLUGIN_COMPUTER_VISION_BASE_PRESENT_
-                    globalDefine.add("#define _LIB_FINROC_PLUGIN_" + be.name.toUpperCase() + "_PRESENT_");
+                    FinrocBuildEntity finrocBE = (FinrocBuildEntity)be;
+                    globalDefine.add("#define _LIB_" + (finrocBE.createTargetPrefix() + finrocBE.createNameString()).toUpperCase() + "_PRESENT_");
+                    //globalDefine.add("#define _LIB_RRLIB_" + be.name.toUpperCase() + "_PRESENT_");
                 } else if (be instanceof MCALibrary) {
                     // _LIB_MCA2_COMPUTER_VISION_BASE_PRESENT_
                     globalDefine.add("#define _LIB_MCA2_" + be.name.toUpperCase() + "_PRESENT_");
