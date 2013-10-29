@@ -196,7 +196,7 @@ public class MakeXMLLoader implements BuildFileLoader {
                     String name1 = result.get(i).name;
                     String name2 = attributes.getValue("name");
                     if (qName.equals(result.get(i).getClass().getSimpleName().toLowerCase()) &&
-                    ((name1 == null && name2 == null) || (name1 != null && name1.equals(name2)))) {
+                            ((name1 == null && name2 == null) || (name1 != null && name1.equals(name2)))) {
                         result.get(i).lineNumber = l.getLineNumber();
                     }
                 }
