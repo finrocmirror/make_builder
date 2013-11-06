@@ -121,7 +121,7 @@ ros-sensor_msgs: -I<sensor_msgs/LaserScan.h>
 ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h>
 ros-geometry_msgs: -I<geometry_msgs/Pose.h>
 ros-tf:  -I<tf/tfMessage.h>
-ros-turtlesim: -I<turtlesim/Pose.h>
+ros-turtlesim: -I<turtlesim/Pose.h> -I<turtlesim/Velocity.h>
 ros-geometry-tf: -I<tf/tf.h>
 ros-geometry-bullet: -I<LinearMath/btTransform.h>
 ros-p2os_driver_msgs: -I<p2os_driver/SonarArray.h>
