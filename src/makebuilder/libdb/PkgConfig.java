@@ -121,7 +121,7 @@ public class PkgConfig {
             for (String s : Files.readLines(p.getInputStream())) {
                 options = options + s + " ";
             }
-            System.out.println("Options for package " + lib + ": " + options);
+            System.out.println(Util.color("Options for package " + lib + ": " + options, Util.Color.GREEN, false));
             ExtLib library = new ExtLib(lib, options, true);
             known_packages.put(lib, library);
             return library;
