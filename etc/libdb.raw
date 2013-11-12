@@ -1,5 +1,4 @@
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface
-amica:	    -I<amica/dev.h> -lamica
 ann:        -I<ANN/ANN.h> -lANN
 ann:        -I<ANN/ANN.h> -lann
 aria:       -I<Aria.h> -lAria -ldl
