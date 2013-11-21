@@ -12,6 +12,7 @@ bfl:        -I<filter/filter.h> -lorocos-bfl -lginac
 boost:      -I<boost/any.hpp>
 boost_date_time:    -I<boost/date_time.hpp> -lboost_date_time
 boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem -lboost_system
+boost_graph:		-I<boost/graph/graph_traits.hpp> -lboost_graph
 boost_iostreams:    -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
@@ -87,6 +88,7 @@ openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
+pal:		-I<pal/palFactory.h> -lpal
 parapin:    -I<parapin.h,parapindriver.h>
 pcl:        -I<pcl-1.7/pcl/pcl_base.h> -I/usr/include/pcl-1.7 -I/usr/include/pcl-1.7/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
