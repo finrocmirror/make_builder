@@ -22,6 +22,7 @@
 package makebuilder.ext.mca;
 
 import java.io.File;
+
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,6 +34,7 @@ import makebuilder.SrcFile;
 import makebuilder.handler.CppHandler;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.ToStringComparator;
+import makebuilder.libdb.ExtLib;
 
 /**
  * @author max
@@ -79,7 +81,7 @@ public class LibInfoGenerator extends SourceFileHandler.Impl {
 
         // string with all closure names
         String extlibs = "";
-        for (LibDB.ExtLib el : be.extlibs) {
+        for (ExtLib el : be.extlibs) {
             extlibs += " " + el.name;
         }
         t.addCommand("echo '" + extlibs.trim() + "' > " + infoFile, false);

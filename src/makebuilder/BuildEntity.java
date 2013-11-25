@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.SortedMap;
 
 import makebuilder.handler.CppHandler;
+import makebuilder.libdb.ExtLib;
 import makebuilder.libdb.LibDB;
+import makebuilder.libdb.PkgConfig;
 import makebuilder.util.AddOrderSet;
 import makebuilder.util.CCOptions;
 import makebuilder.util.Util;
@@ -66,8 +68,8 @@ public abstract class BuildEntity {
     /** Involved libraries */
     public final List<String> libs = new ArrayList<String>(); // libs/dependencies (as specified in SConscript/make.xml)
     public final List<String> optionalLibs = new ArrayList<String>(); // optional libs/dependencies (as specified in SConscript/make.xml)
-    public AddOrderSet<LibDB.ExtLib> extlibs; // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
-    public final AddOrderSet<LibDB.ExtLib> directExtlibs = new AddOrderSet<LibDB.ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; only from build entity itself)
+    public AddOrderSet<ExtLib> extlibs; // resolved external libraries (from libs and available ones in optionalLibs; from build entity itself and its dependencies)
+    public final AddOrderSet<ExtLib> directExtlibs = new AddOrderSet<ExtLib>(); // resolved external libraries (from libs and available ones in optionalLibs; only from build entity itself)
     public final List<BuildEntity> dependencies = new ArrayList<BuildEntity>(); // resolved local (mca2) dependencies (from libs)
     public final List<BuildEntity> optionalDependencies = new ArrayList<BuildEntity>(); // resolved optional local (mca2) dependencies (from optionalLibs)
 
@@ -209,7 +211,7 @@ public abstract class BuildEntity {
         if (extlibs != null) {
             return;
         }
-        extlibs = new AddOrderSet<LibDB.ExtLib>();
+        extlibs = new AddOrderSet<ExtLib>();
         extlibs.addAll(directExtlibs);
         for (BuildEntity be : dependencies) {
             be.mergeExtLibs();
@@ -224,10 +226,10 @@ public abstract class BuildEntity {
         if (getFinalHandler() != CppHandler.class) {
             return;
         }
-        for (LibDB.ExtLib el : directExtlibs) {
+        for (ExtLib el : directExtlibs) {
             opts.merge(el.ccOptions, true);
         }
-        for (LibDB.ExtLib el : extlibs) {
+        for (ExtLib el : extlibs) {
             opts.merge(el.ccOptions, LINKING_AS_NEEDED);
         }
         for (BuildEntity be : dependencies) {
@@ -422,8 +424,9 @@ public abstract class BuildEntity {
             }
         }
 
+        // first, try libdb, so it can be used to override pkg-config, as some pkg-config might be wrong
         if (LibDB.available(dep)) { // External library dependency?
-            LibDB.ExtLib xl = LibDB.getLib(dep);
+            ExtLib xl = LibDB.getLib(dep);
             directExtlibs.add(xl);
             for (BuildEntity be : xl.dependencies) {
                 if (!dependencies.contains(be)) {
@@ -431,7 +434,22 @@ public abstract class BuildEntity {
                 }
             }
             return;
+        } else if (PkgConfig.available(dep)) {
+
+            ExtLib xl = PkgConfig.getLib(dep);
+            directExtlibs.add(xl);
+            for (BuildEntity be : xl.dependencies) {
+                if (!dependencies.contains(be)) {
+                    dependencies.add(be);
+                }
+            }
+            System.out.println(Util.color("Dependency found using pkg-config: " + dep, Util.Color.GREEN, false));
+            return;
+        } else {
+            System.out.println(Util.color("Dependency not found using pkg-config, consider checking if this library is known under a different name: " + dep, Util.Color.Y, false));
         }
+
+
 
         // not found...
         if (!optional) {

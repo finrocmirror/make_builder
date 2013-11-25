@@ -1,17 +1,18 @@
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface
-amica:	    -I<amica/dev.h> -lamica
 ann:        -I<ANN/ANN.h> -lANN
 ann:        -I<ANN/ANN.h> -lann
 aria:       -I<Aria.h> -lAria -ldl
 asn:        -I/usr/include/asn1c -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
+assimp:	    -I/usr/include/assimp -lassimp
 ax10420:    -I<AX10420.h>
 bfl:        -I<filter/filter.h> -I<ltiUnifiedSymmetricEigenSystem_template.h> -lginac -lpthread -lcrypt -lorocos-bfl -lltir
-bfl:        -I<filter/filter.h> -lorocos-bfl
+bfl:        -I<filter/filter.h> -lorocos-bfl -lginac
 boost:      -I<boost/any.hpp>
 boost_date_time:    -I<boost/date_time.hpp> -lboost_date_time
-boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem
+boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem -lboost_system
+boost_graph:		-I<boost/graph/graph_traits.hpp> -lboost_graph
 boost_iostreams:    -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
@@ -27,8 +28,7 @@ cudart:     -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUDART)
 cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
-cutil:      -I<cutil.h> -lcutil
-cutil:      -I<cutil.h> -lcutil_i386 -lm
+cutil:      -Llibraries/camera_sensor/cuda/cutil -Ilibraries/camera_sensor/cuda/cutil -lcutil_i386 -lm
 crypt:      -I<crypt.h> -lcrypt
 db++:       -I<db_cxx.h> -ldb_cxx
 dbxml:      -I<DbXml.hpp> -ldbxml
@@ -37,13 +37,16 @@ dl:         -ldl
 dscud:      -I<dscud.h,DMM32AT_type_defs.h>
 easy_vad:   -Ilibraries/audio/easy_vad -Llibraries/audio/easy_vad -lVAD
 easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca2-legacy/libraries/audio/easy_vad -lVAD
-esd:        -lesd
+eigen:      -I<Eigen/Eigen>
+esd:        -lesd -I<esd.h>
 espeak:     -I<speak_lib.h> -lespeak
+est:		-I<EST.h> -lestbase -leststring -lestools
 ethercat:   -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lethercat
-festival:   -I<festival.h> -I<EST_SingleChannelWave.h> -lFestival -lestbase -lesd -leststring -lestools -lcurses 
+festival:   -I<festival.h> -lFestival 
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMultiTypePortDataBufferPool.h> -I<finroc_core_utils/tAtomicDoubleInt.h,finroc_core_utils/container/tBoundedQElementContainer.h> -I<blackboard/tSingleBufferedBlackboardServer.h,tcp/tTCPServerConnection.h> -lfinroc_plugin_tcp -lfinroc_plugin_blackboard -lfinroc_core -lrrlib_finroc_core_utils
+flann:      -I<flann.h,flann.hpp> -lflann -lflann_cpp 
 flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
@@ -59,39 +62,45 @@ ltdl:       -I<ltdl.h> -lltdl -Wl,--export-dynamic
 lti:        -I/usr/include/ltilib -L/usr/lib/ltilib -lltir
 lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
+libgmapping:   -I<gridfastslam/gridslamprocessor.h> -lgridfastslam -lconfigfile -llog -lscanmatcher -lsensor_base -lsensor_odometry -lsensor_range -lutils -L/usr/lib/gmapping -Wl,-rpath,/usr/lib/gmapping/
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 mpfr:	    -lmpfr
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
+mxpeg:	    -I<mxpeg_sdk/static_component_bootstrap.h> -I/usr/include/qt4/QtCore -I/usr/include/qt4 -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtOpenGL -lmxFramework -lmxm_core -lmxmQt
 netpbm:     -D _LIB_NETPBM_PRESENT_ -I<pam.h> -lnetpbm
 newmat:     -I<newmat/newmat.h> -lnewmat
 newton:     -I<Newton.h> -lNewton
 nite:       -I/usr/include/ni -lOpenNI
 npp32:      -I<npp.h> -lnpp32 -D_LIB_NPP_PRESENT_
 npp32:      -I<npp.h> -lnpp -D_LIB_NPP_PRESENT_
-npp32util:  -lUtilNPP32 -I<ImagesNPP.h>
 nurbs:      -I<nurbs++/nurbs.h> -lnurbsd -lnurbsf -lmatrixN -lmatrixI -lmatrix
 obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lFedmIscCore -lfetcl -lfefu -lfeisc -lfetcp -lfeusb -I<'fecom.h'>
 ode:        -I<ode/ode.h> -lode
+ogre:		-I<Ogre.h> -lOgreMain
+ois:		-I<OIS.h> -lOIS
 oiv:        -D _LIB_OIV_PRESENT_  -I<Inventor/SoDB.h> -lCoin
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
-opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video
+opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video -lopencv_ml
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
-opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h> -lcxcore -lcv -lcvaux -lhighgui
-opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h,oclUtils.h> -I<shrUtils.h> -lOpenCL -lshrutil_i386 -loclUtil_i386
+opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lcxcore -lcv -lcvaux -lhighgui -lml
+opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h>  -lOpenCL
 opencl:     -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
 openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
+pal:		-I<pal/palFactory.h> -lpal
 parapin:    -I<parapin.h,parapindriver.h>
-pcl:        -I<pcl-1.6/pcl/pcl_base.h> -I/usr/include/pcl-1.6 -I/usr/include/pcl-1.6/pcl/ -I/usr/include/eigen3/ -lpcl_filters
+pcl:        -I<pcl-1.7/pcl/pcl_base.h> -I/usr/include/pcl-1.7 -I/usr/include/pcl-1.7/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
+physx33:    -malign-double -DPHYSX_PROFILE_SDK -D_DEBUG -DPX_CHECKED -DPX_SUPPORT_VISUAL_DEBUGGER -I<PxPhysics.h> -L/usr/lib/PhysX/ -Wl,--start-group -lLowLevelCHECKED -lLowLevelClothCHECKED -lPhysX3CHECKED -lPhysX3CharacterKinematicCHECKED -lPhysX3CommonCHECKED -lPhysX3CookingCHECKED -lPhysX3ExtensionsCHECKED -lPhysX3VehicleCHECKED -lPhysXProfileSDKCHECKED -lPhysXVisualDebuggerSDKCHECKED -lPvdRuntimeCHECKED -lSimulationControllerCHECKED -lSceneQueryCHECKED -lPxTaskCHECKED -lrt -lpthread -Wl,--end-group
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 postgres:   -lpq -I<pg_config.h,postgres.h>
 pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom -lethercat
 phonon:     -I<phonon/phononnamespace.h> -lphonon
 phononexperimental: -I<phonon/experimental/phononnamespace.h> -lphononexperimental
 plotter:    -I<plotter.h> -lplotter -DINCLUDE_PNG_SUPPORT
+prrt:       -I<prrt/prrt_sockets.h> -lprrt
 pwc:        -I<pwc-ioctl.h>
 pthread:    -I<pthread.h> -lpthread
 qt4:        -D _MCA_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt/qdialog.h> -lQtCore -lQtGui -lQtNetwork -lQtAssistantClient -lQtOpenGL -lQt3Support
@@ -102,35 +111,26 @@ qt4xml:     -D _MCA_QT_4_ -D _MCA_QT_4_XML_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWOR
 qt4opengl:  -D _MCA_QT_4_ -D _MCA_QT_4_OPENGL_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtOpenGL/qgl.h> -lQtCore -lQtOpenGL
 qt4webkit:  -D _MCA_QT_4_ -D _MCA_QT_4_WEBKIT_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtWebKit/qwebview.h> -lQtCore -lQtWebKit
 qt3support: -D _MCA_QT_4_ -D _MCA_QT_3_SUPPORT_FOR_QT_4_ -D QT_THREAD_SUPPORT -D QT3_SUPPORT -D QT_NO_KEYWORDS -I<Qt3Support/q3cstring.h> -lQtCore -lQt3Support
+qt4uitools: -D _MCA_QT_4_ -D _MCA_QT_4_UITOOLS_ -D QT_THREAD_SUPPORT -D QT_NO_KEYWORDS -I<QtUiTools/quiloader.h> -lQtUiTools
 qt4_no_debug:   -D QT_NO_DEBUG_OUTPUT
 qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
 quarter:    -I<Quarter/Quarter.h> -lQuarter
 qwt:        -I/usr/include/qwt -I<qwt_abstract_scale.h> -lqwt -I /usr/include/qt4/Qt -I /usr/include/qt4/QtGui
-ros-core:   -D _ROS_CORE_PRESENT_ -I<ros/ros.h,ros/exception.h,ros/serialized_message.h,ros/console.h,ros/time.h> -lroslib -lroscpp -lroscpp_serialization -lrosconsole -lrostime -lrospack -L/opt/ros/fuerte/lib/ -Wl,-rpath,/opt/ros/fuerte/lib
-ros-common_msgs: -D _ROS_COMMON_MSGS_PRESENT_ -I<sensor_msgs/LaserScan.h,nav_msgs/OccupancyGrid.h,geometry_msgs/Pose.h>
-<!-- ros:    -I<ros/ros.h> -lroslib -L/opt/ros/fuerte/lib/ -Wl,-rpath,/opt/ros/fuerte/lib -->
-<!-- ros-cpp_common: -I<ros/exception.h> -lroscpp -->
-<!-- ros-cpp_serialization:   -lroscpp_serialization -I<ros/serialized_message.h> -L/opt/ros/fuerte/stacks/ros_comm/clients/cpp/roscpp_serialization/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/clients/cpp/roscpp_serialization/lib -->
-<!-- ros-console:-lrosconsole -I<ros/console.h> -L/opt/ros/fuerte/stacks/ros_comm/tools/rosconsole/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/tools/rosconsole/lib -->
-<!-- ros-time:   -lrostime -I<ros/time.h> -L/opt/ros/fuerte/stacks/ros_comm/utilities/rostime/lib/ -Wl,-rpath,/opt/ros/fuerte/stacks/ros_comm/utilities/rostime/lib -->
-<!-- ros-roslib: -lroslib -L/opt/ros/fuerte/ros/core/roslib/lib/ -->
-<!-- ros-rospack: -lrospack -L/opt/ros/fuerte/ros/tools/rospack/lib/ -->
-ros-rosstack:    -lrosstack -L/opt/ros/fuerte/ros/tools/rospack/lib/
-<!-- ros-cpp_traits: -I<ros/message_traits.h> -->
-<!-- ros-comm_xmlrpcpp: -I<XmlRpcValue.h> -->
-<!-- ros-std_msgs: -I<std_msgs/String.h> -I<std_msgs/header_deprecated_def.h> -->
-<!-- ros-sensor_msgs: -I<sensor_msgs/LaserScan.h> -->
-<!-- ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h> -->
-<!-- ros-geometry_msgs: -I<geometry_msgs/Pose.h> -->
+ros:   -D _ROS_CORE_PRESENT_ -I<ros/ros.h,ros/exception.h,ros/serialized_message.h,ros/console.h,ros/time.h> -lroslib -lroscpp -lroscpp_serialization -lrosconsole -lrostime -lrospack -lxmlrpcpp -L/opt/ros/hydro/lib/ -Wl,-rpath,/opt/ros/hydro/lib
+ros-std_msgs: -I<std_msgs/String.h> -I<std_msgs/header_deprecated_def.h>
+ros-sensor_msgs: -I<sensor_msgs/LaserScan.h>
+ros-nav_msgs: -I<nav_msgs/OccupancyGrid.h>
+ros-geometry_msgs: -I<geometry_msgs/Pose.h>
 ros-tf:  -I<tf/tfMessage.h>
-ros-turtlesim: -I<turtlesim/Pose.h>
+ros-turtlesim: -I<turtlesim/Pose.h> -I<turtlesim/Velocity.h>
 ros-geometry-tf: -I<tf/tf.h>
 ros-geometry-bullet: -I<LinearMath/btTransform.h>
 ros-p2os_driver_msgs: -I<p2os_driver/SonarArray.h>
-<!-- ros-cpp_srvs:    -I<roscpp/GetLoggers.h> -->
-<!-- ros-cpp_msgs:    -I<roscpp/Logger.h> -->
+ros-cpp_srvs:    -I<roscpp/GetLoggers.h>
+ros-cpp_msgs:    -I<roscpp/Logger.h>
 rt:         -lrt
+skyx:	    -I<SkyX.h> -lSkyX
 sndfile:    -I<sndfile.h> -lsndfile
 solid:      -I<SOLID/SOLID.h> -lsolid
 soqt:       -I<Inventor/Qt/SoQt.h> -I<qtconcurrentiteratekernel.h> -lSoQt4
@@ -143,7 +143,7 @@ usb:        -I<libusb.h> -lusb
 usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
-x264:       -I<x264.h>
+x264:       -I<x264.h> -lx264
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
 z:          -I<zlib.h> -lz

@@ -21,6 +21,8 @@
  */
 package makebuilder.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -85,7 +87,33 @@ public class CCOptions implements Comparator<String> {
     public void addOptions(String options, Set<String> optionType) {
         if (options != null) {
             String[] opts = options.split("\\s-");
+
+            // check for groups
+            ArrayList<String> optsWithoutGroups = new ArrayList<String>();
+            boolean inGroup = false;
+            StringBuilder groupEntries = new StringBuilder();
             for (String opt : opts) {
+                if (opt.length() < 1)
+                    continue;
+                String checked = opt.startsWith("-") ? opt : ("-" + opt);
+                if (inGroup && checked.startsWith("-l")) {
+                    check("link", checked, optionType, libs, linkOptions);
+                    groupEntries.append(" ");
+                    groupEntries.append(checked);
+                } else if (checked.contains("Wl,--start-group")) {
+                    inGroup = true;
+                    groupEntries.append(checked);
+                } else if (checked.contains("Wl,--end-group")) {
+                    inGroup = false;
+                    groupEntries.append(" ");
+                    groupEntries.append(checked);
+                    linkOptions.add(groupEntries.toString());
+                    groupEntries.setLength(0);
+                } else if (!inGroup) {
+                    optsWithoutGroups.add(opt);
+                }
+            }
+            for (String opt : optsWithoutGroups) {
                 opt = opt.trim();
                 if (opt.length() > 0) {
                     addOption(opt.startsWith("-") ? opt : "-" + opt, optionType);
