@@ -104,6 +104,7 @@ public class Makefile {
             if (!t.name.startsWith(".")) {
                 ps.print("\t");
                 ps.print(t.name);
+                ps.print(" ");
                 ps.print("clean-" + t.name);
                 ps.print(" \\\n");
             }
