@@ -2,8 +2,6 @@
 <project basedir="." default="build" name="makebuilder">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
     <path id="makebuilder.classpath">
         <pathelement location="bin"/>
     </path>
@@ -23,7 +21,7 @@
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}" includeAntRuntime="false">
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeAntRuntime="false">
             <src path="src"/>
             <classpath refid="makebuilder.classpath"/>
             <include name="**"/>
