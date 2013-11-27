@@ -2,7 +2,7 @@ amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplIn
 ann:        -I<ANN/ANN.h> -lANN
 ann:        -I<ANN/ANN.h> -lann
 aria:       -I<Aria.h> -lAria -ldl
-asn:        -I/usr/include/asn1c -lasn1c 
+asn:        -I<asn_application.h> -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 assimp:	    -I/usr/include/assimp -lassimp
@@ -40,9 +40,9 @@ easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca
 eigen:      -I<Eigen/Eigen>
 esd:        -lesd -I<esd.h>
 espeak:     -I<speak_lib.h> -lespeak
-est:		-I<EST.h> -lestbase -leststring -lestools
+est:        -I<EST.h> -lestbase -leststring -lestools
 ethercat:   -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lethercat
-festival:   -I<festival.h> -lFestival 
+festival:   -I<festival.h> -lFestival
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 finroc-backport:    -include libinfo.h -I<core/tFrameworkElement.h,core/port/tMultiTypePortDataBufferPool.h> -I<finroc_core_utils/tAtomicDoubleInt.h,finroc_core_utils/container/tBoundedQElementContainer.h> -I<blackboard/tSingleBufferedBlackboardServer.h,tcp/tTCPServerConnection.h> -lfinroc_plugin_tcp -lfinroc_plugin_blackboard -lfinroc_core -lrrlib_finroc_core_utils
