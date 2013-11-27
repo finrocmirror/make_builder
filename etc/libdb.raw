@@ -40,7 +40,7 @@ easy_vad:   -Isources/cpp/mca2-legacy/libraries/audio/easy_vad -Lsources/cpp/mca
 eigen:      -I<Eigen/Eigen>
 esd:        -lesd -I<esd.h>
 espeak:     -I<speak_lib.h> -lespeak
-est:        -I<EST.h> -I/usr/include/speech_tools -L/usr/lib/speech_tools/lib -lestbase -leststring -lestools
+est:        -I<EST.h> -lestbase -leststring -lestools
 ethercat:   -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lethercat
 festival:   -I<festival.h> -lFestival
 ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
