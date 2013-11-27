@@ -2,7 +2,7 @@ amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplIn
 ann:        -I<ANN/ANN.h> -lANN
 ann:        -I<ANN/ANN.h> -lann
 aria:       -I<Aria.h> -lAria -ldl
-asn:        -I/usr/include/asn1c -lasn1c 
+asn:        -I<asn_application.h> -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
 asr:        -Ilibraries/dialog_system -Wl,-rpath,libraries/dialog_system -Llibraries/dialog_system -lmv5de -ltxt2phon -lamiasr
 assimp:	    -I/usr/include/assimp -lassimp
