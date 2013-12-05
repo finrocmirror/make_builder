@@ -269,7 +269,7 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
-     * @return GCC Compilter call for makefile
+     * @return GCC Compiler call for makefile
      */
     public String createLinkCommand(String inputs, String output, boolean cxx) {
         return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx));
@@ -281,7 +281,7 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
-     * @return GCC Compilter call for makefile
+     * @return GCC Compiler call for makefile
      */
     public String createCompileCommand(String inputs, String output, boolean cxx) {
         return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c " + createOptionString(true, false, cxx)) + " -o " + output + " " + inputs;
@@ -293,7 +293,7 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
-     * @return GCC Compilter call for makefile
+     * @return GCC Compiler call for makefile
      */
     public String createCompileAndLinkCommand(String inputs, String output, boolean cxx) {
         return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(true, true, cxx));
