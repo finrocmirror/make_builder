@@ -33,7 +33,6 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
-import makebuilder.libdb.LibDB;
 import makebuilder.util.Files;
 import makebuilder.libdb.ExtLib;
 
@@ -46,6 +45,9 @@ public class JavaHandler extends SourceFileHandler.Impl {
 
     private static final Pattern packagePattern = Pattern.compile("\\s*package\\s+(.*)\\s*;");
 
+    /** Path where .jar files are located that were installed to the system */
+    private static final File SYSTEM_LIBRARY_PATH = new File("/usr/share/java");
+
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
 
@@ -56,29 +58,34 @@ public class JavaHandler extends SourceFileHandler.Impl {
         // main target (.jar file)
         Makefile.Target mainTarget = be.target;
 
-        // collect .jar files and copy .jar files to export/java
         String jars = ""; // line in manifest
         String cpJars = ""; // class path
-        ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
-        for (SrcFile sf : copy) {
-            if (sf.hasExtension("jar")) {
-                be.sources.remove(sf);
-                String name = be.getTargetPath() + "/lib/" + sf.getName();
-                jars += " lib/" + sf.getName();
-                cpJars += ":" + name;
 
-                // create .jar copy target in makefile
-                Makefile.Target jar = makefile.addTarget(name, false, be.getRootDir());
-                jar.addCommand("cp " + sf.relative + " " + jar.getName(), false);
-                jar.addDependency(sf.relative);
-                mainTarget.addDependency(jar);
-            }
-        }
+        // collect .jar files and copy .jar files to export/javab (I do not think this should be supported - as external libraries should not be checked in as binary files)
+//        ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
+//        for (SrcFile sf : copy) {
+//            if (sf.hasExtension("jar")) {
+//                be.sources.remove(sf);
+//                String name = be.getTargetPath() + "/lib/" + sf.getName();
+//                jars += " lib/" + sf.getName();
+//                cpJars += ":" + name;
+//
+//                // create .jar copy target in makefile
+//                Makefile.Target jar = makefile.addTarget(name, false, be.getRootDir());
+//                jar.addCommand("cp " + sf.relative + " " + jar.getName(), false);
+//                jar.addDependency(sf.relative);
+//                mainTarget.addDependency(jar);
+//            }
+//        }
 
         // add dependencies to jars
-        for (ExtLib el : be.extlibs) {
+        boolean systemDependencies = false;
+        for (ExtLib el : be.directExtlibs) {
             if (el.name.endsWith(".jar")) { // C++ dependencies are only relevant at runtime
-                jars += " " + el.options;
+                String manifestJar = removeSystemLibraryPath(el.options);
+                boolean systemDependency = !manifestJar.equals(el.options);
+                systemDependencies |= systemDependency;
+                jars += (systemDependency ? " lib/" : " ") + manifestJar;
                 cpJars += ":" + el.options;
             }
         }
@@ -119,7 +126,7 @@ public class JavaHandler extends SourceFileHandler.Impl {
 
         // compile java files
         String buildDir = builder.getTempBuildDir(be) + "/bin";
-        copy = new ArrayList<SrcFile>(be.sources);
+        ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
         String javaFiles = "";
         for (SrcFile javaFile : copy) {
             if (javaFile.hasExtension("java")) {
@@ -143,6 +150,11 @@ public class JavaHandler extends SourceFileHandler.Impl {
 
         // jar java files
         mainTarget.addCommand("jar cfm " + mainTarget.getName() + " " + mfTarget.getName() + "  -C " + buildDir + "/ .", false);
+
+        // possibly create symlink for system libraries
+        if (systemDependencies) {
+            mainTarget.addCommand("if [ ! -e " + be.getTargetPath() + "/lib ]; then ln -s " + SYSTEM_LIBRARY_PATH + " " +  be.getTargetPath() + "/lib; fi", false);
+        }
     }
 
     /**
@@ -179,5 +191,19 @@ public class JavaHandler extends SourceFileHandler.Impl {
             }
         }
         throw new RuntimeException("Could not find package declaration in java source tree " + dir.relative);
+    }
+
+    /**
+     * Removes path from .jar file if it is located in the system library path
+     *
+     * @param jarFile Fully-qualified name of .jar file
+     * @return Provided .jar file if it is not located in system library path; file name (only) of .jar file if it is in system library path
+     */
+    private String removeSystemLibraryPath(String jarFile) {
+        File jar = new File(jarFile);
+        if (SYSTEM_LIBRARY_PATH.exists() && jar.getParentFile().equals(SYSTEM_LIBRARY_PATH)) {
+            return jar.getName();
+        }
+        return jarFile;
     }
 }
