@@ -155,6 +155,11 @@ public class JavaHandler extends SourceFileHandler.Impl {
         if (systemDependencies) {
             mainTarget.addCommand("if [ ! -e " + be.getTargetPath() + "/lib ]; then ln -s " + SYSTEM_LIBRARY_PATH + " " +  be.getTargetPath() + "/lib; fi", false);
         }
+
+        // possibly create index (for applets mainly)
+        if (be.params.containsKey("create_index")) {
+            mainTarget.addCommand("jar i " + mainTarget.getName(), true);
+        }
     }
 
     /**
