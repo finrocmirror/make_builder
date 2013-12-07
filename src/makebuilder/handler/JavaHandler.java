@@ -158,7 +158,7 @@ public class JavaHandler extends SourceFileHandler.Impl {
 
         // possibly create index (for applets mainly)
         if (be.params.containsKey("create_index")) {
-            mainTarget.addCommand("jar i " + mainTarget.getName(), true);
+            mainTarget.addCommand("( cd " + be.getTargetPath() + " ; jar i " + be.getTargetFilename() + " )", true);
         }
     }
 
