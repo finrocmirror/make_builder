@@ -91,7 +91,8 @@ openssl:    -I<openssl/bio.h,openssl/evp.h> -lcrypto
 OSG:        -I<osg/Version> -losg -losgDB -losgGA -losgProducer -losgUtil
 pal:		-I<pal/palFactory.h> -lpal
 parapin:    -I<parapin.h,parapindriver.h>
-pcl:        -I<pcl-1.7/pcl/pcl_base.h> -I/usr/include/pcl-1.7 -I/usr/include/pcl-1.7/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common
+pcap:       -I<pcap/pcap.h> -lpcap
+pcl:        -I<pcl-1.7/pcl/pcl_base.h> -I/usr/include/pcl-1.7 -I/usr/include/pcl-1.7/pcl/ -I/usr/include/eigen3/ -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common -lpcl_search -lpcl_surface -lpcl_visualization -lpcl_features
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
 physx33:    -DPX_PHYSX_STATIC_LIB -DPX_PROFILE -D_DEBUG -DPX_CHECKED -DPX_SUPPORT_VISUAL_DEBUGGER -I<PxPhysics.h> -L/usr/lib/PhysX/ -Wl,--start-group -lLowLevelCHECKED -lLowLevelClothCHECKED -lPhysX3CHECKED -lPhysX3CharacterKinematicCHECKED -lPhysX3CommonCHECKED -lPhysX3CookingCHECKED -lPhysX3ExtensionsCHECKED -lPhysX3VehicleCHECKED -lPhysXProfileSDKCHECKED -lPhysXVisualDebuggerSDKCHECKED -lPvdRuntimeCHECKED -lSimulationControllerCHECKED -lSceneQueryCHECKED -lPxTaskCHECKED -lrt -lpthread -Wl,--end-group
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
@@ -143,6 +144,7 @@ usb:        -I<libusb.h> -lusb
 usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
+vtk:	    -I/usr/include/vtk-5.8 -lvtkCommon -lvtkFiltering -lvtkRendering
 x264:       -I<x264.h> -lx264
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
