@@ -22,6 +22,8 @@
 package makebuilder.ext.finroc;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import makebuilder.BuildEntity;
 import makebuilder.MakeFileBuilder;
@@ -59,7 +61,7 @@ import makebuilder.util.Util.Color;
  *
  * MakeFileBuilder customization for Finroc
  */
-public class FinrocBuilder extends MakeFileBuilder {
+public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.ImportDependencyResolver {
 
     /** Are we building finroc? */
     public final static boolean BUILDING_FINROC = System.getenv("FINROC_TARGET") != null;
@@ -178,7 +180,7 @@ public class FinrocBuilder extends MakeFileBuilder {
         }
 
         addHandler(new CppHandler(cflags, cxxflags, "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2, !opts.combineCppFiles));
-        addHandler(new JavaHandler());
+        addHandler(new JavaHandler(this));
         addHandler(new CakeHandler());
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
@@ -382,6 +384,48 @@ public class FinrocBuilder extends MakeFileBuilder {
             srcDir = source.getRootDir().relative.substring("sources/cpp/".length());
         }
         return tempBuildPath.relative + FS + trimDir(srcDir);
+    }
+
+    @Override
+    public short getVersion() {
+        return 1;
+    }
+
+    @Override
+    public ArrayList<String> getDependencies(SrcFile file, List<String> imports) {
+        ArrayList<String> result = new ArrayList<String>();
+        for (String imp : imports) {
+            if (imp.contains("*")) {
+                System.err.println("warning: ignoring import statement with '*' for automatic dependency resolving (" + file.relative + ")");
+                continue;
+            }
+            String dependency = null;
+            if (imp.startsWith("org.rrlib.") || imp.startsWith("org.finroc.")) {
+                String[] parts = imp.split("[.]");
+                if (parts[1].equals("rrlib")) {
+                    dependency = "rrlib_" + parts[2] + ".jar";
+                } else {
+                    if (parts[2].equals("core")) {
+                        dependency = "finroc_core.jar";
+                    } else if (parts[2].equals("tools")) {
+                        if (parts[3].equals("gui") && parts[4].equals("plugins")) {
+                            dependency = "finroc_tools_gui_plugins_" + parts[5] + ".jar";
+                        } else if (parts[3].equals("gui")) {
+                            dependency = "fingui.jar";
+                        } else {
+                            dependency = parts[3] + ".jar";
+                        }
+                    } else {
+                        dependency = "finroc_" + parts[2] + "_" + parts[3] + ".jar";
+                    }
+                }
+            }
+            if (dependency != null && (!result.contains(dependency)) &&
+                    (file.getOwner() == null || (!file.getOwner().getTargetFilename().equals(dependency)))) {
+                result.add(dependency);
+            }
+        }
+        return result;
     }
 
 }

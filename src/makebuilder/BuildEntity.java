@@ -127,7 +127,7 @@ public abstract class BuildEntity {
     }
 
     public String toString() {
-        return name;
+        return name != null ? name : buildFile.dir.absolute.getName();
     }
 
     public boolean isLibrary() {
@@ -193,7 +193,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.name + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
+                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.toString() + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
                 return;
             }
         }
