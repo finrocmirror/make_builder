@@ -133,7 +133,7 @@ public class CppHandler implements SourceFileHandler {
         CodeTreeNode root = new CodeTreeNode(null, null, false);
         CodeTreeNode curNode = root;
 
-        // parse code an build code tree model
+        // parse code and build code tree model
         for (String line : file.getCppLines()) {
             String orgLine = line;
             if (line.trim().startsWith("#")) {

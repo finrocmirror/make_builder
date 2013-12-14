@@ -22,6 +22,7 @@
 package makebuilder.handler;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,22 +32,144 @@ import makebuilder.BuildEntity;
 import makebuilder.SourceFileHandler;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
+import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.util.Files;
 import makebuilder.libdb.ExtLib;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for building executables and libraries from Java source files
  */
-public class JavaHandler extends SourceFileHandler.Impl {
+public class JavaHandler implements SourceFileHandler {
 
     private static final Pattern packagePattern = Pattern.compile("\\s*package\\s+(.*)\\s*;");
 
     /** Path where .jar files are located that were installed to the system */
     private static final File SYSTEM_LIBRARY_PATH = new File("/usr/share/java");
+
+    /** Key for code model in source file properties */
+    public static final String JAVA_INFO_KEY = "javaInfo";
+
+    /** Debug Java handler? */
+    private final boolean debug = MakeFileBuilder.getOptions().containsKey("debug_java_handler");
+
+    /** Dependency Resolver to use */
+    private final ImportDependencyResolver dependencyResolver;
+
+    public JavaHandler() {
+        this(null);
+    }
+
+    /**
+     * @param dependencyResolver Dependency Resolver to use (may be null if no resolver is to used)
+     */
+    public JavaHandler(ImportDependencyResolver dependencyResolver) {
+        this.dependencyResolver = dependencyResolver;
+    }
+
+    /**
+     * Resolves dependencies to .jar file from import statements
+     * (does not need to handle all import statements;
+     *  unhandled dependencies need to be added to make.xml files in 'libs' attribute)
+     */
+    public static interface ImportDependencyResolver {
+
+        /**
+         * @return Version of dependency resolver (a newer version than in cached info will udpate info on all files)
+         */
+        public short getVersion();
+
+        /**
+         * @param file Source file that contains imports
+         * @param imports List of imports (e.g. "org.finroc.core.FrameworkElement"; any whitespace is removed)
+         * @return List of .jar files
+         */
+        public ArrayList<String> getDependencies(SrcFile file, List<String> imports);
+    }
+
+    /**
+     * Info on Java source files to save to cache
+     */
+    private static class JavaInfo implements Serializable {
+
+        /** UID */
+        private static final long serialVersionUID = -115096753307172576L;
+
+        /** Dependencies to .jar files resolved from import statements (without path - e.g. "finroc_core.jar") */
+        ArrayList<String> resolvedDependencies;
+
+        /** Package that Java file is in */
+        //String package2 = "";
+
+        /** Version of dependency resolver that is used (newer version will udpate info on all files) */
+        short dependencyResolverVersion;
+    }
+
+    @Override
+    public void init(Makefile makefile) {
+    }
+
+    @Override
+    public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
+        if (file.hasExtension("java")) {
+            if ((!file.isInfoUpToDate()) || file.properties.get(JAVA_INFO_KEY) == null ||
+                    (dependencyResolver != null && ((JavaInfo)file.properties.get(JAVA_INFO_KEY)).dependencyResolverVersion < dependencyResolver.getVersion())) {
+                processFile(file, scanner);
+            }
+
+            // Add dependencies to build entity
+            JavaInfo info = (JavaInfo)file.properties.get(JAVA_INFO_KEY);
+            if (info != null && info.resolvedDependencies != null && file.getOwner() != null) {
+                for (String dependency : info.resolvedDependencies) {
+                    if (!file.getOwner().libs.contains(dependency)) {
+                        file.getOwner().libs.add(dependency);
+                    }
+                }
+            }
+
+            if (debug && info != null) {
+                System.out.println("\nSource File '" + file.relative + "' resolved dependencies:");
+                for (String dep : info.resolvedDependencies) {
+                    System.out.println(" " + dep);
+                }
+            }
+        }
+    }
+
+    /**
+     * Find imports in Java files and add dependencies to source files
+     *
+     * @param file File to scan
+     * @param sources SourceScanner instance that contains possible includes
+     */
+    public void processFile(SrcFile file, SourceScanner sources) {
+
+        JavaInfo info = new JavaInfo();
+
+        // parse code and add dependencies
+        ArrayList<String> imports = new ArrayList<String>();
+        for (String line : file.getCppLines()) {
+            if (line.trim().startsWith("import ") && line.trim().endsWith(";")) {
+                line = line.trim().substring("import ".length());
+                line = line.substring(0, line.length() - 1).trim();
+                imports.add(line.replaceAll("\\s+", ""));
+//            } else if (line.trim().startsWith("package ") && line.trim().endsWith(";")) {
+//                line = line.trim().substring("package ".length());
+//                info.package2 = line.substring(0, line.length() - 1).trim().replaceAll("\\s+","");
+            }
+        }
+
+        // finish info
+        if (dependencyResolver != null) {
+            info.dependencyResolverVersion = dependencyResolver.getVersion();
+            info.resolvedDependencies = dependencyResolver.getDependencies(file, imports);
+        }
+        file.properties.put(JAVA_INFO_KEY, info);
+    }
+
 
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) {
@@ -90,7 +213,7 @@ public class JavaHandler extends SourceFileHandler.Impl {
             }
         }
         for (BuildEntity dep : be.dependencies) {
-            if (dep.getTarget().endsWith(".jar")) { // C++ dependencies are only relevant at runtime
+            if (dep.getFinalHandler() == JavaHandler.class) { // C++ dependencies are only relevant at runtime
                 jars += " " + dep.getTargetFilename();
                 cpJars += ":" + dep.getTarget();
                 mainTarget.addDependency(dep.getTarget());
