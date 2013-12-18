@@ -259,7 +259,7 @@ public class JavaHandler implements SourceFileHandler {
             }
         }
         cpJars = buildDir + cpJars;
-        mainTarget.addCommand("find " + buildDir + " -type f -name \\*.class -delete", false);
+        mainTarget.addCommand("if [ -e " + buildDir + " ]; then find " + buildDir + " -type f -name \\*.class -delete; fi", false);
         mainTarget.addCommand("mkdir -p " + buildDir, false);
         mainTarget.addCommand("javac -sourcepath " + srcPath + " -d " + buildDir + " -cp " + cpJars + javaFiles, true);
 
