@@ -10,8 +10,10 @@ JAVA_SOURCES := $(shell find src/makebuilder/ -name "*.java")
 
 dist/build.jar : Makefile $(JAVA_SOURCES)
 	@echo Invoking ant to do the Java build 
+	@#Building incrementally sometimes causes build errors after updates. Workaround: Always call 'ant clean'.
+	@ant clean
 	@ant
-	@# yeah ... if ant does not touch it, we have to do it
+	@# yeah ... if ant does not touch it, we have to do it; TODO: obsolete after adding 'ant clean'?
 	@touch dist/build.jar
 	@echo Clearing make_builder cache ... 
 	@rm -f ../.makeBuilderCache
