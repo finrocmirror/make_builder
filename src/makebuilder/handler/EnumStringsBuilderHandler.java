@@ -31,7 +31,10 @@ import makebuilder.SourceFileHandler;
 import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceScanner;
+import makebuilder.SrcDir;
 import makebuilder.SrcFile;
+import makebuilder.libdb.LibDB;
+import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
 /**
@@ -60,7 +63,14 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     }
 
     /** enum strings builder script */
-    public static String DESCRIPTION_BUILDER_BIN = "make_builder/scripts/enum_strings_builder";
+    public static final String DESCRIPTION_BUILDER_BIN = "make_builder/scripts/enum_strings_builder";
+
+    /** enum strings builder llvm plugin */
+    public static final String LLVM_CLANG_PLUGIN = "make_builder/enum_strings_builder/clang-plugin-enum_strings-" + System.getProperty("os.arch") + ".so";
+    public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/enum_strings_builder/clang-plugin-enum_strings.cpp";
+
+    /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
+    public static final boolean USE_LLVM_PLUGIN = false;
 
     /** Contains a makefile target for each build entity with files to call strings builder upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
@@ -109,7 +119,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 target = new CppDescrTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
                 target.target.addDependency(be.buildFile);
                 target.target.addMessage("Creating " + sft.relative);
-                target.target.addDependency(DESCRIPTION_BUILDER_BIN);
+                target.target.addDependency(USE_LLVM_PLUGIN ? LLVM_CLANG_PLUGIN : DESCRIPTION_BUILDER_BIN);
                 //target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                 be.sources.add(0, sft);
                 be.opts.libs.add("enum_strings");
@@ -128,9 +138,23 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     private Makefile.Target getEnumStringsLib(Makefile makefile) {
         if (enumStringsLib == null) {
             enumStringsLib = makefile.addTarget(buildDir + "/libenum_strings.so", false, null);
-            enumStringsLib.addCommand("$(CXX) $(CXX_OPTS) -shared -fPIC -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp" , true);
+            enumStringsLib.addCommand("$(CXX) $(CXX_OPTS) -shared -fPIC -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.h");
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.cpp");
+
+            if (USE_LLVM_PLUGIN) {
+                if (!LibDB.available("clang")) {
+                    System.err.print("LLVM clang headers not available. Please install and run 'updatelibdb'.");
+                    System.exit(-1);
+                }
+                Makefile.Target target = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
+                try {
+                    target.addCommand("$(CXX) " + LibDB.getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                    target.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return enumStringsLib;
     }
@@ -153,16 +177,54 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             }
             target.descrFile.dependencies.addAll(dependencyBuffer);
 
-            // Create commands
+            // Input files string
             String inputFiles = "";
             for (SrcFile sf : target.originalSourceFiles) {
                 inputFiles += sf.relative + " ";
             }
             inputFiles = '"' + inputFiles.trim() + '"';
-            String outputDir = builder.getTempBuildDir(be) + "/" + be.getTargetFilename() + "_enum_strings";
-            target.target.addCommand("mkdir -p " + outputDir, false);
-            target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen make_builder/enum_strings_builder/doxygen.conf", false);
-            target.target.addCommand("perl -I" + outputDir + "/perlmod " + DESCRIPTION_BUILDER_BIN + " " + target.target.getName(), false);
+
+            // Create commands
+            if (!USE_LLVM_PLUGIN) {
+                String outputDir = builder.getTempBuildDir(be) + "/" + be.getTargetFilename() + "_enum_strings";
+                target.target.addCommand("mkdir -p " + outputDir, false);
+                target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen make_builder/enum_strings_builder/doxygen.conf", false);
+                target.target.addCommand("perl -I" + outputDir + "/perlmod " + DESCRIPTION_BUILDER_BIN + " " + target.target.getName(), false);
+            } else {
+
+                // create compiler options
+                CCOptions options = new CCOptions();
+                options.merge(be.opts, true);
+                options.cCompileOptions.add("$(CC_OPTS)");
+                options.cxxCompileOptions.add("$(CXX_OPTS)");
+
+                // find/prepare include paths
+                for (SrcDir path : be.getRootDir().defaultIncludePaths) {
+                    options.includePaths.add(path.relative);
+                }
+
+                // create input files string for c compiler (all header files except the last are added via '-include')
+                String clangInputFiles = "";
+                String includeGuards = "";
+                for (SrcFile sf : target.originalSourceFiles) {
+                    clangInputFiles += "-include " + sf.relative + " ";
+                    Object includeGuard = sf.properties.get(CppHandler.CPP_INCLUDE_GUARD_KEY);
+                    if (includeGuard != null) {
+                        includeGuards += " " + includeGuard.toString();
+                    }
+                }
+                clangInputFiles = clangInputFiles.trim();
+                if (includeGuards.length() > 0) {
+                    includeGuards = " -D" + includeGuards;
+                }
+
+                // create clang++ command that will create generated file
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + includeGuards +
+                                         " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
+                                         " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
+                                         " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +
+                                         clangInputFiles + " make_builder/enum_strings_builder/empty.cpp", true);
+            }
         }
     }
 }

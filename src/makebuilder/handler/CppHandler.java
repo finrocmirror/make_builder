@@ -52,6 +52,9 @@ public class CppHandler implements SourceFileHandler {
     /** Key for code model in source file properties */
     public static final String CPP_MODEL_KEY = "cppModel";
 
+    /** Key for include guard that a source file might have */
+    public static final String CPP_INCLUDE_GUARD_KEY = "cppIncludeGuard";
+
     /** Dependency buffer */
     private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
 
@@ -134,6 +137,7 @@ public class CppHandler implements SourceFileHandler {
         CodeTreeNode curNode = root;
 
         // parse code and build code tree model
+        String lastPreprocessorLine = "";
         for (String line : file.getCppLines()) {
             String orgLine = line;
             if (line.trim().startsWith("#")) {
@@ -168,10 +172,15 @@ public class CppHandler implements SourceFileHandler {
                         } else {
                             curNode = curNode.parent;
                         }
+                    } else if (line.startsWith("error")) {
+                        if (lastPreprocessorLine.startsWith("#ifndef")) {
+                            file.properties.put(CPP_INCLUDE_GUARD_KEY, lastPreprocessorLine.substring("#ifndef".length()).trim());
+                        }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException("Error while parsing C++ file (" + file.relative + "). Line was: " + orgLine);
                 }
+                lastPreprocessorLine = orgLine;
             }
         }
 
