@@ -54,7 +54,7 @@ public abstract class FinrocBuildEntity extends BuildEntity {
                 if (sf.hasExtension("java")) {
                     finalHandler = JavaHandler.class;
                     break;
-                } else if (sf.hasExtension("c", "cpp", "h", "hpp")) {
+                } else if (sf.hasExtension("c", "cpp", "h", "hpp", "cu")) {
                     finalHandler = CppHandler.class;
                     break;
                 }
