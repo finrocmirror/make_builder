@@ -35,6 +35,7 @@ import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.CCOptions;
+import makebuilder.util.Files;
 import makebuilder.util.ToStringComparator;
 
 /**
@@ -70,7 +71,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/enum_strings_builder/clang-plugin-enum_strings.cpp";
 
     /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
-    public static final boolean USE_LLVM_PLUGIN = false;
+    public static final boolean USE_LLVM_PLUGIN;
 
     /** Contains a makefile target for each build entity with files to call strings builder upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
@@ -83,6 +84,44 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
 
     /** Target for enum string library */
     private Makefile.Target enumStringsLib;
+
+    // Detect which method to use for building enum strings
+    static {
+        boolean suitableDoxygenVersion = false;
+        boolean suitableLlvmVersion = false;
+
+        // get doxygen version
+        try {
+            String[] versionString = Files.readLines(Runtime.getRuntime().exec("doxygen --version").getInputStream()).get(0).split("[.]");
+            suitableDoxygenVersion = versionString[0].equals("1") && Integer.parseInt(versionString[1]) <= 7;
+            if (suitableDoxygenVersion) {
+                System.out.println("Suitable doxygen version found");
+            }
+        } catch (Exception e) {
+        }
+        // get llvm version
+        try {
+            String[] output = Files.readLines(Runtime.getRuntime().exec("clang++ --version").getInputStream()).get(0).split("[ ]");
+            String[] versionString = null;
+            for (String o : output) {
+                if (o.contains(".")) {
+                    versionString = o.split("[.-]");
+                    break;
+                }
+            }
+            suitableLlvmVersion = Integer.parseInt(versionString[0]) > 3 || (Integer.parseInt(versionString[0]) == 3 && Integer.parseInt(versionString[1]) >= 3);
+            if (suitableLlvmVersion) {
+                System.out.println("Suitable llvm clang++ version found");
+            }
+        } catch (Exception e) {
+        }
+
+        if (!suitableDoxygenVersion && (!suitableLlvmVersion)) {
+            System.err.println("ERROR: Either doxygen version <= 1.7.6.1 or llvm clang++ >= 3.3 required for compiling");
+            System.exit(-1);
+        }
+        USE_LLVM_PLUGIN = (!suitableDoxygenVersion);
+    }
 
     /**
      * @param buildDir Build directory - set if lib_enum_strings.so needs to be built
