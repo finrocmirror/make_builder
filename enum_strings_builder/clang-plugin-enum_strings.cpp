@@ -287,6 +287,11 @@ public:
 
   virtual void HandleTranslationUnit(clang::ASTContext& Ctx)
   {
+    if (Ctx.getDiagnostics().hasErrorOccurred())
+    {
+      return;
+    }
+
     // Create generated file
     std::ofstream stream(action.output_file.c_str());
     //std::ostream& stream = std::cout;
@@ -321,3 +326,4 @@ clang::ASTConsumer* GenerateEnumStringsAction::CreateASTConsumer(clang::Compiler
 }
 
 static clang::FrontendPluginRegistry::Add<GenerateEnumStringsAction> cREGISTER_PLUGIN("enum-strings", "generate enum strings");
+
