@@ -23,6 +23,7 @@ package makebuilder.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -67,7 +68,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     public static final String DESCRIPTION_BUILDER_BIN = "make_builder/scripts/enum_strings_builder";
 
     /** enum strings builder llvm plugin */
-    public static final String LLVM_CLANG_PLUGIN = "make_builder/enum_strings_builder/clang-plugin-enum_strings-" + System.getProperty("os.arch") + ".so";
+    public static final String LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-enum_strings-" + System.getProperty("os.arch") + ".so";
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/enum_strings_builder/clang-plugin-enum_strings.cpp";
 
     /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
@@ -136,9 +137,22 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
 
             // find enum keyword
             if (!file.isInfoUpToDate()) {
-                for (String s : file.getCppLines()) {
-                    s = s.trim();
-                    if (s.startsWith("enum") && (s.length() <= 4 || (!Character.isLetter(s.charAt(4))))) {
+                List<String> lines = file.getCppLines();
+                for (int i = 0; i < lines.size(); i++) {
+                    String line = lines.get(i).trim();
+                    if (line.startsWith("enum") && (line.length() <= 4 || (Character.isWhitespace(line.charAt(4))))) {
+
+                        // Okay, we have an enum. Check whether it's an anonymous one.
+                        line = line.substring(4).trim();
+                        while (!line.contains("{")) {
+                            i++;
+                            line += " " + lines.get(i).trim();
+                        }
+                        String[] words = line.substring(0, line.indexOf('{')).split("\\s");
+                        if (words.length == 0 || words[0].trim().length() == 0) {
+                            continue;
+                        }
+
                         file.mark("enum");
                         break;
                     }
