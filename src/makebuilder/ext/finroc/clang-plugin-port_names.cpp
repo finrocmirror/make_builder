@@ -172,7 +172,7 @@ public:
     if (D->isClass() && D->getName().size() > 1 && (D->getName().front() == 'm' || D->getName().front() == 'g'))
     {
       std::string class_name = D->getNameAsString();
-      if (!isupper(class_name[1]))
+      if ((!isupper(class_name[1])) && (!(class_name[1] == 'b' && class_name[2] == 'b')))
       {
         return;
       }
