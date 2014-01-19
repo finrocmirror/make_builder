@@ -167,7 +167,7 @@ foreach my $line (@lines) {
                     last;
                 }
             }
-            unless ($path eq "/usr/lib" || $path eq "/usr/local/lib" || $path =~ /\/gcc\//) {
+            unless ($path eq "/usr/lib" || $path eq "/usr/local/lib" || $path =~ /^\/usr\/(.+)\/gcc\//) {
                 my $newPath = "-L" . $path . " ";
                 unless ($lpaths =~ /\Q$newPath\E/) {
                     $lpaths .= $newPath;

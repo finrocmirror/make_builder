@@ -79,6 +79,7 @@ obid:       -D_FEDM_COM_SUPPORT -D_FEDM_LINUX -D_FEDM_XML_SUPPORT -lfecom -lFedm
 ode:        -I<ode/ode.h> -lode
 ogre:		-I<Ogre.h> -lOgreMain
 oiv:        -D _LIB_OIV_PRESENT_  -I<Inventor/SoDB.h> -lCoin
+opc_ua:     -I<Application.h,ServerHistoryReadProcessedContinuationPoint.h> -I<tb5version.h,SessionSecurityDiagnosticsDataTypeStruct.h> -pthread -ltb5cpp -ltb5ot -ltb5util -ltb5stack -lcrypto -lrt
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect
 opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video -lopencv_ml
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
