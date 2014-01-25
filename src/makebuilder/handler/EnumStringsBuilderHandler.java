@@ -74,6 +74,9 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
     public static final boolean USE_LLVM_PLUGIN;
 
+    /** Extra flags for compiling with clang */
+    public static final String EXTRA_CLANG_FLAGS;
+
     /** Contains a makefile target for each build entity with files to call strings builder upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
 
@@ -122,6 +125,9 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             System.exit(-1);
         }
         USE_LLVM_PLUGIN = (!suitableDoxygenVersion);
+
+        // Workaround for bug https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-snapshot/+bug/1215572
+        EXTRA_CLANG_FLAGS = System.getProperty("os.arch").equals("i386") ? " -I/usr/include/i386-linux-gnu/c++/4.8" : "";
     }
 
     /**
@@ -272,7 +278,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + includeGuards +
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + EXTRA_CLANG_FLAGS + includeGuards +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +
