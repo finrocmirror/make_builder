@@ -33,6 +33,7 @@ import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
+import makebuilder.handler.EnumStringsBuilderHandler;
 import makebuilder.libdb.LibDB;
 import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
@@ -175,7 +176,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
                 clangInputFiles = clangInputFiles.trim();
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) +
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + EnumStringsBuilderHandler.EXTRA_CLANG_FLAGS +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang finroc_port_names " +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --inputs=" + inputFiles + " " +
