@@ -32,7 +32,6 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.Makefile.Target;
-import makebuilder.ext.CakeHandler;
 import makebuilder.ext.mca.DependencyHandler;
 import makebuilder.ext.mca.DescriptionBuilderHandler;
 import makebuilder.ext.mca.EtcDirCopier;
@@ -181,7 +180,6 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
 
         addHandler(new CppHandler(cflags, cxxflags, "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2, !opts.combineCppFiles));
         addHandler(new JavaHandler(this));
-        addHandler(new CakeHandler());
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
 

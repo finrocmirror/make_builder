@@ -30,7 +30,6 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.Makefile.Target;
-import makebuilder.ext.CakeHandler;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.CppMerger;
 import makebuilder.handler.MakeXMLLoader;
@@ -92,7 +91,6 @@ public class MCABuilder extends MakeFileBuilder {
         addHandler(new CppHandler("-Wall -Wwrite-strings -Wno-unknown-pragmas -include Makefile.h",
                                   "-lm -L" + targetLib.relative + " -Wl,-rpath," + targetLib.relative,
                                   !opts.combineCppFiles));
-        addHandler(new CakeHandler());
 
         // is MCA installed system-wide?
         if (getOptions().containsKey("usesysteminstall")) {
