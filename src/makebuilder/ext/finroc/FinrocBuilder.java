@@ -223,6 +223,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             if (targetFile.exists()) {
                 System.out.println(Util.color("Using custom options from target config file: " + targetFile.getCanonicalPath(), Color.GREEN, true));
                 makefile.applyVariablesFromFile(targetFile);
+                // gcc should be default compiler if no other compiler was specified
+                makefile.changeVariable("CC=gcc$(GCC_VERSION)");
+                makefile.changeVariable("CXX=g++$(GCC_VERSION)");
             } else {
                 System.out.println(Util.color("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")", Color.Y, true));
             }
