@@ -2,7 +2,7 @@
 if test -n "$MAKEBIN" ; then
     test
 else
-    MAKEBIN=pmake
+    MAKEBIN=make
 fi
 $MAKEBIN "$@"
 
