@@ -89,6 +89,9 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     /** Target for enum string library */
     private Makefile.Target enumStringsLib;
 
+    /** Compiler flags for clang (used instead of ($CXX_OPTS)) */
+    private final String clangFlags;
+
     // Detect which method to use for building enum strings
     static {
         boolean suitableDoxygenVersion = false;
@@ -132,9 +135,11 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
 
     /**
      * @param buildDir Build directory - set if lib_enum_strings.so needs to be built
+     * @param clangFlags Compiler flags for clang (used instead of ($CXX_OPTS))
      */
-    public EnumStringsBuilderHandler(String buildDir) {
+    public EnumStringsBuilderHandler(String buildDir, String clangFlags) {
         this.buildDir = buildDir;
+        this.clangFlags = clangFlags;
     }
 
     @Override
@@ -278,7 +283,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + EXTRA_CLANG_FLAGS + includeGuards +
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true).replace("$(CXX_OPTS)", clangFlags) + EXTRA_CLANG_FLAGS + includeGuards +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +
