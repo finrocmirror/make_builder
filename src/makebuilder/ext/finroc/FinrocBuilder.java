@@ -134,11 +134,12 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         addHandler(new DescriptionBuilderHandler());
         String cflags = "-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h";
         String cxxflags = cflags + " -include make_builder/enum_strings_builder/enum_strings.h";
+        String clangCodeGenerationFlags = "-std=c++11 -include libinfo.h -include make_builder/enum_strings_builder/enum_strings.h";
         globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
-        addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib"));
+        addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib", clangCodeGenerationFlags));
 
         if (BUILDING_FINROC) {
-            addHandler(new PortDescriptionBuilderHandler());
+            addHandler(new PortDescriptionBuilderHandler(clangCodeGenerationFlags));
         }
         if (getOptions().combineCppFiles) {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));
@@ -222,6 +223,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             if (targetFile.exists()) {
                 System.out.println(Util.color("Using custom options from target config file: " + targetFile.getCanonicalPath(), Color.GREEN, true));
                 makefile.applyVariablesFromFile(targetFile);
+                // gcc should be default compiler if no other compiler was specified
+                makefile.changeVariable("CC=gcc$(GCC_VERSION)");
+                makefile.changeVariable("CXX=g++$(GCC_VERSION)");
             } else {
                 System.out.println(Util.color("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")", Color.Y, true));
             }

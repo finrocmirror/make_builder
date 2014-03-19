@@ -82,6 +82,16 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
     /** Target for clang plugin */
     private Makefile.Target clangPlugin;
 
+    /** Compiler flags for clang (used instead of ($CXX_OPTS)) */
+    private final String clangFlags;
+
+    /**
+     * @param clangFlags Compiler flags for clang (used instead of ($CXX_OPTS))
+     */
+    public PortDescriptionBuilderHandler(String clangFlags) {
+        this.clangFlags = clangFlags;
+    }
+
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g"))) {
@@ -176,7 +186,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
                 clangInputFiles = clangInputFiles.trim();
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + EnumStringsBuilderHandler.EXTRA_CLANG_FLAGS +
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true).replace("$(CXX_OPTS)", clangFlags) + EnumStringsBuilderHandler.EXTRA_CLANG_FLAGS +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang finroc_port_names " +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --inputs=" + inputFiles + " " +
