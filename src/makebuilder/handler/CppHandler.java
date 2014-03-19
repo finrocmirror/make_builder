@@ -289,6 +289,7 @@ public class CppHandler implements SourceFileHandler {
                     be.sources.remove(sf);
                     be.target.addDependency(sf);
                     sources += " " + sf.relative;
+                    atLeastOneCxx = true; // we link with g++ - to be on the safe side (could be e.g. an o-file from cuda compiler)
                 }
             }
             be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
