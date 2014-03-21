@@ -127,7 +127,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             System.err.println("ERROR: Either doxygen version <= 1.7.6.1 or llvm clang++ >= 3.3 required for compiling");
             System.exit(-1);
         }
-        USE_LLVM_PLUGIN = (!suitableDoxygenVersion);
+        USE_LLVM_PLUGIN = suitableLlvmVersion;
 
         // Workaround for bug https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-snapshot/+bug/1215572
         EXTRA_CLANG_FLAGS = System.getProperty("os.arch").equals("i386") ? " -I/usr/include/i386-linux-gnu/c++/4.8" : "";
