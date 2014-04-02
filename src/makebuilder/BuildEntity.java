@@ -355,7 +355,7 @@ public abstract class BuildEntity {
             if (hint != null) {
                 msg += " (" + hint + ")";
             }
-            builder.printCannotBuildError(this, " due to missing dependency " + msg, Color.RED);
+            builder.printCannotBuildError(this, " due to missing dependency " + msg, this.isOptional() ? Color.Y : Color.RED);
             return;
         }
 
@@ -518,6 +518,17 @@ public abstract class BuildEntity {
      * @return Is this a unit test (program) that should be executed at compile time?
      */
     public boolean isUnitTest() {
+        return false;
+    }
+
+    /**
+     * @return Is this an optional target? (will only produce yellow error messages)
+     */
+    public boolean isOptional() {
+        Object o = params.get("optional");
+        if (o != null && o.toString().equalsIgnoreCase("true")) {
+            return true;
+        }
         return false;
     }
 }

@@ -68,4 +68,8 @@ public class TestProgram extends FinrocBuildEntity {
         }
         super.initTarget(makefile);
     }
+
+    public boolean isOptional() {
+        return true;
+    }
 }

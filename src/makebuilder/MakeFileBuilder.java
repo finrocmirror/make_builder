@@ -361,7 +361,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      */
     public void printCannotBuildError(BuildEntity be, String string, Util.Color c) {
         be.errorMessageId = errorMessages.size() + 1;
-        printErrorLine(Util.color("(" + be.errorMessageId + ") ", c, false) + Util.color("Cannot build " + be.getReferenceName(), c, true) + " (" + be.buildFile + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ")" + Util.color(string, c, false));
+        printErrorLine(Util.color("(" + be.errorMessageId + ") ", c, false) + Util.color("Cannot build " + (be.isOptional() ? "optional " : "") + be.getReferenceName(), c, true) + " (" + be.buildFile + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ")" + Util.color(string, c, false));
     }
 
 
