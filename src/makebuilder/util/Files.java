@@ -394,11 +394,6 @@ public class Files {
             dirName = dirName.substring(dirName.indexOf("file:/") + 5);
         }
 
-        // replace %20 with spaces
-        while (dirName.contains("%20")) {
-            dirName = dirName.replace("%20", " ");
-        }
-
         return dirName.substring(0, dirName.length() - 1); // cut off proceeding File.separator
     }
 
