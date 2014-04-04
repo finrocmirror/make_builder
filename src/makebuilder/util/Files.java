@@ -39,6 +39,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -374,6 +375,11 @@ public class Files {
     public static String getRootDir(Class<?> caller) {
 
         String dirName = caller.getResource(caller.getSimpleName() + ".class").toString();
+        try {
+            dirName = URLDecoder.decode(dirName, "utf8");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         String packageName = caller.getName().replaceAll("[.]", "/");
         dirName = dirName.substring(0, dirName.indexOf(packageName));
         if (dirName.contains(".jar!")) {
