@@ -525,6 +525,10 @@ public abstract class BuildEntity {
      * @return Is this an optional target? (will only produce yellow error messages)
      */
     public boolean isOptional() {
+        if (params == null) {
+            return false;
+        }
+
         Object o = params.get("optional");
         if (o != null && o.toString().equalsIgnoreCase("true")) {
             return true;
