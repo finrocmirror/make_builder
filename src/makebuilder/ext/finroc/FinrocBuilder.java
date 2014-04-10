@@ -307,7 +307,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         // create additional defines
         for (BuildEntity be : buildEntities) {
             if (!be.missingDep && be.getTargetFilename().endsWith(".so")) {
-                if (be instanceof RRLib || be instanceof FinrocLibrary || be instanceof FinrocPlugin) {
+                if (be instanceof RRLib || be instanceof FinrocLibrary || be instanceof FinrocPlugin || be instanceof Library) {
                     // _RRLIB_COMPUTER_VISION_BASE_PRESENT_
                     FinrocBuildEntity finrocBE = (FinrocBuildEntity)be;
                     globalDefine.add("#define _LIB_" + (finrocBE.createTargetPrefix() + finrocBE.createNameString()).toUpperCase() + "_PRESENT_");
