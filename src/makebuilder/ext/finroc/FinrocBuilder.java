@@ -125,9 +125,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         // init handlers
         addLoader(new SConscriptParser());
         if (BUILDING_FINROC) {
-            addLoader(new MakeXMLLoader(MCALibrary.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
+            addLoader(new MakeXMLLoader(Library.class, Program.class, MCALibrary.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
         } else {
-            addLoader(new MakeXMLLoader(MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
+            addLoader(new MakeXMLLoader(Library.class, Program.class, MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
         }
         addHandler(new Qt4Handler());
         addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
