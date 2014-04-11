@@ -32,9 +32,10 @@ import makebuilder.StartScript;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.JavaHandler;
 import makebuilder.util.Files;
+import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Finroc build entity.
  * Decides which target entity belongs to.
@@ -43,7 +44,11 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 
     protected Makefile.Target startScriptTarget;
 
+    /** Final handler for this build entity */
     private Class <? extends SourceFileHandler > finalHandler;
+
+    /** Has the final handler been determined? */
+    private boolean finalHandlerDetermined = false;
 
     public static final String SEARCH_BIN = FinrocBuilder.BUILDING_FINROC ? "finroc_search" : "mca_search";
 
@@ -74,19 +79,22 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 
     @Override
     public Class <? extends SourceFileHandler > getFinalHandler() {
-        if (finalHandler == null) {
-            for (SrcFile sf : sources) {
-                if (sf.hasExtension("java")) {
-                    finalHandler = JavaHandler.class;
-                    break;
-                } else if (sf.hasExtension("c", "cpp", "h", "hpp", "cu")) {
-                    finalHandler = CppHandler.class;
-                    break;
+        if (!finalHandlerDetermined) {
+            if (finalHandler == null) {
+                for (SrcFile sf : sources) {
+                    if (sf.hasExtension("java")) {
+                        finalHandler = JavaHandler.class;
+                        break;
+                    } else if (sf.hasExtension("c", "cpp", "h", "hpp", "cu")) {
+                        finalHandler = CppHandler.class;
+                        break;
+                    }
                 }
             }
-        }
-        if (finalHandler == null) {
-            System.out.println("warning: cannot determine final handler for target " + toString());
+            if (finalHandler == null) {
+                System.out.println(Util.color("warning: cannot determine final handler for target " + toString(), Util.Color.RED, true));
+            }
+            finalHandlerDetermined = true;
         }
         return finalHandler;
     }

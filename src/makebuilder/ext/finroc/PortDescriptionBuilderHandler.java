@@ -94,10 +94,10 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
 
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
-        if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g"))) {
+        if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g")) && Character.isUpperCase(file.getName().charAt(1))) {
 
             BuildEntity be = file.getOwner();
-            if (be == null || !(be instanceof FinrocLibrary || be instanceof FinrocProgram || be instanceof FinrocPlugin || (be instanceof TestProgram && be.getTargetFilename().startsWith("finroc_")))) { // we don't know where generated code belongs
+            if (be == null || be.buildFile.relative.startsWith("sources/cpp/rrlib/")) { // we don't know where generated code belongs
                 return;
             }
 
