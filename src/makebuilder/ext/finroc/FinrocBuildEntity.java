@@ -47,6 +47,31 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 
     public static final String SEARCH_BIN = FinrocBuilder.BUILDING_FINROC ? "finroc_search" : "mca_search";
 
+    /** Has target type already been determined? */
+    private boolean typeDetermined = false;
+
+    /** Is this an example target? */
+    private boolean example;
+
+    /** Is this a (unit) test target */
+    private boolean test;
+
+    /**
+     * @return Is this an example target?
+     */
+    public boolean isExampleTarget() {
+        determineType();
+        return example;
+    }
+
+    /**
+     * @return Is this a test target?
+     */
+    public boolean isTestTarget() {
+        determineType();
+        return test;
+    }
+
     @Override
     public Class <? extends SourceFileHandler > getFinalHandler() {
         if (finalHandler == null) {
@@ -180,5 +205,43 @@ public abstract class FinrocBuildEntity extends BuildEntity {
      */
     public String createNameString() {
         return (name == null || name.length() == 0) ? "" : ("_" + name);
+    }
+
+    /**
+     * Determines whether this target is an example or test target
+     */
+    private void determineType() {
+        if (!typeDetermined) {
+            boolean allTest = true;
+            boolean allExample = true;
+            boolean oneTest = false;
+            boolean oneExample = false;
+
+            for (SrcFile sf : sources) {
+                if (!sf.buildProduct) {
+                    if (sf.relative.contains("/tests/")) {
+                        oneTest = true;
+                    } else {
+                        allTest = false;
+                    }
+                    if (sf.relative.contains("/examples/")) {
+                        oneExample = true;
+                    } else {
+                        allExample = false;
+                    }
+                }
+            }
+
+            if (oneExample && allExample) {
+                example = true;
+            } else if (oneTest && allTest) {
+                test = true;
+            } else if (oneTest) {
+                throw new RuntimeException("Cannot determine whether " + this.toString() + " is a test program as only some source files are from 'tests' directory. Please clean this up.");
+            } else if (oneExample) {
+                throw new RuntimeException("Cannot determine whether " + this.toString() + " is an example program as only some source files are from 'examples' directory. Please clean this up.");
+            }
+            typeDetermined = true;
+        }
     }
 }

@@ -34,25 +34,15 @@ import makebuilder.handler.JavaHandler;
  */
 public class Program extends FinrocBuildEntity {
 
-    /** Has program type already been determined? */
-    private boolean typeDetermined = false;
-
-    /** Is this an example program? */
-    private boolean example;
-
-    /** Is this a (unit) test */
-    private boolean test;
-
     public Program() {
         //opts.addOptions("-Wl,--no-as-needed");
     }
 
     @Override
     public String getTargetPrefix() {
-        determineType();
-        if (example) {
+        if (isExampleTarget()) {
             return createTargetPrefix() + "_example";
-        } else if (test) {
+        } else if (isTestTarget()) {
             return createTargetPrefix() + "_test";
         }
         return "";
@@ -65,8 +55,7 @@ public class Program extends FinrocBuildEntity {
 
     @Override
     public boolean isOptional() {
-        determineType();
-        if (example) {
+        if (isExampleTarget() || isTestTarget()) {
             return true;
         }
         return super.isOptional();
@@ -83,8 +72,7 @@ public class Program extends FinrocBuildEntity {
                 throw new RuntimeException("Invalid autorun parameter '" + this.params.get("autorun") + "' in " + this.buildFile.relative);
             }
         }
-        determineType();
-        if (test) {
+        if (isTestTarget()) {
             return true;
         }
         return super.isUnitTest();
@@ -92,8 +80,7 @@ public class Program extends FinrocBuildEntity {
 
     @Override
     public String getTarget() {
-        determineType();
-        String result = "$(TARGET_BIN)/" + getTargetPrefix() + (example || test ? createNameString() : name);
+        String result = "$(TARGET_BIN)/" + getTargetPrefix() + (isExampleTarget() || isTestTarget() ? createNameString() : name);
         if (getFinalHandler() == JavaHandler.class) {
             return result.replace("$(TARGET_BIN)", "$(TARGET_JAVA)") + ".jar";
         }
@@ -108,40 +95,5 @@ public class Program extends FinrocBuildEntity {
             }
         }
         super.initTarget(makefile);
-    }
-
-    private void determineType() {
-        if (!typeDetermined) {
-            boolean allTest = true;
-            boolean allExample = true;
-            boolean oneTest = false;
-            boolean oneExample = false;
-
-            for (SrcFile sf : sources) {
-                if (!sf.buildProduct) {
-                    if (sf.relative.contains("/tests/")) {
-                        oneTest = true;
-                    } else {
-                        allTest = false;
-                    }
-                    if (sf.relative.contains("/examples/")) {
-                        oneExample = true;
-                    } else {
-                        allExample = false;
-                    }
-                }
-            }
-
-            if (oneExample && allExample) {
-                example = true;
-            } else if (oneTest && allTest) {
-                test = true;
-            } else if (oneTest) {
-                throw new RuntimeException("Cannot determine whether " + this.toString() + " is a test program as only some source files are from 'tests' directory. Please clean this up.");
-            } else if (oneExample) {
-                throw new RuntimeException("Cannot determine whether " + this.toString() + " is an example program as only some source files are from 'examples' directory. Please clean this up.");
-            }
-            typeDetermined = true;
-        }
     }
 }

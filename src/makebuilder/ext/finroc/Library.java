@@ -42,4 +42,12 @@ public class Library extends FinrocBuildEntity {
         }
         return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".so";
     }
+
+    @Override
+    public boolean isOptional() {
+        if (isExampleTarget() || isTestTarget()) {
+            return true;
+        }
+        return super.isOptional();
+    }
 }
