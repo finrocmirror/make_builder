@@ -53,7 +53,7 @@ public class Program extends FinrocBuildEntity {
         if (example) {
             return createTargetPrefix() + "_example";
         } else if (test) {
-            return createTargetPrefix() + "_unit_test";
+            return createTargetPrefix() + "_test";
         }
         return "";
     }
@@ -74,6 +74,15 @@ public class Program extends FinrocBuildEntity {
 
     @Override
     public boolean isUnitTest() {
+        if (this.params != null && this.params.containsKey("autorun")) {
+            if (this.params.get("autorun").toString().equalsIgnoreCase("false")) {
+                return false;
+            } else if (this.params.get("autorun").toString().equalsIgnoreCase("true")) {
+                return true;
+            } else if (!this.params.get("autorun").toString().equalsIgnoreCase("default")) {
+                throw new RuntimeException("Invalid autorun parameter '" + this.params.get("autorun") + "' in " + this.buildFile.relative);
+            }
+        }
         determineType();
         if (test) {
             return true;
