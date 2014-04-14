@@ -94,7 +94,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
 
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
-        if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g")) && Character.isUpperCase(file.getName().charAt(1))) {
+        if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g")) && (!file.getName().toLowerCase().equals(file.getName()))) { // at least one upper case character
 
             BuildEntity be = file.getOwner();
             if (be == null || be.buildFile.relative.startsWith("sources/cpp/rrlib/")) { // we don't know where generated code belongs
