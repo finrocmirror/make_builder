@@ -201,7 +201,7 @@ public:
           if (type_name.find('<') != std::string::npos)
           {
             type_name = type_name.substr(0, type_name.find('<'));
-            if (type_name == "tInput" || type_name == "tOutput" || type_name == "tControllerInput" || type_name == "tControllerOutput" || type_name == "tSensorInput" || type_name == "tSensorOutput" || type_name == "tParameter" || type_name == "tStaticParameter" || type_name == "tVisualizationPort")
+            if (type_name == "tInput" || type_name == "tOutput" || type_name == "tControllerInput" || type_name == "tControllerOutput" || type_name == "tSensorInput" || type_name == "tSensorOutput" || type_name == "tParameter" || type_name == "tStaticParameter" || type_name == "tVisualizationOutput" || type_name == "tServer" || type_name == "tClient")
             {
               generated_code << "  names.push_back(\"" << FormatPortNameString((*it)->getNameAsString(), type_name) << "\");" << std::endl;
             }
