@@ -97,7 +97,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
         if (file.hasExtension("h") && (file.getName().startsWith("m") || file.getName().startsWith("g")) && (!file.getName().toLowerCase().equals(file.getName()))) { // at least one upper case character
 
             BuildEntity be = file.getOwner();
-            if (be == null || be.buildFile.relative.startsWith("sources/cpp/rrlib/")) { // we don't know where generated code belongs
+            if (be == null || be.buildFile.relative.startsWith("sources/cpp/rrlib/") || be.buildFile.relative.startsWith("sources/cpp/mca2-legacy/")) { // we don't know where generated code belongs
                 return;
             }
 
