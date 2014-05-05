@@ -220,19 +220,19 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             String home = BUILDING_FINROC ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME");
             File targetFile = new File(home + "/etc/targets/" + TARGET);
             //File targetFile = Util.getFileInEtcDir("../targets/" + target);
-            if (targetFile.exists()) {
-                System.out.println(Util.color("Using custom options from target config file: " + targetFile.getCanonicalPath(), Color.GREEN, true));
-                makefile.applyVariablesFromFile(targetFile);
-                // gcc should be default compiler if no other compiler was specified
-                makefile.changeVariable("CC=gcc$(GCC_VERSION)");
-                makefile.changeVariable("CXX=g++$(GCC_VERSION)");
-            } else {
-                System.out.println(Util.color("No configuration file for current target found (" + targetFile.getAbsolutePath() + ")", Color.Y, true));
+            if (!targetFile.exists()) {
+                System.out.println(Util.color("No configuration file for current target found (expected " + targetFile.getCanonicalPath() + ")!", Color.RED, true));
+                System.out.println(Util.color("Maybe you need to source scripts/setenv again to update your environment.", Color.RED, true));
+                System.exit(-1);
             }
-        }
+// TODO: do we really need the following lines together with the include below?
+            makefile.applyVariablesFromFile(targetFile);
+            // gcc should be default compiler if no other compiler was specified
+            makefile.changeVariable("CC=gcc$(GCC_VERSION)");
+            makefile.changeVariable("CXX=g++$(GCC_VERSION)");
 
-        // include target file
-        makefile.addVariable("-include etc/targets/$(TARGET)");
+            makefile.addVariable("include etc/targets/$(TARGET)");
+        }
 
         if (getOptions().containsKey("usesysteminstall")) {
             new FinrocRepositoryTargetCreator().postprocess(makefile);
