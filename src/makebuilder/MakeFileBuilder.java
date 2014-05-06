@@ -262,7 +262,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      */
     protected void writeMakefile() throws Exception {
 
-        makefile.writeTo(new File("Makefile"));
+        makefile.writeTo(new File(opts.generatedMakefileName));
     }
 
     /**

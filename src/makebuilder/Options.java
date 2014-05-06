@@ -43,6 +43,9 @@ public class Options extends Properties {
     /** create dot file of dependecy graph? */
     public boolean outputDotFile;
 
+    /** File name for generated makefile */
+    public String generatedMakefileName = "Makefile";
+
     /** Main class to instantiate (optional) */
     Class <? extends Runnable > mainClass = MakeFileBuilder.class;
 
@@ -69,6 +72,8 @@ public class Options extends Properties {
                 calculateDependencies = true;
             } else if (s.startsWith("--dotfile")) {
                 outputDotFile = true;
+            } else if (s.startsWith("--makefile=")) {
+                generatedMakefileName = s.substring("--makefile=".length());
             } else if (s.startsWith("--")) {
                 String key = s.contains("=") ? s.substring(2, s.indexOf("=")) : s.substring(2);
                 String value = s.contains("=") ? s.substring(s.indexOf("=") + 1) : "N/A";
