@@ -151,10 +151,14 @@ public class SourceScanner {
         // set ownership of files: relate SrcFile instances to BuildEntity instances
         // heuristic: all files with same base name (no extension) as one of build entity's source files belong to build entity
         for (BuildEntity be : builder.buildEntities) {
-            for (SrcFile sf : be.sources) {
+            for (int i = 0, n = be.sources.size(); i < n; i++) {
+                SrcFile sf = be.sources.get(i);
                 String baseName = sf.dir.relative + FS + sf.getRawName();
                 for (SrcFile sf2 : files.subMap(baseName + ".aaa", baseName + ".zzz").values()) {
                     sf2.setOwner(be);
+                    if (!be.sources.contains(sf2)) {
+                        be.sources.add(sf2);
+                    }
                 }
             }
         }

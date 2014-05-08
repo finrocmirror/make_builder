@@ -164,9 +164,9 @@ public abstract class BuildEntity {
                         }
                     }
                 }
-                System.out.println("-> " + be.toString() +  " [" + be.getRootDir().toString() + "]" + (srcFile == null ? "" : ("   (" + srcFile.toString() + "  includes  " + srcFileDep.toString() + ")")));
+                System.out.println("-> " + be.getTargetFilename() +  " [" + be.getRootDir().toString() + "]" + (srcFile == null ? "" : ("   (" + srcFile.toString() + "  includes  " + srcFileDep.toString() + ")")));
             }
-            System.out.println("-> " + toString() +  " [" + getRootDir().toString() + "]");
+            System.out.println("-> " + getTargetFilename() +  " [" + getRootDir().toString() + "]");
             System.exit(-1);
         }
 
