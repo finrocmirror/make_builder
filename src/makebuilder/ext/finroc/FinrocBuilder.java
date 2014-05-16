@@ -113,6 +113,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         makefile.addVariable("TARGET_JAVA:=export/java");
         makefile.addBuildDir("build/java");
         makefile.addBuildDir("export/java");
+        makefile.addBuildDir("make_builder/dist");
         //makefile.addVariable("TARGET_PLUGIN=$(TARGET_DIR)/plugin");
 
         // init global defines
