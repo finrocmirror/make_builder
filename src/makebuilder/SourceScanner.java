@@ -156,7 +156,7 @@ public class SourceScanner {
                 String baseName = sf.dir.relative + FS + sf.getRawName();
                 for (SrcFile sf2 : files.subMap(baseName + ".aaa", baseName + ".zzz").values()) {
                     sf2.setOwner(be);
-                    if (!be.sources.contains(sf2)) {
+                    if ((sf2.getExtension().equals("h") || sf2.getExtension().equals("hpp")) && (!be.sources.contains(sf2))) {
                         be.sources.add(sf2);
                     }
                 }

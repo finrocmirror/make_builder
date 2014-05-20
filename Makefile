@@ -1,4 +1,5 @@
 .PHONY: all
+.NOTPARALLEL:
 
 all : etc/libdb.txt dist/build.jar
 
