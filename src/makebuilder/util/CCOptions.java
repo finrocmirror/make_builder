@@ -251,14 +251,20 @@ public class CCOptions implements Comparator<String> {
      * @return String with options required by nvcc compiler
      */
     public String createCudaString() {
+        String compilerOptions = "";
         String result = "";
         for (String s : cxxCompileOptions) {
             if (s.startsWith("-D") || s.startsWith("$")) {
                 result += " " + s;
+            } else {
+                compilerOptions += "," + s;
             }
         }
         for (String s : includePaths) {
             result += " -I" + s;
+        }
+        if (compilerOptions.length() > 0) {
+            result += " --compiler-options " + compilerOptions.substring(1);
         }
         return result;
     }
