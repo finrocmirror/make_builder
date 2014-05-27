@@ -334,9 +334,9 @@ public class CppHandler implements SourceFileHandler {
             be.target.addDependencies(dependencyBuffer);
         }
         if (be.isUnitTest()) {
-            be.target.addCommand("@echo ; echo \"===== Running unit test " + be.getTargetFilename() + " =====\"" , true);
-            be.target.addCommand("@" + be.getTarget(), true);
-            be.target.addCommand("@echo \"=====\" ; echo", true);
+            be.target.addCommand("echo ; echo \"===== Running unit test " + be.getTargetFilename() + " =====\"" , false);
+            be.target.addCommand("" + be.getTarget() + " || ( rm " + be.getTarget() + " && false )" , false);
+            be.target.addCommand("echo \"=====\" ; echo", false);
         }
     }
 
