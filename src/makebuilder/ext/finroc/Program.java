@@ -35,7 +35,7 @@ import makebuilder.handler.JavaHandler;
 public class Program extends FinrocBuildEntity {
 
     public Program() {
-        //opts.addOptions("-Wl,--no-as-needed");
+        opts.addOptions("-Wl,--no-as-needed");
     }
 
     @Override

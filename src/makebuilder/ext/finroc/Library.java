@@ -32,7 +32,7 @@ import makebuilder.handler.JavaHandler;
 public class Library extends FinrocBuildEntity {
 
     public Library() {
-        opts.addOptions("-shared -fPIC");
+        opts.addOptions("-shared -fPIC -Wl,--no-as-needed");
     }
 
     @Override
