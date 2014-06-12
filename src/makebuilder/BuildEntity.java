@@ -28,7 +28,6 @@ import java.util.SortedMap;
 
 import makebuilder.handler.CppHandler;
 import makebuilder.libdb.ExtLib;
-import makebuilder.libdb.LibDB;
 import makebuilder.libdb.PkgConfig;
 import makebuilder.util.AddOrderSet;
 import makebuilder.util.CCOptions;
@@ -417,8 +416,8 @@ public abstract class BuildEntity {
         }
 
         // first, try libdb, so it can be used to override pkg-config, as some pkg-config might be wrong
-        if (LibDB.available(dep)) { // External library dependency?
-            ExtLib xl = LibDB.getLib(dep);
+        if (builder.getTargetLibDB().available(dep)) { // External library dependency?
+            ExtLib xl = builder.getTargetLibDB().getLib(dep);
             directExtlibs.add(xl);
             for (BuildEntity be : xl.dependencies) {
                 if (!dependencies.contains(be)) {
@@ -426,7 +425,7 @@ public abstract class BuildEntity {
                 }
             }
             return;
-        } else if (PkgConfig.available(dep)) {
+        } else if (PkgConfig.available(dep) && (!builder.isCrossCompiling())) {
 
             ExtLib xl = PkgConfig.getLib(dep);
             directExtlibs.add(xl);
@@ -437,7 +436,7 @@ public abstract class BuildEntity {
             }
             System.out.println(Util.color("Dependency found using pkg-config: " + dep, Util.Color.GREEN, false));
             return;
-        } else {
+        } else if (!builder.isCrossCompiling()) {
             System.out.println(Util.color("Dependency not found using pkg-config, consider checking if this library is known under a different name: " + dep, Util.Color.Y, false));
         }
 

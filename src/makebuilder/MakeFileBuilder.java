@@ -393,4 +393,18 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     public SourceScanner getSources() {
         return sources;
     }
+
+    /**
+     * @return Returns true when cross-compiling (may be overridden by subclass)
+     */
+    public boolean isCrossCompiling() {
+        return false;
+    }
+
+    /**
+     * @return Returns libdb to use for actual compiling (may be overridden by subclass)
+     */
+    public LibDB getTargetLibDB() {
+        return LibDB.getInstance("native");
+    }
 }

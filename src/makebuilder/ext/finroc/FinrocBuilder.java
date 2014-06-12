@@ -51,6 +51,7 @@ import makebuilder.handler.NvccHandler;
 import makebuilder.handler.PkgConfigFileHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
+import makebuilder.libdb.LibDB;
 import makebuilder.util.CodeBlock;
 import makebuilder.util.Util;
 import makebuilder.util.Util.Color;
@@ -99,9 +100,21 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     /** Optional dependency handler */
     private DependencyHandler dependencyHandler;
 
+    /** Is make_builder used for cross-compiling? */
+    private Boolean crossCompiling;
+
+    /** libdb to use for actual compiling */
+    private LibDB targetLibDB;
+
     public FinrocBuilder() {
         super("export/$(TARGET)", "build/$(TARGET)");
         //super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
+
+        // init libdb
+        targetLibDB = LibDB.getInstance("native").reinit(null);
+        if (isCrossCompiling()) {
+            targetLibDB = LibDB.getInstance(System.getenv("FINROC_ARCHITECTURE")).reinit(new File("make_builder/etc/libdb." + System.getenv("FINROC_ARCHITECTURE")));
+        }
 
         // init target paths
         targetBin = buildPath.getSubDir("bin");
@@ -429,4 +442,16 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         return result;
     }
 
+    @Override
+    public boolean isCrossCompiling() {
+        if (crossCompiling == null) {
+            crossCompiling = !System.getenv("FINROC_ARCHITECTURE").equals(System.getenv("FINROC_ARCHITECTURE_NATIVE"));
+        }
+        return crossCompiling;
+    }
+
+    @Override
+    public LibDB getTargetLibDB() {
+        return targetLibDB;
+    }
 }

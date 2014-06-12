@@ -125,13 +125,13 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
      */
     private Makefile.Target getClangPlugin(Makefile makefile) {
         if (clangPlugin == null) {
-            if (!LibDB.available("clang")) {
+            if (!LibDB.getInstance("native").available("clang")) {
                 System.err.print("LLVM clang headers not available. Please install and run 'updatelibdb'.");
                 System.exit(-1);
             }
             clangPlugin = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
             try {
-                clangPlugin.addCommand("c++ " + LibDB.getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                clangPlugin.addCommand("c++ " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
                 clangPlugin.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
             } catch (Exception e) {
                 e.printStackTrace();

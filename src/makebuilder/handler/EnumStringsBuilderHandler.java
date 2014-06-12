@@ -214,13 +214,13 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.cpp");
 
             if (USE_LLVM_PLUGIN) {
-                if (!LibDB.available("clang")) {
+                if (!LibDB.getInstance("native").available("clang")) {
                     System.err.print("LLVM clang headers not available. Please install and run 'updatelibdb'.");
                     System.exit(-1);
                 }
                 Makefile.Target target = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
                 try {
-                    target.addCommand("c++ " + LibDB.getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                    target.addCommand("c++ " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
                     target.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
                 } catch (Exception e) {
                     e.printStackTrace();

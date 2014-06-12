@@ -77,8 +77,8 @@ public class Qt4Handler extends SourceFileHandler.Impl {
 
     public Qt4Handler() {
         try {
-            MOC_CALL = LibDB.getLib("moc-qt4").options.trim();
-            UIC_CALL = LibDB.getLib("uic-qt4").options.trim();
+            MOC_CALL = LibDB.getInstance("native").getLib("moc-qt4").options.trim();
+            UIC_CALL = LibDB.getInstance("native").getLib("uic-qt4").options.trim();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -23,19 +23,17 @@ package makebuilder.libdb;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import makebuilder.BuildEntity;
-import makebuilder.util.CCOptions;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Contains specific information about external libraries
  *
@@ -43,31 +41,57 @@ import makebuilder.util.Util;
  */
 public class LibDB {
 
+    /** LibDB instances: architecture => instance */
+    private static Map<String, LibDB> instances = new HashMap<String, LibDB>();
+
     /** Mapping: Library name => library */
-    private static Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
+    private Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
 
     /** File names of files to process */
     static final String LIBDB_RAW = "libdb.raw", LIBDB_TXT = "libdb.txt", LIBDB_JAVA = "libdb.java";
 
-    /** Load libdb.txt at the beginning */
-    static {
-        reinit();
+    /**
+     * @param architecture Architecture to obtain libdb for (there should be one "native" for host architecture/system)
+     * @return Libdb for specified architecture (a new one is created if it does not exist yet)
+     */
+    public static LibDB getInstance(String architecture) {
+        LibDB instance = instances.get(architecture);
+        if (instance == null) {
+            instance = new LibDB();
+            instances.put(architecture, instance);
+        }
+        return instance;
     }
 
     /**
      * reads and processes libdb.txt file
      * may be called again, if file changes
+     *
+     * @param libdb File with libdb. Default libdb is used if null.
+     * @return Reference to this LibDB (for convenience)
      */
-    public static void reinit() {
+    public LibDB reinit(File libdb) {
         libs.clear();
         try {
-            loadLibDb(LIBDB_TXT, true);
+            if (libdb == null) {
+                loadLibDb(Util.getFileInEtcDir(LIBDB_TXT), true);
+            } else if (libdb.exists()) {
+                loadLibDb(libdb, true);
+            }
             if (Util.getFileInEtcDir(LIBDB_JAVA).exists()) {
-                loadLibDb(LIBDB_JAVA, false);
+                loadLibDb(Util.getFileInEtcDir(LIBDB_JAVA), false);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return this;
+    }
+
+    /**
+     * @return Does LibDB have any entries?
+     */
+    public boolean hasEntries() {
+        return libs.size() > 0;
     }
 
     /**
@@ -76,10 +100,10 @@ public class LibDB {
      * @param libdbTxt file name (relative to make_builder/etc directory)
      * @param cpp c/c++ library?
      */
-    private static void loadLibDb(String libdbTxt, boolean cpp) throws IOException {
+    private void loadLibDb(File libdbTxt, boolean cpp) throws IOException {
 
         // external libraries
-        File f = Util.getFileInEtcDir(libdbTxt);
+        File f = libdbTxt;
         List<String> lines = Files.readLines(f);
         for (String s : lines) {
             if (s.trim().length() <= 1) {
@@ -99,7 +123,7 @@ public class LibDB {
      *
      * @param defines List with defines
      */
-    public static void addDefines(List<String> defines) {
+    public void addDefines(List<String> defines) {
         for (Map.Entry<String, ExtLib> e : libs.entrySet()) {
             String opts = e.getValue().options;
             if (!opts.contains("N/A")) {
@@ -114,7 +138,7 @@ public class LibDB {
      * @return Library with this name
      * @throws Exception Thrown when not found
      */
-    public static ExtLib getLib(String lib) throws Exception {
+    public ExtLib getLib(String lib) throws Exception {
         ExtLib el = libs.get(lib);
         if (el != null) {
             return libs.get(lib);
@@ -126,7 +150,7 @@ public class LibDB {
      * @param lib Library name
      * @return Is library with this name available?
      */
-    public static boolean available(String lib) {
+    public boolean available(String lib) {
         ExtLib el = libs.get(lib);
         if (el != null) {
             return el.available();
@@ -141,10 +165,10 @@ public class LibDB {
      * @param bes All build entities
      */
     public static void findLocalDependencies(Collection<BuildEntity> bes) {
-        for (ExtLib el : libs.values()) {
-            el.findLocalDependencies(bes);
+        for (LibDB instance : instances.values()) {
+            for (ExtLib el : instance.libs.values()) {
+                el.findLocalDependencies(bes);
+            }
         }
     }
-
-
 }
