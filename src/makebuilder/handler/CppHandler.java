@@ -43,8 +43,9 @@ import makebuilder.util.ToStringComparator;
  */
 public class CppHandler implements SourceFileHandler {
 
-    /** Standard compile and linke options (included in every compile/link) */
-    private final String cCompileOptions, cxxCompileOptions, linkOptions;
+    /** Standard compile and linker options (included in every compile/link) */
+    private final String cCompileOptions, cxxCompileOptions, compileOptionsLib, compileOptionsBin,
+            linkOptions, linkOptionsLib, linkOptionsBin;
 
     /** Do compiling and linking separately (or rather in one gcc call)? */
     private final boolean separateCompileAndLink;
@@ -67,22 +68,26 @@ public class CppHandler implements SourceFileHandler {
      * @param separateCompileAndLink Do compiling and linking separately (or rather in one gcc call)?
      */
     public CppHandler(String compileOptions, String linkOptions, boolean separateCompileAndLink) {
-        this.cCompileOptions = compileOptions;
-        this.cxxCompileOptions = compileOptions;
-        this.linkOptions = linkOptions;
-        this.separateCompileAndLink = separateCompileAndLink;
+        this(compileOptions, compileOptions, "", "", linkOptions, "", "", separateCompileAndLink);
     }
 
     /**
      * @param cCompileOptions Standard compile options (included in every compile of C file)
      * @param cxxCompileOptions Standard compile options (included in every compile of C++ file)
      * @param linkOptions Standard linker options (in every link)
+     * @param linkOptionsLib Standard linker options for libraries (in addition to linkOptions)
+     * @param linkOptionsBin Standard linker options for binaries (in addition to linkOptions)
      * @param separateCompileAndLink Do compiling and linking separately (or rather in one gcc call)?
      */
-    public CppHandler(String cCompileOptions, String cxxCompileOptions, String linkOptions, boolean separateCompileAndLink) {
+    public CppHandler(String cCompileOptions, String cxxCompileOptions, String compileOptionsLib, String compileOptionsBin,
+                      String linkOptions, String linkOptionsLib, String linkOptionsBin, boolean separateCompileAndLink) {
         this.cCompileOptions = cCompileOptions;
         this.cxxCompileOptions = cxxCompileOptions;
+        this.compileOptionsLib = compileOptionsLib;
+        this.compileOptionsBin = compileOptionsBin;
         this.linkOptions = linkOptions;
+        this.linkOptionsLib = linkOptionsLib;
+        this.linkOptionsBin = linkOptionsBin;
         this.separateCompileAndLink = separateCompileAndLink;
     }
 
@@ -92,12 +97,22 @@ public class CppHandler implements SourceFileHandler {
         makefile.addVariable("CFLAGS=-g2");
         makefile.addVariable("GCC_VERSION=");
         makefile.addVariable("CC=gcc$(GCC_VERSION)");
-        makefile.addVariable("CCFLAGS=$(CFLAGS)");
-        makefile.addVariable("CC_OPTS=$(CCFLAGS) " + cCompileOptions);
         makefile.addVariable("CXX=g++$(GCC_VERSION)");
+        makefile.addVariable("STATIC_LINKING=");
+        makefile.addVariable("LIB_EXTENSION=$(if $(STATIC_LINKING),a,so)");
+        makefile.addVariable("CFLAGS_LIB=" + compileOptionsLib);
+        makefile.addVariable("CFLAGS_BIN=" + compileOptionsBin);
+        makefile.addVariable("CC_OPTIONS=$(CCFLAGS) " + cCompileOptions);
+        makefile.addVariable("CC_OPTIONS_LIB=$(CC_OPTIONS) $(CFLAGS_LIB)");
+        makefile.addVariable("CC_OPTIONS_BIN=$(CC_OPTIONS) $(CFLAGS_BIN)");
         makefile.addVariable("CXXFLAGS=$(CFLAGS)");
-        makefile.addVariable("CXX_OPTS=$(CXXFLAGS) " + cxxCompileOptions);
-        makefile.addVariable("LINK_OPTS=$(LDFLAGS) " + linkOptions);
+        makefile.addVariable("CXX_OPTIONS=$(CXXFLAGS) " + cxxCompileOptions);
+        makefile.addVariable("CXX_OPTIONS_LIB=$(CXX_OPTIONS) $(CFLAGS_LIB)");
+        makefile.addVariable("CXX_OPTIONS_BIN=$(CXX_OPTIONS) $(CFLAGS_BIN)");
+        makefile.addVariable("LDFLAGS_LIB=" + linkOptionsLib);
+        makefile.addVariable("LDFLAGS_BIN=" + linkOptionsBin);
+        makefile.addVariable("LINK_OPTIONS_LIB=$(LDFLAGS) " + linkOptions + " -shared $(LDFLAGS_LIB) ");
+        makefile.addVariable("LINK_OPTIONS_BIN=$(LDFLAGS) " + linkOptions + " $(if $(STATIC_LINKING),-static,) $(LDFLAGS_BIN) ");
     }
 
     @Override
@@ -247,9 +262,15 @@ public class CppHandler implements SourceFileHandler {
         // create compiler options
         CCOptions options = new CCOptions();
         options.merge(be.opts, true);
-        options.linkOptions.add("$(LINK_OPTS)");
-        options.cCompileOptions.add("$(CC_OPTS)");
-        options.cxxCompileOptions.add("$(CXX_OPTS)");
+        if (be.isLibrary()) {
+            options.linkOptions.add("$(LINK_OPTIONS_LIB)");
+            options.cCompileOptions.add("$(CC_OPTIONS_LIB)");
+            options.cxxCompileOptions.add("$(CXX_OPTIONS_LIB)");
+        } else {
+            options.linkOptions.add("$(LINK_OPTIONS_BIN)");
+            options.cCompileOptions.add("$(CC_OPTIONS_BIN)");
+            options.cxxCompileOptions.add("$(CXX_OPTIONS_BIN)");
+        }
 
         // find/prepare include paths
         for (SrcDir path : be.getRootDir().defaultIncludePaths) {
@@ -292,7 +313,69 @@ public class CppHandler implements SourceFileHandler {
                     atLeastOneCxx = true; // we link with g++ - to be on the safe side (could be e.g. an o-file from cuda compiler)
                 }
             }
-            be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+
+            if (be.isLibrary()) {
+                be.target.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
+                be.target.addCommand("ar rs " + be.getTarget() + sources, true);
+                be.target.addCommand("else", false, true);
+                be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                be.target.addCommand("endif", false, true);
+            } else {
+                be.target.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
+                String linkCommand = options.createStaticLinkCommand(sources, be.getTarget(), atLeastOneCxx);
+                ArrayList<String> otherLibraries = new ArrayList<String>(options.libs);
+
+                // Collect all Dependencies (and remove them from list above)
+                ArrayList<BuildEntity> dependencies = new ArrayList<BuildEntity>();
+                collectDependencies(be, dependencies);
+                for (BuildEntity dependency : dependencies) {
+                    String targetFilename = dependency.getTargetFilename();
+                    String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
+                    if (!otherLibraries.remove(libName)) {
+                        throw new RuntimeException("Could not find " + libName  + " in list (programming error)");
+                    }
+                }
+
+                String librariesString = "";
+
+                // Sort dependencies and create string
+                while (dependencies.size() > 0) {
+                    for (BuildEntity dependency : dependencies) {
+                        boolean useNext = true;
+                        for (BuildEntity otherDependency : dependencies) {
+                            if (dependency != otherDependency && otherDependency.dependencies.contains(dependency)) {
+                                useNext = false;
+                                break;
+                            }
+                        }
+
+                        if (useNext) {
+                            String targetFilename = dependency.getTargetFilename();
+                            String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
+                            librariesString += " -l" + libName;
+                            dependencies.remove(dependency);
+                            break;
+                        }
+                    }
+                }
+                if (librariesString.length() > 0) {
+                    librariesString = " -Wl,--whole-archive " + librariesString + " -Wl,--no-whole-archive";
+                }
+
+                for (String otherLibrary : otherLibraries) {
+                    if (otherLibrary.equals("pthread")) {
+                        librariesString += " -Wl,--whole-archive -lpthread -Wl,--no-whole-archive";
+                    } else {
+                        librariesString += " -l" + otherLibrary;
+                    }
+                }
+
+
+                be.target.addCommand(linkCommand + librariesString, true);
+                be.target.addCommand("else", false, true);
+                be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                be.target.addCommand("endif", false, true);
+            }
 
         } else { // compiling and linking in one step
             ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
@@ -337,6 +420,21 @@ public class CppHandler implements SourceFileHandler {
             be.target.addCommand("echo ; echo \"===== Running unit test " + be.getTargetFilename() + " =====\"" , false);
             be.target.addCommand("" + be.getTarget() + " || ( rm " + be.getTarget() + " && false )" , false);
             be.target.addCommand("echo \"=====\" ; echo", false);
+        }
+    }
+
+    /**
+     * Collect all dependencies from a build entity (recursively)
+     *
+     * @param be Build Entity to fetch all dependencies of
+     * @param dependencies Container to place dependencies in
+     */
+    private void collectDependencies(BuildEntity be, ArrayList<BuildEntity> dependencies) {
+        for (BuildEntity dependency : be.dependencies) {
+            if (!dependencies.contains(dependency)) {
+                dependencies.add(dependency);
+                collectDependencies(dependency, dependencies);
+            }
         }
     }
 

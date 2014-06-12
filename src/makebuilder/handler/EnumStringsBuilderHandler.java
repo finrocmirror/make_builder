@@ -199,10 +199,17 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     /**
      * @return Enum string lib target
      */
-    private Makefile.Target getEnumStringsLib(Makefile makefile) {
+    private Makefile.Target getEnumStringsLib(Makefile makefile, MakeFileBuilder builder) {
         if (enumStringsLib == null) {
-            enumStringsLib = makefile.addTarget(buildDir + "/libenum_strings.so", false, null);
-            enumStringsLib.addCommand("$(CXX) $(CXX_OPTS) -shared -fPIC -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
+            enumStringsLib = makefile.addTarget(buildDir + "/libenum_strings.$(LIB_EXTENSION)", false, null);
+            enumStringsLib.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
+            String ofile = buildDir + "/libenum_strings.o";
+            enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -c -o " + ofile + " -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
+            enumStringsLib.addCommand("ar rs " + enumStringsLib.getName() + " " + ofile, true);
+            enumStringsLib.addCommand("rm " + ofile, false);
+            enumStringsLib.addCommand("else", false, true);
+            enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -shared -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
+            enumStringsLib.addCommand("endif", false, true);
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.h");
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.cpp");
 
@@ -213,7 +220,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
                 Makefile.Target target = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
                 try {
-                    target.addCommand("$(CXX) " + LibDB.getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                    target.addCommand("c++ " + LibDB.getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
                     target.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -226,12 +233,12 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     @Override
     public void build(BuildEntity be, Makefile makefile, MakeFileBuilder builder) throws Exception {
         CppDescrTarget target = descrTargets.get(be);
-        getEnumStringsLib(makefile); // make sure we always build enum string lib - also when using system installation
+        getEnumStringsLib(makefile, builder); // make sure we always build enum string lib - also when using system installation
         if (target != null) {
 
             // Add dependency to libenum_strings.so
             if (buildDir != null) {
-                be.target.addDependency(getEnumStringsLib(makefile).getName());
+                be.target.addDependency(getEnumStringsLib(makefile, builder).getName());
             }
 
             // Add all dependencies of original files to generated .descr cpp file
@@ -259,8 +266,6 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 // create compiler options
                 CCOptions options = new CCOptions();
                 options.merge(be.opts, true);
-                options.cCompileOptions.add("$(CC_OPTS)");
-                options.cxxCompileOptions.add("$(CXX_OPTS)");
 
                 // find/prepare include paths
                 for (SrcDir path : be.getRootDir().defaultIncludePaths) {
@@ -283,7 +288,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true).replace("$(CXX_OPTS)", clangFlags) + EXTRA_CLANG_FLAGS + includeGuards +
+                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + " " + clangFlags + EXTRA_CLANG_FLAGS + includeGuards +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +

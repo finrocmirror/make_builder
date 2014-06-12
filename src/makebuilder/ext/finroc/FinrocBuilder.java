@@ -180,7 +180,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             t.addCommand("echo success > $(TARGET_DIR)/success", true);
         }
 
-        addHandler(new CppHandler(cflags, cxxflags, "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,-rpath," + targetLib.relative + sysLinkPath2, !opts.combineCppFiles));
+        addHandler(new CppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,--no-as-needed,-rpath," + targetLib.relative + sysLinkPath2, "", "", !opts.combineCppFiles));
         addHandler(new JavaHandler(this));
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
@@ -226,8 +226,6 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
                 System.out.println(Util.color("Maybe you need to source scripts/setenv again to update your environment.", Color.RED, true));
                 System.exit(-1);
             }
-// TODO: do we really need the following lines together with the include below?
-            makefile.applyVariablesFromFile(targetFile);
             // gcc should be default compiler if no other compiler was specified
             makefile.changeVariable("CC=gcc$(GCC_VERSION)");
             makefile.changeVariable("CXX=g++$(GCC_VERSION)");
@@ -307,7 +305,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
 
         // create additional defines
         for (BuildEntity be : buildEntities) {
-            if (!be.missingDep && be.getTargetFilename().endsWith(".so")) {
+            if (!be.missingDep && be.isLibrary()) {
                 if (be instanceof RRLib || be instanceof FinrocLibrary || be instanceof FinrocPlugin || be instanceof Library) {
                     // _RRLIB_COMPUTER_VISION_BASE_PRESENT_
                     FinrocBuildEntity finrocBE = (FinrocBuildEntity)be;

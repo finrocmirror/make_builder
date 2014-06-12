@@ -85,7 +85,7 @@ public class ExtLib {
         ArrayList<String> libCopy = new ArrayList<String>(ccOptions.libs);
         for (String lib : libCopy) {
             for (BuildEntity be : bes) {
-                if (be.getTarget().endsWith("/lib" + lib + ".so")) {
+                if (be.getTarget().endsWith("/lib" + lib + ".so") || be.getTarget().endsWith("/lib" + lib + ".$(LIB_EXTENSION)")) {
                     ccOptions.libs.remove(lib);
                     dependencies.add(be);
                     break;

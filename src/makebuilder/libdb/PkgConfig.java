@@ -21,16 +21,12 @@
  */
 package makebuilder.libdb;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import makebuilder.BuildEntity;
-import makebuilder.util.CCOptions;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
 
@@ -104,7 +100,7 @@ public class PkgConfig {
             return el;
         } else {
             // get the info from pkg-config
-            Process p = Runtime.getRuntime().exec(new String[] {"pkg-config", "--cflags", "--libs", lib});
+            Process p = Runtime.getRuntime().exec(new String[] {"pkg-config", "--cflags", "--static", "--libs", lib});
             String options = "";
             p.waitFor();
             if (p.exitValue() != 0) {

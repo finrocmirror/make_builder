@@ -32,7 +32,7 @@ public class Library extends BuildEntity {
 
     @Override
     public String getTarget() {
-        return "($TARGET_DIR)/lib" + name + ".so";
+        return "($TARGET_DIR)/lib" + name + ".$(LIB_EXTENSION)";
     }
 
     @Override

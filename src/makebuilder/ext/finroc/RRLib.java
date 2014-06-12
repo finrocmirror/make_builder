@@ -31,7 +31,6 @@ import makebuilder.handler.JavaHandler;
 public class RRLib extends FinrocBuildEntity {
 
     public RRLib() {
-        opts.addOptions("-shared -fPIC");
     }
 
     //???
@@ -43,7 +42,7 @@ public class RRLib extends FinrocBuildEntity {
         if (getFinalHandler() == JavaHandler.class) {
             return "$(TARGET_JAVA)/" + createTargetPrefix() + createNameString() + ".jar";
         }
-        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".so";
+        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".$(LIB_EXTENSION)";
     }
 
 }

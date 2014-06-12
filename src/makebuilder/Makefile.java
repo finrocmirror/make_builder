@@ -67,6 +67,9 @@ public class Makefile {
     /** Dummy target - can be useful for certain non-standard stuff - will not be added to any makefile */
     public final Target DUMMY_TARGET = new Target("dummy target", null);
 
+    /** Prefix for lines in Target.commands that should not be indented */
+    private final String NO_INDENT_PREFIX = "###";
+
     /**
      * @param buildDirs Directories that targets are built to. Will be removed with make clean command
      */
@@ -353,8 +356,12 @@ public class Makefile {
             }
 
             for (String cmd : commands) {
-                ps.print("\t");
-                ps.println(cmd);
+                if (cmd.startsWith(NO_INDENT_PREFIX)) {
+                    ps.println(cmd.substring(NO_INDENT_PREFIX.length()));
+                } else {
+                    ps.print("\t");
+                    ps.println(cmd);
+                }
             }
             ps.println();
         }
@@ -380,9 +387,21 @@ public class Makefile {
          *
          * @param cmd Command
          * @param consoleOutput Output this command on console?
+         * @param noindent Do not indentate? (this is necessary for lines such as ifeq ***, else, endif)
          */
         public void addCommand(String cmd, boolean consoleOutput) {
-            commands.add((consoleOutput ? "" : "@") + cmd);
+            addCommand(cmd, consoleOutput, false);
+        }
+
+        /**
+         * Add command to target
+         *
+         * @param cmd Command
+         * @param consoleOutput Output this command on console?
+         * @param noindent Do not indentate? (this is necessary for lines such as ifeq ***, else, endif)
+         */
+        public void addCommand(String cmd, boolean consoleOutput, boolean noindent) {
+            commands.add((noindent ? NO_INDENT_PREFIX : "") + (noindent || consoleOutput ? "" : "@") + cmd);
         }
 
         /**

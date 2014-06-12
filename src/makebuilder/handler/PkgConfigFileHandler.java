@@ -59,7 +59,7 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
         }
 
         String beTarget = be.getTargetFilename();
-        beTarget = beTarget.substring(0, beTarget.length() - 3);
+        beTarget = beTarget.substring(0, beTarget.lastIndexOf("."));
 
         final String pcFile = outputDir + File.separator + beTarget.substring(3) + ".pc";
 

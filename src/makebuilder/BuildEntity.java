@@ -131,7 +131,7 @@ public abstract class BuildEntity {
     }
 
     public boolean isLibrary() {
-        return getTarget().endsWith(".so") || getTarget().endsWith(".jar");
+        return getTarget().endsWith(".so") || getTarget().endsWith(".jar") || getTarget().endsWith(".$(LIB_EXTENSION)");
     }
 
     /**
@@ -238,7 +238,7 @@ public abstract class BuildEntity {
             }
             String s = be.getTarget();
             target.addDependency(s);
-            s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
+            s = s.substring(s.lastIndexOf("/lib") + 4, Math.max(s.lastIndexOf(".so"), s.lastIndexOf(".$(LIB_EXTENSION)")));
             opts.libs.add(s);
 
             ArrayList<BuildEntity> visited = new ArrayList<BuildEntity>();
@@ -257,7 +257,7 @@ public abstract class BuildEntity {
         }
 
         String s = be.getTarget();
-        s = s.substring(s.lastIndexOf("/lib") + 4, s.lastIndexOf(".so"));
+        s = s.substring(s.lastIndexOf("/lib") + 4, Math.max(s.lastIndexOf(".so"), s.lastIndexOf(".$(LIB_EXTENSION)")));
         opts.libs.add(s);
         visited.add(be);
         for (BuildEntity be2 : be.dependencies) {
@@ -273,19 +273,11 @@ public abstract class BuildEntity {
             return;
         }
 
-        String s = be.getTarget();
         opts.includePaths.addAll(be.opts.includePaths);
         visited.add(be);
         for (BuildEntity be2 : be.dependencies) {
             addIndirectIncludePaths(be2, visited);
         }
-    }
-
-    /**
-     * @return Name of build entity, if it were compiled to a library
-     */
-    protected String getLibName() {
-        return toString() + ".so";
     }
 
     /**
@@ -481,6 +473,9 @@ public abstract class BuildEntity {
         String s = getTargetFilename(); // file name
         if (s.startsWith("lib") && s.endsWith(".so")) {
             return s.substring(3, s.length() - 3);
+        }
+        if (s.startsWith("lib") && s.endsWith(".$(LIB_EXTENSION)")) {
+            return s.substring(3, s.length() - ".$(LIB_EXTENSION)".length());
         }
         return s;
     }

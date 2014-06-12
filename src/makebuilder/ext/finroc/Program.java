@@ -22,7 +22,6 @@
 package makebuilder.ext.finroc;
 
 import makebuilder.Makefile;
-import makebuilder.SrcFile;
 import makebuilder.StartScript;
 import makebuilder.handler.JavaHandler;
 
@@ -35,7 +34,6 @@ import makebuilder.handler.JavaHandler;
 public class Program extends FinrocBuildEntity {
 
     public Program() {
-        opts.addOptions("-Wl,--no-as-needed");
     }
 
     @Override

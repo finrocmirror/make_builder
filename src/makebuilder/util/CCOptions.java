@@ -22,7 +22,6 @@
 package makebuilder.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -218,6 +217,20 @@ public class CCOptions implements Comparator<String> {
      * @return String with options
      */
     public String createOptionString(boolean compile, boolean link, boolean cpp) {
+        return createOptionString(compile, link, cpp, true);
+    }
+
+
+    /**
+     * Create string with options
+     *
+     * @param compile Is this a compiling operation?
+     * @param link Is this a linking operation?
+     * @param cpp C++ options? (rather than C)
+     * @param addLibs Add libraries? (-l*** parameters)
+     * @return String with options
+     */
+    private String createOptionString(boolean compile, boolean link, boolean cpp, boolean addLibs) {
         String result = "";
         if (compile) {
             for (String s : cpp ? cxxCompileOptions : cCompileOptions) {
@@ -236,7 +249,7 @@ public class CCOptions implements Comparator<String> {
                 }
             }
         }
-        if (link) {
+        if (link && addLibs) {
             for (String s : libPaths) {
                 result += " -L" + s;
             }
@@ -279,6 +292,19 @@ public class CCOptions implements Comparator<String> {
      */
     public String createLinkCommand(String inputs, String output, boolean cxx) {
         return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx));
+    }
+
+    /**
+     * Create Cpp compiler call for static linking only
+     * (excluding libraries - as they need to be added in the correct order)
+     *
+     * @param inputs Input files (divided by whitespace)
+     * @param output Output file
+     * @param cxx Use C++ compiler? (instead of c)
+     * @return GCC Compiler call for makefile
+     */
+    public String createStaticLinkCommand(String inputs, String output, boolean cxx) {
+        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx, false));
     }
 
     /**

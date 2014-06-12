@@ -32,7 +32,6 @@ import makebuilder.handler.JavaHandler;
 public class Library extends FinrocBuildEntity {
 
     public Library() {
-        opts.addOptions("-shared -fPIC -Wl,--no-as-needed");
     }
 
     @Override
@@ -40,7 +39,7 @@ public class Library extends FinrocBuildEntity {
         if (getFinalHandler() == JavaHandler.class) {
             return "$(TARGET_JAVA)/" + createTargetPrefix() + createNameString() + ".jar";
         }
-        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".so";
+        return "$(TARGET_LIB)/lib" + createTargetPrefix() + createNameString() + ".$(LIB_EXTENSION)";
     }
 
     @Override
