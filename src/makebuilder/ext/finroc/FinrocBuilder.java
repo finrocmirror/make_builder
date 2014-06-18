@@ -144,7 +144,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             addLoader(new MakeXMLLoader(Library.class, Program.class, MCALibrary.class, MCAPlugin.class, MCAProgram.class, FinrocLibrary.class, FinrocPlugin.class, UnitTest.class, TestProgram.class, RRLib.class, FinrocProgram.class));
         }
         addHandler(new Qt4Handler());
-        addHandler(new NvccHandler(""/*"-include libinfo.h"*/));
+        addHandler(new NvccHandler("-Xcompiler -fPIC"/*"-include libinfo.h"*/));
         addHandler(new DescriptionBuilderHandler());
         String cflags = "-Wall -Wwrite-strings -Wno-unknown-pragmas -include libinfo.h";
         String cxxflags = cflags + " -include make_builder/enum_strings_builder/enum_strings.h";
