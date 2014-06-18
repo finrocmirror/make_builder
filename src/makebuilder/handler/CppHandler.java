@@ -158,8 +158,10 @@ public class CppHandler implements SourceFileHandler {
             if (line.trim().startsWith("#")) {
                 line = line.trim().substring(1).trim();
                 try {
-                    if (line.startsWith("include")) {
-                        line = line.substring(7).trim();
+                    if (line.startsWith("include_next")) {
+                        // ignore
+                    } else if (line.startsWith("include")) {
+                        line = line.substring("include".length()).trim();
                         if (line.startsWith("\"")) {
                             line = line.substring(1, line.lastIndexOf("\""));
                             if (curNode.elseBranch) {
