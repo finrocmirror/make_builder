@@ -96,13 +96,26 @@ public class Makefile {
     public void writeTo(File target) throws Exception {
         PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(target)));
 
+        // write default target (must be first target in the file)
+        Target default_target = new Target("default", null);
+        default_target.addDependency("all");
+        default_target.writeTo(ps);
+
+        // write double-colon rules that allow to hook into the build process
+        ps.println("pre-build-hook::");
+        ps.println("\t@echo -n");
+        ps.println("");
+        ps.println("post-build-hook::");
+        ps.println("\t@echo -n");
+        ps.println("");
+
         // write variable declarations
         for (String s : variables) {
             ps.println(s + "\n");
         }
 
         // write PHONY target list
-        ps.print(".PHONY: clean all init");
+        ps.print(".PHONY: default pre-build-hook post-build-hook clean all");
         for (Target t : phonyTargets.values()) {
             if (!t.name.startsWith(".")) {
                 ps.print("\t");
