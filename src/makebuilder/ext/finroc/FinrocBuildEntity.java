@@ -196,6 +196,16 @@ public abstract class FinrocBuildEntity extends BuildEntity {
         }
         return "";
     }
+    /**
+     * @return Suffix for target file (e.g. -java if it is a Java build entity)
+     */
+    public String createTargetSuffix() {
+        if (this.getFinalHandler() == JavaHandler.class) {
+            return "-java";
+        } else {
+            return "";
+        }
+    }
 
     /**
      * Helper function for createTargetPrefix()
