@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import makebuilder.handler.CppHandler;
 import makebuilder.libdb.ExtLib;
@@ -480,7 +481,7 @@ public abstract class BuildEntity {
     }
 
     /**
-     * Get custom attribute/parameter/tag that was set in make.xml for this target
+     * Get custom attribute/parameter/tag that was set in e.g. make.xml for this target
      *
      * @param key Key
      * @return Value (null if it wasn't set)
@@ -488,6 +489,20 @@ public abstract class BuildEntity {
     public String getParameter(String key) {
         return params == null ? null : params.get(key);
     }
+
+    /**
+     * Set custom attribute/parameter/tag for this target
+     *
+     * @param key Key
+     * @param value Value to set for this key
+     */
+    public String setParameter(String key, String value) {
+        if (params == null) {
+            params = new TreeMap<String, String>();
+        }
+        return params.put(key, value);
+    }
+
 
     /**
      * @return Handler that will finally create this target

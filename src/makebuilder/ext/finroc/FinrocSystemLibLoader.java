@@ -93,6 +93,23 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         }
     }
 
+    /**
+     * Helper function to collect all checked out repositories
+     *
+     * @param directory Directory to check
+     * @param prefix Prefix to add to each directory found in specified directory
+     * @param result Collection to add results to
+     */
+    public void getLocalRepositoriesFromDir(File directory, String prefix, List<String> result) {
+        if (directory.exists()) {
+            for (File f : directory.listFiles()) {
+                if (f.isDirectory() && (!f.getName().startsWith("."))) {
+                    result.add(prefix + f.getName());
+                }
+            }
+        }
+    }
+
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {
         // Do this only once
@@ -102,9 +119,18 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         loaded = true;
 
         // find all locally installed components
-        Process p = Runtime.getRuntime().exec(new String[] {System.getenv("FINROC_HOME") + "/scripts/finroc_status", "-c"});
-        p.waitFor();
-        List<String> localComponents = Files.readLines(p.getInputStream());
+        ArrayList<String> localComponents = new ArrayList<String>();
+        if (new File("sources/cpp/core").exists()) {
+            localComponents.add("finroc_core");
+        }
+        getLocalRepositoriesFromDir(new File("sources/cpp/libraries"), "finroc_libraries_", localComponents);
+        getLocalRepositoriesFromDir(new File("sources/cpp/plugins"), "finroc_plugins_", localComponents);
+        getLocalRepositoriesFromDir(new File("sources/cpp/projects"), "finroc_projects_", localComponents);
+        getLocalRepositoriesFromDir(new File("sources/cpp/rrlib"), "rrlib_", localComponents);
+        getLocalRepositoriesFromDir(new File("sources/cpp/tools"), "finroc_tools_", localComponents);
+        for (String s : localComponents) {
+            //System.out.println("Found local repository: " + s);
+        }
 
         // find/load all libraries that contain system information
         for (File f : new File(PKG_CONFIG_DIR).listFiles()) {
@@ -142,7 +168,7 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
                     be.buildFile = scanner.registerBuildProduct(f.getAbsolutePath());
 
                     // Get compile options
-                    p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
+                    Process p = Runtime.getRuntime().exec("pkg-config --libs --cflags " + rawName);
                     p.waitFor();
                     String options = Files.readLines(p.getInputStream()).get(0).replaceAll("\\s+", " ");
 

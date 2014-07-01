@@ -31,6 +31,7 @@ import makebuilder.SrcFile;
 import makebuilder.StartScript;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.JavaHandler;
+import makebuilder.handler.PkgConfigFileHandler;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
 
@@ -127,6 +128,10 @@ public abstract class FinrocBuildEntity extends BuildEntity {
 
         if (getFinalHandler() == JavaHandler.class) {
             target.addDependency("$(TARGET_DIR)/share/java.created");
+        }
+
+        if (isLibrary() && getFinalHandler() == CppHandler.class) {
+            setParameter(PkgConfigFileHandler.PARAMETER_KEY_CUSTOM_PKG_CONFIG_FILE_CONTENT, "component=" + createTargetPrefix());
         }
     }
 

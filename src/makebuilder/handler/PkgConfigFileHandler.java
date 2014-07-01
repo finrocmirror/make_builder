@@ -43,6 +43,9 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
     /** Root directory of system installation - typically "/usr" or "/usr/local" */
     private final String systemInstallationRoot;
 
+    /** If a parameter with this key is found in build entities, its content is included in generated .pc files */
+    public static String PARAMETER_KEY_CUSTOM_PKG_CONFIG_FILE_CONTENT = "PkgConfigCustomContent";
+
     /**
      * @param outputDir Directory to place generated .pc files in
      * @param systemInstallationRoot Root directory of system installation - typically "/usr" or "/usr/local"
@@ -102,6 +105,12 @@ public class PkgConfigFileHandler extends SourceFileHandler.Impl {
         be.target.addCommand("echo 'libdir=$${exec_prefix}/lib' >> " + pcFile, false);
         be.target.addCommand("echo 'includedir=$${prefix}/include' >> " + pcFile, false);
         be.target.addCommand("echo 'headerlist=" + sb.toString() + "' >> " + pcFile, false);
+        String customContent = be.getParameter(PARAMETER_KEY_CUSTOM_PKG_CONFIG_FILE_CONTENT);
+        if (customContent != null) {
+            for (String contentLine : customContent.split("\n")) {
+                be.target.addCommand("echo '" + contentLine + "' >> " + pcFile, false);
+            }
+        }
         be.target.addCommand("echo '' >> " + pcFile, false);
         be.target.addCommand("echo 'Name: " + beTarget + "' >> " + pcFile, false);
         be.target.addCommand("echo 'Description: " + beTarget + "' >> " + pcFile, false);
