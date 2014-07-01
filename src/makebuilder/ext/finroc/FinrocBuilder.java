@@ -31,12 +31,8 @@ import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
-import makebuilder.Makefile.Target;
 import makebuilder.ext.mca.DependencyHandler;
 import makebuilder.ext.mca.DescriptionBuilderHandler;
-import makebuilder.ext.mca.EtcDirCopier;
-import makebuilder.ext.mca.HFileCopier;
-import makebuilder.ext.mca.LibInfoGenerator;
 import makebuilder.ext.mca.MCALibrary;
 import makebuilder.ext.mca.MCAPlugin;
 import makebuilder.ext.mca.MCAProgram;
@@ -160,48 +156,19 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             makefile.changeVariable(Makefile.DONE_MSG_VAR + "=" + QUICK_BUILD_DONE_MSG);
         }
 
-        // (OUTDATED)
-        String sysLinkPath = "";
-        String sysLinkPath2 = "";
-        if (getOptions().containsKey("usesysteminstall")) {
-            systemInstall = new MCASystemLibLoader();
-            if (systemInstall.MCA_SYSTEM_LIB != null) {
-                sysLinkPath = systemInstall.MCA_SYSTEM_LIB.getAbsolutePath();
-                sysLinkPath2 = ",-rpath," + sysLinkPath;
-                sysLinkPath = " -L" + sysLinkPath;
-            }
-        }
-
         // generate pkg-config files
         makefile.addVariable("TARGET_PKGINFO:=export/pkgconfig");
         addHandler(new PkgConfigFileHandler("$(TARGET_PKGINFO)", "/usr"));
 
         // look for any system-installed libraries
-        if (BUILDING_FINROC) {
+        if (BUILDING_FINROC && (!getOptions().containsKey("local-libs-only"))) {
             addHandler(new FinrocSystemLibLoader());
         }
 
-        // generate system installation? (OUTDATED)
-        if (getOptions().containsKey("systeminstall")) {
-            makefile.addVariable("TARGET_INFO:=$(TARGET_DIR)/info");
-            makefile.addVariable("TARGET_INCLUDE:=$(TARGET_DIR)/include");
-            makefile.addVariable("TARGET_ETC:=$(TARGET_DIR)/etc");
-            addHandler(new LibInfoGenerator("$(TARGET_INFO)"));
-            addHandler(new HFileCopier("$(TARGET_INCLUDE)"));
-            addHandler(new EtcDirCopier("$(TARGET_ETC)"));
-            Target t = makefile.addPhonyTarget("sysinstall", "libs", "tools", "test");
-            t.addCommand("echo success > $(TARGET_DIR)/success", true);
-        }
-
-        addHandler(new CppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + sysLinkPath + " -Wl,--no-as-needed,-rpath," + targetLib.relative + sysLinkPath2, "", "", !opts.combineCppFiles));
+        addHandler(new CppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + " -Wl,--no-as-needed,-rpath," + targetLib.relative, "", "", !opts.combineCppFiles));
         addHandler(new JavaHandler(this));
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
-
-        // is MCA installed system-wide? (OUTDATED)
-        if (systemInstall != null) {
-            addHandler(systemInstall);
-        }
 
         // Calculate dependencies option?
         if (getOptions().calculateDependencies) {
