@@ -81,9 +81,9 @@ public class DotFile {
 
     private static String createName(BuildEntity be) {
         if (SLOCCOUNT_AVAILABLE) {
-            return be.name + "\\n" + be.params.get("sloc") + " SLOC";
+            return be.toString() + "\\n" + be.params.get("sloc") + " SLOC";
         }
-        return be.name;
+        return be.toString();
     }
 
     private static boolean hasIndirectDependency(BuildEntity be, BuildEntity dep, BuildEntity orgBe) {
