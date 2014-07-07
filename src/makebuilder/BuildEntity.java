@@ -193,7 +193,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.toString() + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
+                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.getReferenceName() + " (" + be.errorMessageId + ")", Util.Color.X, true) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, true), Util.Color.X);
                 return;
             }
         }

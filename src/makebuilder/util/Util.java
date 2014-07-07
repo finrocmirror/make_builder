@@ -188,7 +188,7 @@ public class Util {
             return s;
         }
         String c = COLOR_STRING[color.ordinal()];
-        if (fat) {
+        if (fat || color == Color.X) {
             c = c.replace("[;2;", "[;1;");
         }
         return c + s + "\033[;0m";
