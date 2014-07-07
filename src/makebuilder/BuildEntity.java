@@ -193,7 +193,7 @@ public abstract class BuildEntity {
             be.checkDependencies(mfb);
             if (be.missingDep) {
                 missingDep = true;
-                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.getReferenceName() + " (" + be.errorMessageId + ")", Util.Color.X, true) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, true), Util.Color.X);
+                mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.getReferenceName() + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
                 return;
             }
         }
@@ -340,14 +340,15 @@ public abstract class BuildEntity {
             if (optional) {
                 return;
             }
+            Color messageColor = this.isOptional() ? Color.Y : Color.RED;
             missingDep = true;
-            String miss = sf.getMissingDependency();
-            String msg = miss + " in " + sf.relative;
+            String miss = "'" + sf.getMissingDependency() + "'";
+            String msg = " in '" + sf.relative + "'";
             String hint = getHintForMissingDependency(sf);
             if (hint != null) {
                 msg += " (" + hint + ")";
             }
-            builder.printCannotBuildError(this, " due to missing dependency " + msg, this.isOptional() ? Color.Y : Color.RED);
+            builder.printCannotBuildError(this, Util.color(" due to missing dependency ", messageColor, false) + Util.color(miss, messageColor, true) + Util.color(msg, messageColor, false), messageColor);
             return;
         }
 

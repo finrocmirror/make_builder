@@ -161,7 +161,7 @@ public abstract class FinrocBuildEntity extends BuildEntity {
             if (lines.size() > 0) {
                 return lines.get(0).split(" ")[0] + " repository";
             } else {
-                return "file is not known";
+                return null;
             }
         } catch (Exception e) {
         }
