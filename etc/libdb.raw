@@ -51,6 +51,7 @@ flycap:     -lflycapture -I<FlyCapture2.h>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 glui:       -I<GL/glui.h> -lglui -lGLU -IGL
+gpsd:       -I<libgpsmm.h> -lgps
 gsl:        -lgsl -lgslcblas
 hokuyo:     -I<urg_sensor.h,urg_connection.h,urg_tcpclient.h,urg_utils.h> -lurg_c
 jack:       -I<jack/jack.h> -ljack
