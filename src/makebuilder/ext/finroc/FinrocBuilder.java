@@ -412,7 +412,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     @Override
     public boolean isCrossCompiling() {
         if (crossCompiling == null) {
-            crossCompiling = !System.getenv("FINROC_ARCHITECTURE").equals(System.getenv("FINROC_ARCHITECTURE_NATIVE"));
+            crossCompiling = BUILDING_FINROC && (!System.getenv("FINROC_ARCHITECTURE").equals(System.getenv("FINROC_ARCHITECTURE_NATIVE")));
         }
         return crossCompiling;
     }
