@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.List;
 
 import makebuilder.BuildEntity;
+import makebuilder.MakeFileBuilder;
 import makebuilder.Makefile;
 import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
@@ -92,10 +93,10 @@ public abstract class FinrocBuildEntity extends BuildEntity {
                     }
                 }
             }
-            if (finalHandler == null) {
-                System.out.println(Util.color("warning: cannot determine final handler for target " + toString(), Util.Color.RED, true));
-            }
             finalHandlerDetermined = true;
+            if (finalHandler == null) {
+                MakeFileBuilder.getInstance().printCannotBuildError(this, ": Target contains no source files to compile", Util.Color.RED);
+            }
         }
         return finalHandler;
     }
