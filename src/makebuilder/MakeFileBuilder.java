@@ -84,6 +84,16 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     /** Error message for console - are collected and presented at the end */
     private final List<String> errorMessages = new ArrayList<String>();
 
+    /** Single MakefileBuilder instance */
+    private static MakeFileBuilder instance;
+
+    /**
+     * @return Single MakefileBuilder instance
+     */
+    public static MakeFileBuilder getInstance() {
+        return instance;
+    }
+
     public static void main(String[] args) {
 
         // Parse command line options
@@ -112,6 +122,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      * Performs diverse initializations
      */
     public MakeFileBuilder(String relBuildDir, String relTempBuildDir) {
+        instance = this;
 
         // init source scanner and paths
         sources = new SourceScanner(HOME, this);
