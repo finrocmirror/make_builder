@@ -68,7 +68,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     public static final String DESCRIPTION_BUILDER_BIN = "make_builder/scripts/enum_strings_builder";
 
     /** enum strings builder llvm plugin */
-    public static final String LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-enum_strings-" + System.getProperty("os.arch") + ".so";
+    public final String LLVM_CLANG_PLUGIN;
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/enum_strings_builder/clang-plugin-enum_strings.cpp";
 
     /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
@@ -136,10 +136,12 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     /**
      * @param buildDir Build directory - set if lib_enum_strings.so needs to be built
      * @param clangFlags Compiler flags for clang (used instead of ($CXX_OPTS))
+     * @param nativeArchitectureString Identification of compiling platform's architecture (e.g. "i686"). Is appended to clang-Plugin name.
      */
-    public EnumStringsBuilderHandler(String buildDir, String clangFlags) {
+    public EnumStringsBuilderHandler(String buildDir, String clangFlags, String nativeArchitectureString) {
         this.buildDir = buildDir;
         this.clangFlags = clangFlags;
+        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-enum_strings-" + nativeArchitectureString + ".so";
     }
 
     @Override

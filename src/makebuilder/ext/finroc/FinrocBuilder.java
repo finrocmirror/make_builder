@@ -146,10 +146,10 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         String cxxflags = cflags + " -include make_builder/enum_strings_builder/enum_strings.h";
         String clangCodeGenerationFlags = "-std=c++11 -include libinfo.h -include make_builder/enum_strings_builder/enum_strings.h";
         globalDefine.add("#define _LIB_ENUM_STRINGS_PRESENT_");
-        addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib", clangCodeGenerationFlags));
+        addHandler(new EnumStringsBuilderHandler("export/$(TARGET)/lib", clangCodeGenerationFlags, "$(FINROC_ARCHITECTURE_NATIVE)"));
 
         if (BUILDING_FINROC) {
-            addHandler(new PortDescriptionBuilderHandler(clangCodeGenerationFlags));
+            addHandler(new PortDescriptionBuilderHandler(clangCodeGenerationFlags, "$(FINROC_ARCHITECTURE_NATIVE)"));
         }
         if (getOptions().combineCppFiles) {
             addHandler(new CppMerger("#undef LOCAL_DEBUG", "#undef MODULE_DEBUG"));

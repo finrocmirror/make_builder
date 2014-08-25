@@ -67,7 +67,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
     public static final String DESCRIPTION_BUILDER_BIN = "scripts/tools/port_name_builder";
 
     /** enum strings builder llvm plugin */
-    public static final String LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-port_names-" + System.getProperty("os.arch") + ".so";
+    public final String LLVM_CLANG_PLUGIN;
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/src/makebuilder/ext/finroc/clang-plugin-port_names.cpp";
 
     /** Use (experimental) llvm-clang plugin for building port names (instead of script utilizing doxygen) */
@@ -87,9 +87,11 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
 
     /**
      * @param clangFlags Compiler flags for clang (used instead of ($CXX_OPTS))
+     * @param nativeArchitectureString Identification of compiling platform's architecture (e.g. "i686"). Is appended to clang-Plugin name.
      */
-    public PortDescriptionBuilderHandler(String clangFlags) {
+    public PortDescriptionBuilderHandler(String clangFlags, String nativeArchitectureString) {
         this.clangFlags = clangFlags;
+        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-port_names-" + nativeArchitectureString + ".so";
     }
 
     @Override
