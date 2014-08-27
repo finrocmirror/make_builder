@@ -155,18 +155,18 @@ public abstract class FinrocBuildEntity extends BuildEntity {
     @Override
     protected String getHintForMissingDependency(SrcFile sf) {
         String miss = sf.getMissingDependency();
-        try {
-            Process p = Runtime.getRuntime().exec(SEARCH_BIN + " -f " + miss);
-            p.waitFor();
-            List<String> lines = Files.readLines(p.getInputStream());
-            if (lines.size() > 0) {
-                return lines.get(0).split(" ")[0] + " repository";
-            } else {
-                return null;
+        if (miss.startsWith("core/") && (!new File("sources/cpp/core").exists())) {
+            return "finroc_core repository";
+        } else if (miss.startsWith("libraries/") || miss.startsWith("projects/") || miss.startsWith("plugins/") || miss.startsWith("rrlib/")) {
+            int cutOffIndex = miss.indexOf('/', miss.indexOf('/') + 1);
+            if (cutOffIndex > 0) {
+                String relevantDir = miss.substring(0, cutOffIndex);
+                if (!new File("sources/cpp/" + relevantDir).exists()) {
+                    return (relevantDir.startsWith("rrlib") ? "" : "finroc_") + relevantDir.replace('/', '_') + " repository";
+                }
             }
-        } catch (Exception e) {
         }
-        return null;
+        return "erroneous include";
     }
 
     @Override
