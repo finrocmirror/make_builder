@@ -126,11 +126,13 @@ const tEnumStrings &GetEnumStrings(const char *type_name)
   if (EnumStringsRegister().count(demangled) != 1)
   {
     std::stringstream message;
-    message << "Could not find type_id: '" << demangled.c_str() << "'\nCandidates are:\n\n";
+    message << "Could not find enum strings for type_id: '" << demangled.c_str() << "'\nCandidates are:\n\n";
     for (auto it = EnumStringsRegister().begin(); it != EnumStringsRegister().end(); ++it)
     {
       message << "\t" << it->first.c_str() << "\n";
     }
+
+    message << "\nPlease note that enum strings are only generated for public enums in .h files.\n";
     throw std::runtime_error(message.str());
   }
 
