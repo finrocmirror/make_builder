@@ -30,6 +30,7 @@ import java.util.List;
 import makebuilder.handler.CppHandler;
 import makebuilder.handler.MakeXMLLoader;
 import makebuilder.libdb.LibDB;
+import makebuilder.util.ActivityLog;
 import makebuilder.util.Util;
 
 /**
@@ -87,6 +88,9 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     /** Single MakefileBuilder instance */
     private static MakeFileBuilder instance;
 
+    /** Activity log */
+    private final ActivityLog activityLog;
+
     /**
      * @return Single MakefileBuilder instance
      */
@@ -123,6 +127,8 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      */
     public MakeFileBuilder(String relBuildDir, String relTempBuildDir) {
         instance = this;
+        activityLog = new ActivityLog("Makebuilder");
+        activityLog.addActivity("Initialization");
 
         // init source scanner and paths
         sources = new SourceScanner(HOME, this);
@@ -182,9 +188,11 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // find local dependencies in "external libraries"
+        activityLog.addActivity("find local dependencies in external libraries");
         LibDB.findLocalDependencies(buildEntities);
 
         // Check for duplicate targets
+        activityLog.addActivity("Check for duplicate targets");
         for (BuildEntity be : buildEntities) {
             for (BuildEntity be2 : buildEntities) {
                 if (be != be2 && be.getTarget().equals(be2.getTarget())) {
@@ -195,6 +203,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // Check for files without owner
+        activityLog.addActivity("Check for files without owner");
         if (opts.get("report-unmanaged-files") != null) {
             ArrayList<SrcFile> ownerLess = new ArrayList<SrcFile>();
             for (SrcFile sf : sources.getAllFiles()) {
@@ -212,6 +221,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // process dependencies
+        activityLog.addActivity("Processing dependencies");
         System.out.println("Processing dependencies...");
         for (BuildEntity be : buildEntities) {
             be.resolveDependencies(buildEntities, this);
@@ -227,27 +237,32 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // check whether all dependencies are met
+        activityLog.addActivity("check whether all dependencies are met");
         for (BuildEntity be : buildEntities) {
             be.checkForCycles(1);
             be.checkDependencies(this);
         }
 
         // add available optional libs
+        activityLog.addActivity("add available optional libs");
         for (BuildEntity be : buildEntities) {
             be.addOptionalLibs();
         }
 
         // check for new cycles
+        activityLog.addActivity("check for new cycles");
         for (BuildEntity be : buildEntities) {
             be.checkForCycles(2);
         }
 
         // collect external libraries needed for building
+        activityLog.addActivity("collect external libraries needed for building");
         for (BuildEntity be : buildEntities) {
             be.mergeExtLibs();
         }
 
         // add build commands for entity to makefile
+        activityLog.addActivity("add build commands for entity to makefile");
         for (BuildEntity be : buildEntities) {
             if (be.missingDep) {
                 continue;
@@ -256,6 +271,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
         }
 
         // Write makefile
+        activityLog.addActivity("Write makefile");
         writeMakefile();
 
         // print error messages at the end... so nobody will miss them
@@ -266,6 +282,11 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
 
         // completed
         System.out.println(Util.color("Creating Makefile successful.", Util.Color.GREEN, true));
+
+        if (getOptions().printActivityLog) {
+            System.out.println("\nActivity Log:\n");
+            activityLog.print();
+        }
     }
 
     /**
@@ -417,5 +438,12 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      */
     public LibDB getTargetLibDB() {
         return LibDB.getInstance("native");
+    }
+
+    /**
+     * @return Activity log
+     */
+    public ActivityLog getActivityLog() {
+        return activityLog;
     }
 }

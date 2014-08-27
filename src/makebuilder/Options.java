@@ -43,6 +43,9 @@ public class Options extends Properties {
     /** create dot file of dependecy graph? */
     public boolean outputDotFile;
 
+    /** Print activity log? */
+    public boolean printActivityLog = false;
+
     /** File name for generated makefile */
     public String generatedMakefileName = "Makefile";
 
@@ -72,6 +75,8 @@ public class Options extends Properties {
                 calculateDependencies = true;
             } else if (s.startsWith("--dotfile")) {
                 outputDotFile = true;
+            } else if (s.startsWith("--activitylog")) {
+                printActivityLog = true;
             } else if (s.startsWith("--makefile=")) {
                 generatedMakefileName = s.substring("--makefile=".length());
             } else if (s.startsWith("--")) {

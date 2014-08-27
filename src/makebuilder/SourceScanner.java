@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import makebuilder.util.ActivityLog;
 import makebuilder.util.ToStringComparator;
 
 /**
@@ -101,6 +102,8 @@ public class SourceScanner {
     public void scan(Makefile makefile, Collection<BuildFileLoader> loaders, Collection<SourceFileHandler> handlers, boolean useCache, String... sourceDirs) throws Exception {
 
         // find/register all source directories and files
+        ActivityLog activityLog = MakeFileBuilder.getInstance().getActivityLog();
+        activityLog.addGroup("Scan source files", "find/register all source directories and files");
         LinkedList<SrcDir> dirsToScan = new LinkedList<SrcDir>();
         for (String dir : sourceDirs) {
             SrcDir sd = homeDir.getSubDir(dir);
@@ -124,6 +127,7 @@ public class SourceScanner {
         }
 
         // init include paths of scanned directories
+        activityLog.addActivity("init include paths of scanned directories");
         for (int i = 0; i < needIncludePaths.size(); i++) {
             builder.setDefaultIncludePaths(needIncludePaths.get(i), this);
         }
@@ -131,6 +135,7 @@ public class SourceScanner {
 
         // load and apply cached information about files
         if (useCache) {
+            activityLog.addActivity("load and apply cached information about files");
             SortedMap<String, SrcFile> cachedFileInfo = loadCachedInfo();
             if (cachedFileInfo != null) {
                 for (SrcFile sf : files.values()) {
@@ -142,6 +147,7 @@ public class SourceScanner {
         ArrayList<SrcFile> tempFiles = new ArrayList<SrcFile>(files.values()); // make copy
 
         // load build files
+        activityLog.addActivity("load build files");
         for (SrcFile file : tempFiles) {
             for (BuildFileLoader loader : loaders) {
                 loader.process(file, builder.buildEntities, this, builder);
@@ -150,6 +156,7 @@ public class SourceScanner {
 
         // set ownership of files: relate SrcFile instances to BuildEntity instances
         // heuristic: all files with same base name (no extension) as one of build entity's source files belong to build entity
+        activityLog.addActivity("set ownership of files");
         for (BuildEntity be : builder.buildEntities) {
             for (int i = 0, n = be.sources.size(); i < n; i++) {
                 SrcFile sf = be.sources.get(i);
@@ -164,6 +171,7 @@ public class SourceScanner {
         }
 
         // scan/process source files
+        activityLog.addActivity("scan/process source files");
         for (SourceFileHandler handler : handlers) {
             for (SrcFile file : tempFiles) {
                 if (!file.relative.startsWith("/")) {
@@ -173,16 +181,20 @@ public class SourceScanner {
         }
 
         // release resources (cached lines)
+        activityLog.addActivity("release resources");
         for (SrcFile file : tempFiles) {
             file.scanCompleted();
         }
 
         // save cached info
         if (useCache) {
+            activityLog.addActivity("saving cache");
             System.out.print("Saving cache... ");
             saveCachedInfo();
             System.out.println("done");
         }
+
+        activityLog.endGroup();
     }
 
     /**
