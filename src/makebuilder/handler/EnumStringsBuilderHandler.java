@@ -204,14 +204,14 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     private Makefile.Target getEnumStringsLib(Makefile makefile, MakeFileBuilder builder) {
         if (enumStringsLib == null) {
             enumStringsLib = makefile.addTarget(buildDir + "/libenum_strings.$(LIB_EXTENSION)", false, null);
-            enumStringsLib.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
-            String ofile = buildDir + "/libenum_strings.o";
-            enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -c -o " + ofile + " -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
-            enumStringsLib.addCommand("ar rs " + enumStringsLib.getName() + " " + ofile, true);
-            enumStringsLib.addCommand("rm " + ofile, false);
-            enumStringsLib.addCommand("else", false, true);
-            enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -shared -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
-            enumStringsLib.addCommand("endif", false, true);
+            if (builder.isStaticLinkingEnabled()) {
+                String ofile = buildDir + "/libenum_strings.o";
+                enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -c -o " + ofile + " -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
+                enumStringsLib.addCommand("ar rs " + enumStringsLib.getName() + " " + ofile, true);
+                enumStringsLib.addCommand("rm " + ofile, false);
+            } else {
+                enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -shared -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
+            }
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.h");
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.cpp");
 

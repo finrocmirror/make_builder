@@ -41,7 +41,7 @@ public class Util {
      * Read all lines from a C++/Java file and remove all comments and strings
      *
      * @param f File
-     * @param setLineMacro set ling macros (currently only false)
+     * @param setLineMacro set line macros (currently only false)
      * @return List with lines that were read
      */
     public static List<String> readLinesWithoutComments(File f, boolean setLineMacro) throws Exception {

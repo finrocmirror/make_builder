@@ -434,6 +434,13 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     }
 
     /**
+     * @return Returns true if binaries are to be linked statically (may be overridden by subclass)
+     */
+    public boolean isStaticLinkingEnabled() {
+        return false;
+    }
+
+    /**
      * @return Returns libdb to use for actual compiling (may be overridden by subclass)
      */
     public LibDB getTargetLibDB() {

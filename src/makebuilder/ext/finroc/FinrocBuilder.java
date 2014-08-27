@@ -68,6 +68,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     /** Target to build */
     private final static String TARGET = System.getenv(TARGET_ENV_VAR);
 
+    /** File containing target configuration */
+    private final static File TARGET_FILE = new File((BUILDING_FINROC ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME")) + "/etc/targets/" + TARGET);
+
     /** Source directories to use */
     private final static String[] SOURCE_PATHS = BUILDING_FINROC ?
             new String[] {"sources"} :
@@ -99,12 +102,30 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     /** Is make_builder used for cross-compiling? */
     private Boolean crossCompiling;
 
+    /** Is static linking enabled? */
+    private boolean staticLinking;
+
     /** libdb to use for actual compiling */
     private LibDB targetLibDB;
 
     public FinrocBuilder() {
         super("export/$(TARGET)", "build/$(TARGET)");
-        //super("export" + FS + opts.getProperty("build"), "build" + FS + opts.getProperty("build"));
+
+        // Process target file
+        if (!TARGET_FILE.exists()) {
+            System.out.println(Util.color("No configuration file for current target found (expected " + TARGET_FILE.getPath() + ")!", Color.RED, true));
+            System.out.println(Util.color("Maybe you need to source scripts/setenv again to update your environment.", Color.RED, true));
+            System.exit(-1);
+        }
+        try {
+            for (String line : Util.readLinesWithoutComments(TARGET_FILE, false)) {
+                if (line.trim().equals("STATIC_LINKING=true")) {
+                    staticLinking = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // init libdb
         targetLibDB = LibDB.getInstance("native").reinit(null);
@@ -197,20 +218,16 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
 
         // apply options for specific target?
         if (TARGET != null) {
-            //File targetFile = new File(System.getenv("FINROC_HOME") + "/etc/targets/" + target);
-            String home = BUILDING_FINROC ? System.getenv("FINROC_HOME") : System.getenv("MCAHOME");
-            File targetFile = new File(home + "/etc/targets/" + TARGET);
-            //File targetFile = Util.getFileInEtcDir("../targets/" + target);
-            if (!targetFile.exists()) {
-                System.out.println(Util.color("No configuration file for current target found (expected " + targetFile.getCanonicalPath() + ")!", Color.RED, true));
-                System.out.println(Util.color("Maybe you need to source scripts/setenv again to update your environment.", Color.RED, true));
-                System.exit(-1);
-            }
             // gcc should be default compiler if no other compiler was specified
             makefile.changeVariable("CC=gcc$(GCC_VERSION)");
             makefile.changeVariable("CXX=g++$(GCC_VERSION)");
+            makefile.addVariable("STATIC_LINKING_CHECK=" + (staticLinking ? "true" : ""));
 
             makefile.addVariable("include etc/targets/$(TARGET)");
+
+            makefile.addVariable("ifneq ($(STATIC_LINKING_CHECK), $(STATIC_LINKING))");
+            makefile.addVariable("$(error Setting on static linking has changed. Please recreate Makefile.)");
+            makefile.addVariable("endif");
         }
 
         if (getOptions().containsKey("usesysteminstall")) {
@@ -415,6 +432,11 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             crossCompiling = BUILDING_FINROC && (!System.getenv("FINROC_ARCHITECTURE").equals(System.getenv("FINROC_ARCHITECTURE_NATIVE")));
         }
         return crossCompiling;
+    }
+
+    @Override
+    public boolean isStaticLinkingEnabled() {
+        return staticLinking;
     }
 
     @Override

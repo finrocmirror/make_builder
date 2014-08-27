@@ -99,7 +99,7 @@ public class CppHandler implements SourceFileHandler {
         makefile.addVariable("CC=gcc$(GCC_VERSION)");
         makefile.addVariable("CXX=g++$(GCC_VERSION)");
         makefile.addVariable("STATIC_LINKING=");
-        makefile.addVariable("LIB_EXTENSION=$(if $(STATIC_LINKING),a,so)");
+        makefile.addVariable("LIB_EXTENSION=" + (MakeFileBuilder.getInstance().isStaticLinkingEnabled() ? "a" : "so"));
         makefile.addVariable("CFLAGS_LIB=" + compileOptionsLib);
         makefile.addVariable("CFLAGS_BIN=" + compileOptionsBin);
         makefile.addVariable("CC_OPTIONS=$(CCFLAGS) " + cCompileOptions);
@@ -317,66 +317,66 @@ public class CppHandler implements SourceFileHandler {
             }
 
             if (be.isLibrary()) {
-                be.target.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
-                be.target.addCommand("ar rs " + be.getTarget() + sources, true);
-                be.target.addCommand("else", false, true);
-                be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
-                be.target.addCommand("endif", false, true);
-            } else {
-                be.target.addCommand("ifeq ($(LIB_EXTENSION),a)", false, true);
-                String linkCommand = options.createStaticLinkCommand(sources, be.getTarget(), atLeastOneCxx);
-                ArrayList<String> otherLibraries = new ArrayList<String>(options.libs);
-
-                // Collect all Dependencies (and remove them from list above)
-                ArrayList<BuildEntity> dependencies = new ArrayList<BuildEntity>();
-                collectDependencies(be, dependencies);
-                for (BuildEntity dependency : dependencies) {
-                    String targetFilename = dependency.getTargetFilename();
-                    String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
-                    if (!otherLibraries.remove(libName)) {
-                        throw new RuntimeException("Could not find " + libName  + " in list (programming error)");
-                    }
+                if (builder.isStaticLinkingEnabled()) {
+                    be.target.addCommand("ar rs " + be.getTarget() + sources, true);
+                } else {
+                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
                 }
+            } else {
+                if (builder.isStaticLinkingEnabled()) {
+                    String linkCommand = options.createStaticLinkCommand(sources, be.getTarget(), atLeastOneCxx);
+                    ArrayList<String> otherLibraries = new ArrayList<String>(options.libs);
 
-                String librariesString = "";
-
-                // Sort dependencies and create string
-                while (dependencies.size() > 0) {
+                    // Collect all Dependencies (and remove them from list above)
+                    ArrayList<BuildEntity> dependencies = new ArrayList<BuildEntity>();
+                    collectDependencies(be, dependencies);
                     for (BuildEntity dependency : dependencies) {
-                        boolean useNext = true;
-                        for (BuildEntity otherDependency : dependencies) {
-                            if (dependency != otherDependency && otherDependency.dependencies.contains(dependency)) {
-                                useNext = false;
+                        String targetFilename = dependency.getTargetFilename();
+                        String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
+                        if (!otherLibraries.remove(libName)) {
+                            throw new RuntimeException("Could not find " + libName  + " in list (programming error)");
+                        }
+                    }
+
+                    String librariesString = "";
+
+                    // Sort dependencies and create string
+                    while (dependencies.size() > 0) {
+                        for (BuildEntity dependency : dependencies) {
+                            boolean useNext = true;
+                            for (BuildEntity otherDependency : dependencies) {
+                                if (dependency != otherDependency && otherDependency.dependencies.contains(dependency)) {
+                                    useNext = false;
+                                    break;
+                                }
+                            }
+
+                            if (useNext) {
+                                String targetFilename = dependency.getTargetFilename();
+                                String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
+                                librariesString += " -l" + libName;
+                                dependencies.remove(dependency);
                                 break;
                             }
                         }
+                    }
+                    if (librariesString.length() > 0) {
+                        librariesString = " -Wl,--whole-archive " + librariesString + " -Wl,--no-whole-archive";
+                    }
 
-                        if (useNext) {
-                            String targetFilename = dependency.getTargetFilename();
-                            String libName = targetFilename.substring(3, targetFilename.lastIndexOf("."));
-                            librariesString += " -l" + libName;
-                            dependencies.remove(dependency);
-                            break;
+                    for (String otherLibrary : otherLibraries) {
+                        if (otherLibrary.equals("pthread")) {
+                            librariesString += " -Wl,--whole-archive -lpthread -Wl,--no-whole-archive";
+                        } else {
+                            librariesString += " -l" + otherLibrary;
                         }
                     }
-                }
-                if (librariesString.length() > 0) {
-                    librariesString = " -Wl,--whole-archive " + librariesString + " -Wl,--no-whole-archive";
-                }
-
-                for (String otherLibrary : otherLibraries) {
-                    if (otherLibrary.equals("pthread")) {
-                        librariesString += " -Wl,--whole-archive -lpthread -Wl,--no-whole-archive";
-                    } else {
-                        librariesString += " -l" + otherLibrary;
-                    }
-                }
 
 
-                be.target.addCommand(linkCommand + librariesString, true);
-                be.target.addCommand("else", false, true);
-                be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
-                be.target.addCommand("endif", false, true);
+                    be.target.addCommand(linkCommand + librariesString, true);
+                } else {
+                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                }
             }
 
         } else { // compiling and linking in one step
