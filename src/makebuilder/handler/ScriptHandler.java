@@ -28,7 +28,7 @@ import makebuilder.SourceFileHandler;
 import makebuilder.StartScript;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Creates start scripts for build entities
  */

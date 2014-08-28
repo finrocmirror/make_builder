@@ -52,7 +52,7 @@ import makebuilder.StartScript;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This handler processes/loads make.xml files and creates BuildEntity instances for them
  */

@@ -36,7 +36,7 @@ import makebuilder.util.Util;
 import makebuilder.util.Util.Color;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * "Build Entity".
  * This is typically a set of source files that will be compiled to a library or executable.

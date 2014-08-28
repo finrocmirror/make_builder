@@ -33,7 +33,7 @@ import makebuilder.SrcFile;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Merges cpp files before building them
  */

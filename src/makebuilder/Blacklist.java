@@ -31,7 +31,7 @@ import makebuilder.util.Files;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Manages list of sources that cannot be combined in one great file without problems
  */

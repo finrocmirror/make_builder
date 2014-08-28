@@ -35,7 +35,7 @@ import makebuilder.SrcFile;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for calling MCA descriptionbuilder on relevant files
  */

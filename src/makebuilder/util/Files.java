@@ -47,7 +47,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Contains helpful functions for files and streams
  */

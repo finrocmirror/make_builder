@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import makebuilder.RepositoryTargetCreator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  */
 public class MCA2RepositoryTargetCreator extends RepositoryTargetCreator {

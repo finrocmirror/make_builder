@@ -37,7 +37,7 @@ import makebuilder.libdb.LibDB;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Handler for qt4 files.
  *

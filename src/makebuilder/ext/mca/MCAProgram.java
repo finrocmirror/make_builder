@@ -22,7 +22,7 @@
 package makebuilder.ext.mca;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * MCA executable build entity
  */

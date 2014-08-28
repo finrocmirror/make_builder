@@ -24,7 +24,7 @@ package makebuilder.ext.finroc;
 import makebuilder.ext.mca.MCA2RepositoryTargetCreator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  */
 public class FinrocRepositoryTargetCreator extends MCA2RepositoryTargetCreator {

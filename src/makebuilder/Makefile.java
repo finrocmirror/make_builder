@@ -36,7 +36,7 @@ import java.util.TreeSet;
 import makebuilder.util.Files;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This class represents a makefile.
  * It encapsulates the Makefile syntax

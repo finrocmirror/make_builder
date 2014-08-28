@@ -38,7 +38,7 @@ import makebuilder.util.ActivityLog;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Scans local source files for dependencies to other local source files
  */

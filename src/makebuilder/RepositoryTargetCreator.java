@@ -22,7 +22,7 @@
 package makebuilder;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Post-processor for makefiles.
  *

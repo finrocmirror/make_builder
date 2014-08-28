@@ -37,7 +37,7 @@ import makebuilder.util.ToStringComparator;
 import makebuilder.libdb.ExtLib;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Generates information file for every library (.so)
  * This information currently includes the required closures for compiling this library

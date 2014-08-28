@@ -28,7 +28,7 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcFile;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Copies etc directories from libraries (including generated ones in build) to export/.../etc
  * (MCA-specific; only needed for system-installs)

@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This is a helper class to deal with calls to the C Compiler.
  * It wraps a set of GCC command line options.

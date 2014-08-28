@@ -24,7 +24,7 @@ package makebuilder;
 import makebuilder.handler.CppHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This class is a C++ build entity that will be compiled to an executable.
  */

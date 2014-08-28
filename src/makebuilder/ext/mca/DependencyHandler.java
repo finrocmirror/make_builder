@@ -41,7 +41,7 @@ import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for calculation of build entity dependencies files (the files are named ".dependencies" and include one line with the repository name for each depending entity)
  */

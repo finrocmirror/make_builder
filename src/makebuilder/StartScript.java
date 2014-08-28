@@ -26,7 +26,7 @@ import java.util.SortedMap;
 import makebuilder.handler.ScriptHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This class represents a start script for a build entity.
  * A build entity may have multiple start scripts.

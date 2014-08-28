@@ -35,7 +35,7 @@ import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This experimental class builds a virtual mca repository in the /tmp/ folder
  */

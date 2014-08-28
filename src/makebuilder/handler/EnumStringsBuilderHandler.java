@@ -40,7 +40,7 @@ import makebuilder.util.Files;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Creates strings for all enum constants
  */

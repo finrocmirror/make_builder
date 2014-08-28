@@ -31,7 +31,7 @@ import makebuilder.StartScript;
 import makebuilder.handler.JavaHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Generates a script that echos a LD_PRELOAD=<libs> to the console.
  * This is required to load native code with static TLS in fingui.

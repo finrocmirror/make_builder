@@ -36,7 +36,7 @@ import makebuilder.handler.MakeXMLLoader;
 import makebuilder.util.Files;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * This classes parses SConscripts
  */

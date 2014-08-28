@@ -22,7 +22,7 @@
 package makebuilder;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Handles and transforms source files in some way.
  *

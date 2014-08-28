@@ -28,7 +28,7 @@ import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Copies h files from libraries and tools (including generated ones in build) to export/.../include
  * (MCA-specific; only needed for system-installs)

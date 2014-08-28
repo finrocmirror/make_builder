@@ -36,7 +36,7 @@ import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for building executables and libraries from C/C++ source files
  */

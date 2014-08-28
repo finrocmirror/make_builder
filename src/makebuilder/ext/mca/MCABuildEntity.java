@@ -34,7 +34,7 @@ import makebuilder.handler.CppHandler;
 import makebuilder.util.Files;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * MCA build entity.
  *

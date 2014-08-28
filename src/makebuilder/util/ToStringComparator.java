@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  */
 public class ToStringComparator implements Comparator<Object>, Serializable {

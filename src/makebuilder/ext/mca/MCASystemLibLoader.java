@@ -34,7 +34,7 @@ import makebuilder.ext.finroc.FinrocBuilder;
 import makebuilder.util.Files;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Handles system-wide installation of MCA
  */

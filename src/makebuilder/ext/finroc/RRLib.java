@@ -24,7 +24,7 @@ package makebuilder.ext.finroc;
 import makebuilder.handler.JavaHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * RRLib (framework independent RRLab library)
  */

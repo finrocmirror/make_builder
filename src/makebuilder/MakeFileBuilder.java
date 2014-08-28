@@ -34,7 +34,7 @@ import makebuilder.util.ActivityLog;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Main class for Building makefiles
  */
@@ -187,7 +187,7 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
             }
         }
 
-        // find local dependencies in "external libraries"
+        // find local dependencies in "external libraries" (note: ugly hack only required for some mca2 libraries with external .so files checked in)
         activityLog.addActivity("find local dependencies in external libraries");
         LibDB.findLocalDependencies(buildEntities);
 

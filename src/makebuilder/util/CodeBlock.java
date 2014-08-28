@@ -29,7 +29,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Block of code
  */

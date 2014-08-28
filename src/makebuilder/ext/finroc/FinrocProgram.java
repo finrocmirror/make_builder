@@ -26,7 +26,7 @@ import makebuilder.StartScript;
 import makebuilder.handler.JavaHandler;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Finroc library
  */

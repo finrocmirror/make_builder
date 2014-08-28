@@ -22,7 +22,7 @@
 package makebuilder.util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Some helper functions to access the gcc compiler directly...
  * Most of it was deleted, because not needed any longer

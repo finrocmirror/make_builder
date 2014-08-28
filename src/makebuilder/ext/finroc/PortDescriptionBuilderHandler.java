@@ -39,7 +39,7 @@ import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for calling finroc_port_description_builder on relevant files
  */

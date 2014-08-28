@@ -30,7 +30,7 @@ import makebuilder.SourceFileHandler;
 import makebuilder.SrcFile;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Handler to generate pkgconfig (.pc) files for all C++ libraries that
  * are created using makebuilder.

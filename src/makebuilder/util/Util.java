@@ -31,7 +31,7 @@ import makebuilder.MakeFileBuilder;
 import makebuilder.libdb.LibDB;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Various utility functions
  */

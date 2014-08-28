@@ -39,7 +39,7 @@ import makebuilder.util.CodeBlock;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * MakeFileBuilder customization for MCA
  */

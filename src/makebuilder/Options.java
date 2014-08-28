@@ -24,7 +24,7 @@ package makebuilder;
 import java.util.Properties;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Builder (command line) options
  * Class is used for parsing and managing them.

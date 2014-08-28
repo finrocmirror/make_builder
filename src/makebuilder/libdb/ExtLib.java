@@ -35,7 +35,7 @@ import makebuilder.util.Files;
 import makebuilder.util.Util;
 
 /**
-  * @author max
+  * @author Max Reichardt
   *
   * Represents one external library
   */

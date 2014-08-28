@@ -36,7 +36,7 @@ import makebuilder.SrcFile;
 import makebuilder.handler.MakeXMLLoader;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  */
 public class SConscriptConverter extends MakeFileBuilder {

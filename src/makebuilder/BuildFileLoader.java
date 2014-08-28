@@ -24,7 +24,7 @@ package makebuilder;
 import java.util.List;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Any class that loads build files (make.xml, SConscript etc.)
  * only needs to implement this interface

@@ -32,9 +32,9 @@ import java.util.SortedSet;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
 
-/** 
+/**
  * @author Max Reichardt
- * 
+ *
  * Relevant info on single source file
  */
 public class SrcFile implements Serializable {

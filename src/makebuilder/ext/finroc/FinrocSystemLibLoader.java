@@ -37,7 +37,7 @@ import makebuilder.util.Files;
 import makebuilder.util.Util;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Handles system-wide installation of Finroc
  *

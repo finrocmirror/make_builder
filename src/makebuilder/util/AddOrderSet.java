@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Set with entries ordered by the time they were added
  */

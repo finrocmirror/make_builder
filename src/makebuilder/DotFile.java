@@ -31,7 +31,7 @@ import makebuilder.util.Files;
 
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Dumps dependency graphs to dot file
  */
