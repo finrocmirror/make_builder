@@ -203,7 +203,32 @@ public:
             type_name = type_name.substr(0, type_name.find('<'));
             if (type_name == "tInput" || type_name == "tOutput" || type_name == "tControllerInput" || type_name == "tControllerOutput" || type_name == "tSensorInput" || type_name == "tSensorOutput" || type_name == "tParameter" || type_name == "tStaticParameter" || type_name == "tVisualizationOutput" || type_name == "tServer" || type_name == "tClient")
             {
-              generated_code << "  names.push_back(\"" << FormatPortNameString((*it)->getNameAsString(), type_name) << "\");" << std::endl;
+              if ((*it)->getType().getTypePtr()->isArrayType())
+              {
+                if ((*it)->getType().getTypePtr()->isConstantArrayType())
+                {
+                  unsigned long long int size = static_cast<const clang::ConstantArrayType*>((*it)->getType().getTypePtr()->getAsArrayTypeUnsafe())->getSize().getLimitedValue(10001);
+                  if (size > 10000)
+                  {
+                    generated_code << "  Port array with more than 10000 elements (class " << D->getQualifiedNameAsString() << ")" << std::endl;
+                  }
+                  else
+                  {
+                    for (unsigned long long int i = 0; i < size; i++)
+                    {
+                      generated_code << "  names.push_back(\"" << FormatPortNameString((*it)->getNameAsString(), type_name) << "[" << i << "]\");" << std::endl;
+                    }
+                  }
+                }
+                else
+                {
+                  generated_code << "  Only constant arrays are supported (class " << D->getQualifiedNameAsString() << ")" << std::endl;
+                }
+              }
+              else
+              {
+                generated_code << "  names.push_back(\"" << FormatPortNameString((*it)->getNameAsString(), type_name) << "\");" << std::endl;
+              }
             }
           }
 
