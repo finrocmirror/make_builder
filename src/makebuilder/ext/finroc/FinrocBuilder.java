@@ -53,7 +53,7 @@ import makebuilder.util.Util;
 import makebuilder.util.Util.Color;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * MakeFileBuilder customization for Finroc
  */
@@ -107,6 +107,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
 
     /** libdb to use for actual compiling */
     private LibDB targetLibDB;
+
+    /** Finroc C++ handler - in case BUILDING_FINROC is true - otherwise null */
+    private FinrocCppHandler finrocCppHandler;
 
     public FinrocBuilder() {
         super("export/$(TARGET)", "build/$(TARGET)");
@@ -186,7 +189,12 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             addHandler(new FinrocSystemLibLoader());
         }
 
-        addHandler(new CppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + " -Wl,--no-as-needed,-rpath," + targetLib.relative, "", "", !opts.combineCppFiles));
+        if (BUILDING_FINROC) {
+            finrocCppHandler = new FinrocCppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + " -Wl,--no-as-needed,-rpath," + targetLib.relative, "", "", !opts.combineCppFiles);
+            addHandler(finrocCppHandler);
+        } else {
+            addHandler(new CppHandler(cflags, cxxflags, "$(if $(STATIC_LINKING),,-fPIC)", "", "-lm -L" + targetLib.relative + " -Wl,--no-as-needed,-rpath," + targetLib.relative, "", "", !opts.combineCppFiles));
+        }
         addHandler(new JavaHandler(this));
         addHandler(new ScriptHandler("$(TARGET_BIN)", "$$FINROC_HOME"));
         //addHandler(new LdPreloadScriptHandler());
@@ -234,6 +242,11 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             new FinrocRepositoryTargetCreator().postprocess(makefile);
         } else {
             new FinrocRepositoryTargetCreator().postprocess(makefile, "tools");
+        }
+
+        // udpate 'presence' files
+        if (finrocCppHandler != null) {
+            finrocCppHandler.updatePresenceFiles();
         }
 
         super.writeMakefile();

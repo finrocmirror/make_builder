@@ -37,7 +37,7 @@ import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
 /**
- * @author max
+ * @author Max Reichardt
  *
  * Responsible for building executables and libraries from C/C++ source files
  */
@@ -133,7 +133,7 @@ public class CppHandler implements SourceFileHandler {
                     System.out.println(" " + sf.relative);
                 }
                 System.out.println("\nResolved optional dependencies:");
-                for (SrcFile sf : file.dependencies) {
+                for (SrcFile sf : file.optionalDependencies) {
                     System.out.println(" " + sf.relative);
                 }
             }
@@ -451,16 +451,16 @@ public class CppHandler implements SourceFileHandler {
         private static final long serialVersionUID = -1187066325757049661L;
 
         /** Name of makro - if block starts with #ifdef - otherwise null */
-        private String makroName;
+        public final String makroName;
 
         /** Parent node */
         private CodeTreeNode parent;
 
         /** Child nodes - in standard case */
-        private ArrayList<CodeTreeNode> children = new ArrayList<CodeTreeNode>();
+        public ArrayList<CodeTreeNode> children = new ArrayList<CodeTreeNode>();
 
         /** Child nodes - in "else* case */
-        private ArrayList<CodeTreeNode> altChildren = new ArrayList<CodeTreeNode>();
+        public ArrayList<CodeTreeNode> altChildren = new ArrayList<CodeTreeNode>();
 
         /** Include files - in standard case */
         private ArrayList<String> includes = new ArrayList<String>();

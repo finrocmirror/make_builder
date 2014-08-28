@@ -32,7 +32,11 @@ import java.util.SortedSet;
 import makebuilder.util.Files;
 import makebuilder.util.Util;
 
-/** Relevant info on single source file */
+/** 
+ * @author Max Reichardt
+ * 
+ * Relevant info on single source file
+ */
 public class SrcFile implements Serializable {
 
     /** UID */
@@ -65,7 +69,7 @@ public class SrcFile implements Serializable {
     /** Other source files that this file directly depends on - resolved */
     public transient final List<SrcFile> dependencies = new ArrayList<SrcFile>();
 
-    /** Other source files that this file directly depends on - resolved */
+    /** Other optional source files that this file directly depends on - resolved */
     public transient final List<SrcFile> optionalDependencies = new ArrayList<SrcFile>();
 
     /** First raw dependency that could not be resolved - null if no dependencies were missing */
@@ -81,7 +85,7 @@ public class SrcFile implements Serializable {
     private transient BuildEntity owner;
 
     /** Currently processing file? (temporary variable for BuildEntity.java) */
-    public boolean processing = false;
+    public transient boolean processing = false;
 
     /**
      * @param dir Directory that file is in
