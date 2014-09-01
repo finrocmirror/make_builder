@@ -132,7 +132,7 @@ const tEnumStrings &GetEnumStrings(const char *type_name)
       message << "\t" << it->first.c_str() << "\n";
     }
 
-    message << "\nPlease note that enum strings are only generated for public enums in .h files.\n";
+    message << "\nPlease note that enum strings are only generated for public enums in .h files.\nIn templates, strings are only generated for enums with default values.\n";
     throw std::runtime_error(message.str());
   }
 

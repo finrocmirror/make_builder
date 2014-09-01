@@ -254,11 +254,31 @@ public:
 
         // Do we have an array with standard constants?
         bool standard_constants = true;
+        bool init_expression_found = false;
+        bool in_template = enum_decl->getDeclContext() && enum_decl->getDeclContext()->isDependentContext();
+        bool all_zero = true;
         size_t current_index = 0;
         for (clang::EnumDecl::enumerator_iterator it = enum_decl->enumerator_begin(); current_index < constants.size(); ++it)
         {
+          //llvm::outs() << D->getQualifiedNameAsString() << "[" << current_index << "] " << (*it)->getInitVal() << " " << (*it)->getInitExpr() << " " << in_template << "\n";
           standard_constants &= ((*it)->getInitVal() == current_index);
+          all_zero &= ((*it)->getInitVal() == 0);
+          init_expression_found |= ((*it)->getInitExpr() != NULL);
           current_index++;
+        }
+        if (in_template && init_expression_found)
+        {
+          llvm::outs() << "enum-strings-builder warning: Enums in templates with custom (non-standard) values are not supported (" << D->getQualifiedNameAsString() << "). Skipping.\n";
+          return;
+        }
+        if ((!standard_constants) && (!in_template) && all_zero)
+        {
+          llvm::outs() << "enum-strings-builder warning: All enum values are zero (" << D->getQualifiedNameAsString() << "). Skipping\n";
+          return;
+        }
+        if ((!standard_constants) && in_template)
+        {
+          standard_constants = true;
         }
 
         // Generate code
