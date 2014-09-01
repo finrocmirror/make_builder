@@ -207,7 +207,8 @@ public:
       }
       clang::EnumDecl* enum_decl = dynamic_cast<clang::EnumDecl*>(D);
       if (enum_decl && filename.length() > 0 && filename[0] != '/' &&
-          std::find(action.input_files.begin(), action.input_files.end(), filename) != action.input_files.end())
+          std::find(action.input_files.begin(), action.input_files.end(), filename) != action.input_files.end() &&
+          enum_decl->getAccess() != clang::AS_private && enum_decl->getAccess() != clang::AS_protected)
       {
         //llvm::outs() << "\nNext Enum: " << filename << " " << D->getQualifiedNameAsString() << "\n";
         //D->print(llvm::outs());
