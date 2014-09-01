@@ -133,7 +133,7 @@ sub ProcessEnum($$$)
     $output .= sprintf "const char *strings_%s_upper[] = {\n  \"%s\"\n};\n", $array_name, join "\",\n  \"", map { uc } @names;
     $output .= sprintf "const char *strings_%s_lower[] = {\n  \"%s\"\n};\n", $array_name, join "\",\n  \"", map { lc } @names;
     $output .= sprintf "const char *strings_%s_camel[] = {\n  \"%s\"\n};\n", $array_name, join "\",\n  \"", map { join "", map ucfirst, map lc, split "_" } @names;
-    $output .= sprintf "const internal::tEnumStrings enum_strings_%s = { { strings_%s_natural, strings_%s_upper, strings_%s_lower, strings_%s_camel }, %d };\n", $array_name, $array_name, $array_name, $array_name, $array_name, scalar @names;
+    $output .= sprintf "const internal::tEnumStrings enum_strings_%s = { { strings_%s_natural, strings_%s_upper, strings_%s_lower, strings_%s_camel }, %d, NULL };\n", $array_name, $array_name, $array_name, $array_name, $array_name, scalar @names;
     $output .= sprintf "__attribute__ ((init_priority (101))) static internal::tRegisterEnumStrings init_strings_%s(\"%s\", enum_strings_%s);\n", $array_name, $enum, $array_name;
     $output .= sprintf "\n";
 }
