@@ -34,6 +34,7 @@
 #include <sstream>
 #include <iostream>
 #include <limits>
+#include <set>
 #include <clang/AST/AST.h>
 #include <clang/AST/ASTConsumer.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
@@ -43,6 +44,7 @@ class GenerateEnumStringsAction : public clang::PluginASTAction
 public:
   std::string output_file;
   std::vector<std::string> input_files;
+  std::string include_dir;
 
   virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile);
 
@@ -50,13 +52,18 @@ public:
   {
     const std::string OUTPUT_PREFIX = "--output=";
     const std::string INPUTS_PREFIX = "--inputs=";
+    const std::string INCLUDE_PREFIX = "--include_dir=";
     for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
     {
-      if ((*it).substr(0, OUTPUT_PREFIX.length())  == OUTPUT_PREFIX)
+      if ((*it).substr(0, OUTPUT_PREFIX.length()) == OUTPUT_PREFIX)
       {
         output_file = (*it).substr(OUTPUT_PREFIX.length());
       }
-      if ((*it).substr(0, INPUTS_PREFIX.length())  == INPUTS_PREFIX)
+      if ((*it).substr(0, INCLUDE_PREFIX.length()) == INCLUDE_PREFIX)
+      {
+        include_dir = (*it).substr(INCLUDE_PREFIX.length()) + "/";
+      }
+      if ((*it).substr(0, INPUTS_PREFIX.length()) == INPUTS_PREFIX)
       {
         std::string files = (*it).substr(INPUTS_PREFIX.length());
         //llvm::outs() << "\nInput Files: " << files << "\n";
@@ -147,6 +154,7 @@ class GenerateEnumStringsConsumer : public clang::ASTConsumer
   clang::ASTContext* ast_context;
   GenerateEnumStringsAction& action;
   std::ostringstream generated_code;
+  std::set<std::string> includes;
 
 public:
 
@@ -243,6 +251,15 @@ public:
           constants.pop_back();
         }
 
+        // Do we have an array with standard constants?
+        bool standard_constants = true;
+        size_t current_index = 0;
+        for (clang::EnumDecl::enumerator_iterator it = enum_decl->enumerator_begin(); current_index < constants.size(); ++it)
+        {
+          standard_constants &= ((*it)->getInitVal() == current_index);
+          current_index++;
+        }
+
         // Generate code
         for (int i = 0; i < eSF_DIMENSION; i++)
         {
@@ -258,25 +275,39 @@ public:
           generated_code << std::endl << "};" << std::endl << std::endl;
         }
 
-        size_t count = 0;
-        generated_code << "const int " << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_DIMENSION) << "_values[] = {" << std::endl;
-        for (clang::EnumDecl::enumerator_iterator it = enum_decl->enumerator_begin(); count < constants.size(); ++it)
+        const std::string value_array_name = CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_DIMENSION) + "_values";
+        if (!standard_constants)
         {
-          if (count)
+          includes.insert(filename);
+          generated_code << "const " << D->getQualifiedNameAsString() << " " << value_array_name << "[] = {" << std::endl;
+          for (size_t i = 0; i < constants.size(); i++)
           {
-            generated_code << ", " << std::endl;
+            if (i)
+            {
+              generated_code << ", " << std::endl;
+            }
+            generated_code << "  " << D->getQualifiedNameAsString() << "::" << constants[i];
           }
-          generated_code << "  " << (*it)->getInitVal().toString(10);
-          count++;
+
+          /*for (clang::EnumDecl::enumerator_iterator it = enum_decl->enumerator_begin(); count < constants.size(); ++it)
+          {
+            if (count)
+            {
+              generated_code << ", " << std::endl;
+            }
+            generated_code << "  " << (*it)->getInitVal().toString(10);
+            count++;
+          }*/
+          generated_code << std::endl << "};" << std::endl << std::endl;
         }
-        generated_code << std::endl << "};" << std::endl << std::endl;
 
         generated_code << "const internal::tEnumStrings enum_" << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_DIMENSION)
                        << " = { { "
                        << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_NATURAL) << ", "
                        << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_UPPER) << ", "
                        << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_LOWER) << ", "
-                       << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_CAMEL) << " }, " << count << " };" << std::endl;
+                       << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_CAMEL) << " }, "
+                       << constants.size() << ", " << (standard_constants ? std::string("nullptr") : value_array_name) << " };" << std::endl;
         generated_code << "__attribute__ ((init_priority (101))) static internal::tRegisterEnumStrings init_"
                        << CreateStringArrayVarName(D->getQualifiedNameAsString(), eSF_DIMENSION)
                        << "(\"" << D->getQualifiedNameAsString() << "\", enum_"
@@ -306,8 +337,24 @@ public:
     }
     stream << " *" << std::endl
            << " * This code is released under the same license as the source files." << std::endl
-           << " */" << std::endl  << std::endl
-           << "namespace make_builder" << std::endl << "{" << std::endl
+           << " */" << std::endl << std::endl;
+
+    if (!includes.empty())
+    {
+      for (std::set<std::string>::const_iterator it = includes.begin(); it != includes.end(); ++it)
+      {
+        std::string include = *it;
+        if (include.compare(0, action.include_dir.length(), action.include_dir) == 0)
+        {
+          include = include.substr(action.include_dir.length());
+        }
+
+        stream << "#include \"" << include << "\"" << std::endl;
+      }
+      stream << std::endl;
+    }
+
+    stream << "namespace make_builder" << std::endl << "{" << std::endl
            << "namespace generated" << std::endl << "{" << std::endl << std::endl;
 
     // Print content
@@ -326,4 +373,3 @@ clang::ASTConsumer* GenerateEnumStringsAction::CreateASTConsumer(clang::Compiler
 }
 
 static clang::FrontendPluginRegistry::Add<GenerateEnumStringsAction> cREGISTER_PLUGIN("enum-strings", "generate enum strings");
-

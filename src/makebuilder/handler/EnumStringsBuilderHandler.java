@@ -277,11 +277,20 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 // create input files string for c compiler (all header files except the last are added via '-include')
                 String clangInputFiles = "";
                 String includeGuards = "";
+                String includeDir = "";
                 for (SrcFile sf : target.originalSourceFiles) {
                     clangInputFiles += "-include " + sf.relative + " ";
                     Object includeGuard = sf.properties.get(CppHandler.CPP_INCLUDE_GUARD_KEY);
                     if (includeGuard != null) {
                         includeGuards += " " + includeGuard.toString();
+                    }
+                    if (includeDir.length() == 0) {
+                        for (SrcDir path : be.getRootDir().defaultIncludePaths) {
+                            if (sf.relative.startsWith(path.relative + '/')) {
+                                includeDir = path.relative;
+                                break;
+                            }
+                        }
                     }
                 }
                 clangInputFiles = clangInputFiles.trim();
@@ -294,6 +303,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +
+                                         (includeDir.length() > 0 ? ("-Xclang -plugin-arg-enum-strings -Xclang --include_dir=" + includeDir + " ") : "") +
                                          clangInputFiles + " make_builder/enum_strings_builder/empty.cpp", true);
             }
         }

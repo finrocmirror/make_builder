@@ -73,6 +73,7 @@ struct tEnumStrings
 {
   const char * const *strings[static_cast<size_t>(tEnumStringsFormat::DIMENSION)];
   const size_t size;
+  const void * const non_standard_values;
 };
 
 const tEnumStrings &GetEnumStrings(const char *type_name);
@@ -127,8 +128,21 @@ const char * const *GetEnumStrings(tEnumStringsFormat format = tEnumStringsForma
 template <typename TEnum>
 inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumStringsFormat::NATURAL)
 {
-  assert(static_cast<size_t>(value) < GetEnumStringsDimension<TEnum>());
-  return GetEnumStrings<TEnum>(format)[static_cast<size_t>(value)];
+  internal::tEnumStrings& enum_strings = GetEnumStrings<TEnum>();
+  assert(static_cast<size_t>(value) < enum_strings.size);
+  if (enum_strings.non_standard_values)
+  {
+    const TEnum* values = static_cast<const TEnum*>(enum_strings.non_standard_values);
+    for (size_t i = 0; i < enum_strings.size; i++)
+    {
+      if (values[i] == value)
+      {
+        return enum_strings.strings[static_cast<size_t>(format)][i];
+      }
+    }
+    throw std::runtime_error("Could not find enum string for value '" + std::to_string(value) + "'!");
+  }
+  return enum_strings.strings[static_cast<size_t>(format)][static_cast<size_t>(value)];
 }
 
 template <typename TEnum>
@@ -146,14 +160,17 @@ inline TEnum GetEnumValueFromString(const std::string &string, tEnumStringsForma
 
   for (size_t format = format_begin; format != format_end; ++format)
   {
-    const char * const *enum_strings(GetEnumStrings<TEnum>(static_cast<tEnumStringsFormat>(format)));
-
+    internal::tEnumStrings& enum_strings = GetEnumStrings<TEnum>();
+    const char * const *strings = enum_strings.strings[static_cast<size_t>(format)];
     for (size_t i = 0; i < GetEnumStringsDimension<TEnum>(); ++i)
     {
-      if (string == enum_strings[i])
+      if (string == strings[i])
       {
+        if (enum_strings.non_standard_values)
+        {
+          return static_cast<const TEnum*>(enum_strings.non_standard_values)[i];
+        }
         return static_cast<TEnum>(i);
-        break;
       }
     }
   }
