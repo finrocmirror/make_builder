@@ -128,7 +128,7 @@ const char * const *GetEnumStrings(tEnumStringsFormat format = tEnumStringsForma
 template <typename TEnum>
 inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumStringsFormat::NATURAL)
 {
-  internal::tEnumStrings& enum_strings = GetEnumStrings<TEnum>();
+  const internal::tEnumStrings& enum_strings = internal::GetEnumStrings<TEnum>();
   assert(static_cast<size_t>(value) < enum_strings.size);
   if (enum_strings.non_standard_values)
   {
@@ -140,7 +140,7 @@ inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumS
         return enum_strings.strings[static_cast<size_t>(format)][i];
       }
     }
-    throw std::runtime_error("Could not find enum string for value '" + std::to_string(value) + "'!");
+    throw std::runtime_error("Could not find enum string for value '" + std::to_string(static_cast<uint64_t>(value)) + "'!");
   }
   return enum_strings.strings[static_cast<size_t>(format)][static_cast<size_t>(value)];
 }
@@ -160,7 +160,7 @@ inline TEnum GetEnumValueFromString(const std::string &string, tEnumStringsForma
 
   for (size_t format = format_begin; format != format_end; ++format)
   {
-    internal::tEnumStrings& enum_strings = GetEnumStrings<TEnum>();
+    const internal::tEnumStrings& enum_strings = internal::GetEnumStrings<TEnum>();
     const char * const *strings = enum_strings.strings[static_cast<size_t>(format)];
     for (size_t i = 0; i < GetEnumStringsDimension<TEnum>(); ++i)
     {
