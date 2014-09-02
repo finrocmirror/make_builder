@@ -129,7 +129,6 @@ template <typename TEnum>
 inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumStringsFormat::NATURAL)
 {
   const internal::tEnumStrings& enum_strings = internal::GetEnumStrings<TEnum>();
-  assert(static_cast<size_t>(value) < enum_strings.size);
   if (enum_strings.non_standard_values)
   {
     const TEnum* values = static_cast<const TEnum*>(enum_strings.non_standard_values);
@@ -142,6 +141,7 @@ inline const char *GetEnumString(TEnum value, tEnumStringsFormat format = tEnumS
     }
     throw std::runtime_error("Could not find enum string for value '" + std::to_string(static_cast<uint64_t>(value)) + "'!");
   }
+  assert(static_cast<size_t>(value) < enum_strings.size);
   return enum_strings.strings[static_cast<size_t>(format)][static_cast<size_t>(value)];
 }
 
