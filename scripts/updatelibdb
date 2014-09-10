@@ -326,10 +326,20 @@ sub scorePath($) {
         $score += 10000;
     }
     if ($path =~ /^\/usr\/local\/include\// || $path2 =~ /^\/usr\/local\/lib\//) {
-        $score += 1000;
+        $score += 5000;
     }
     if ($path =~ /^\/usr\/include\// || $path2 =~ /^\/usr\/lib\//) {
-       $score += 500;
+        $score += 3000;
+    }
+    my $ld_library_path = $ENV{"LD_LIBRARY_PATH"};
+    if (defined $ld_library_path) {
+        my @ld_library_paths = split(/:/, $ld_library_path);
+        foreach (@ld_library_paths) {
+            if ($path eq $_ || $path eq ($_ . '/')) {
+                #print "LD_LIBRARY_PATH hit\n";
+                $score += 1000;
+            }
+        }
     }
     $score -= length($path); #heuristic: shorter paths are typically better
 }
