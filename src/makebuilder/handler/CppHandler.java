@@ -283,6 +283,7 @@ public class CppHandler implements SourceFileHandler {
                 options.includePaths.add(sf.dir.relative);
             }
         }*/
+        String compiler = be.getParameter("compiler");
 
         if (separateCompileAndLink) {
             ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
@@ -299,7 +300,7 @@ public class CppHandler implements SourceFileHandler {
                     target.addDependencies(sf.getAllDependencies(dependencyBuffer));
                     boolean cxx = sf.hasExtension("cpp");
                     atLeastOneCxx |= cxx;
-                    target.addCommand(options.createCompileCommand(sf.relative, ofile.relative, cxx), true);
+                    target.addCommand(options.createCompileCommand(sf.relative, ofile.relative, cxx, compiler), true);
                 }
             }
 
@@ -320,11 +321,11 @@ public class CppHandler implements SourceFileHandler {
                 if (builder.isStaticLinkingEnabled()) {
                     be.target.addCommand("ar rs " + be.getTarget() + sources, true);
                 } else {
-                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx, compiler), true);
                 }
             } else {
                 if (builder.isStaticLinkingEnabled()) {
-                    String linkCommand = options.createStaticLinkCommand(sources, be.getTarget(), atLeastOneCxx);
+                    String linkCommand = options.createStaticLinkCommand(sources, be.getTarget(), atLeastOneCxx, compiler);
                     ArrayList<String> otherLibraries = new ArrayList<String>(options.libs);
 
                     // Collect all Dependencies (and remove them from list above)
@@ -375,7 +376,7 @@ public class CppHandler implements SourceFileHandler {
 
                     be.target.addCommand(linkCommand + librariesString, true);
                 } else {
-                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx, compiler), true);
                 }
             }
 
@@ -402,7 +403,7 @@ public class CppHandler implements SourceFileHandler {
 
             if (sources.length() == 0 || cxxSources.length() == 0) {
                 boolean cxx = cxxSources.length() > 0;
-                be.target.addCommand(options.createCompileAndLinkCommand(cxx ? cxxSources : sources, be.getTarget(), cxx), true);
+                be.target.addCommand(options.createCompileAndLinkCommand(cxx ? cxxSources : sources, be.getTarget(), cxx, compiler), true);
             } else {
                 // we need to compile c files and then link them into compiled c++ files
 
@@ -410,11 +411,11 @@ public class CppHandler implements SourceFileHandler {
                 SrcFile ofile = builder.getTempBuildArtifact(cfile, "o");
                 Makefile.Target target = makefile.addTarget(ofile.relative, true, be.getRootDir());
                 target.addDependencies(dependencyBuffer);
-                target.addCommand(options.createCompileCommand(sources, ofile.relative, false), true);
+                target.addCommand(options.createCompileCommand(sources, ofile.relative, false, compiler), true);
 
                 // Compile and link c++ files
                 be.target.addDependency(ofile.relative);
-                be.target.addCommand(options.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true), true);
+                be.target.addCommand(options.createCompileAndLinkCommand(cxxSources + " " + ofile.relative, be.getTarget(), true, compiler), true);
             }
             be.target.addDependencies(dependencyBuffer);
         }

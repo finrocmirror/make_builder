@@ -283,15 +283,25 @@ public class CCOptions implements Comparator<String> {
     }
 
     /**
+     * @param cxx Use C++ compiler? (instead of c)
+     * @param compiler Compiler to use (optional; null to use default compiler)
+     * @return Compiler call to write to Makefile
+     */
+    private String getCompiler(boolean cxx, String compiler) {
+        return compiler != null ? compiler : (cxx ? "$(CXX)" : "$(CC)");
+    }
+
+    /**
      * Create Cpp compiler call for linking only
      *
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
+     * @param compiler Compiler to use (optional; null to use default compiler)
      * @return GCC Compiler call for makefile
      */
-    public String createLinkCommand(String inputs, String output, boolean cxx) {
-        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx));
+    public String createLinkCommand(String inputs, String output, boolean cxx, String compiler) {
+        return cleanCommand(getCompiler(cxx, compiler) + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx));
     }
 
     /**
@@ -301,10 +311,11 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
+     * @param compiler Compiler to use (optional; null to use default compiler)
      * @return GCC Compiler call for makefile
      */
-    public String createStaticLinkCommand(String inputs, String output, boolean cxx) {
-        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx, false));
+    public String createStaticLinkCommand(String inputs, String output, boolean cxx, String compiler) {
+        return cleanCommand(getCompiler(cxx, compiler) + " -o " + output + " " + inputs + " " + createOptionString(false, true, cxx, false));
     }
 
     /**
@@ -313,10 +324,11 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
+     * @param compiler Compiler to use (optional; null to use default compiler)
      * @return GCC Compiler call for makefile
      */
-    public String createCompileCommand(String inputs, String output, boolean cxx) {
-        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -c " + createOptionString(true, false, cxx)) + " -o " + output + " " + inputs;
+    public String createCompileCommand(String inputs, String output, boolean cxx, String compiler) {
+        return cleanCommand(getCompiler(cxx, compiler) + " -c " + createOptionString(true, false, cxx)) + " -o " + output + " " + inputs;
     }
 
     /**
@@ -325,10 +337,11 @@ public class CCOptions implements Comparator<String> {
      * @param inputs Input files (divided by whitespace)
      * @param output Output file
      * @param cxx Use C++ compiler? (instead of c)
+     * @param compiler Compiler to use (optional; null to use default compiler)
      * @return GCC Compiler call for makefile
      */
-    public String createCompileAndLinkCommand(String inputs, String output, boolean cxx) {
-        return cleanCommand((cxx ? "$(CXX)" : "$(CC)") + " -o " + output + " " + inputs + " " + createOptionString(true, true, cxx));
+    public String createCompileAndLinkCommand(String inputs, String output, boolean cxx, String compiler) {
+        return cleanCommand(getCompiler(cxx, compiler) + " -o " + output + " " + inputs + " " + createOptionString(true, true, cxx));
     }
 
     /**
