@@ -358,9 +358,9 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
      * @param targetExtension Suggested extension for target
      * @return
      */
-    public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
+    public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPostfix) {
         String srcDir = source.getRootDir().relativeTo(source.getRootDir().getSrcRoot());
-        return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS + source.name + "_" + suggestedPrefix + "." + targetExtension);
+        return sources.registerBuildProduct(tempBuildPath.relative + FS + srcDir + FS + source.name + "_" + suggestedPostfix + "." + targetExtension);
     }
 
     /**

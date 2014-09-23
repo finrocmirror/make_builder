@@ -373,7 +373,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     }
 
     @Override
-    public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPrefix) {
+    public SrcFile getTempBuildArtifact(BuildEntity source, String targetExtension, String suggestedPostfix) {
         if (targetExtension.equals("mf")) {
             return sources.registerBuildProduct(tempBuildPath.getParent().getSubDir("java") + FS + source.getTargetFilename().replaceAll("[.]jar$", "") + ".mf");
         }
@@ -382,7 +382,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         if (filename.contains(".")) {
             filename = filename.substring(0, filename.lastIndexOf("."));
         }
-        return sources.registerBuildProduct(targetDir.relative + FS + filename + "_" + suggestedPrefix + "." + targetExtension);
+        return sources.registerBuildProduct(targetDir.relative + FS + filename + "_" + suggestedPostfix + "." + targetExtension);
     }
 
     @Override

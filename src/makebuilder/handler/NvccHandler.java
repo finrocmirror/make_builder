@@ -86,17 +86,32 @@ public class NvccHandler extends SourceFileHandler.Impl {
         }
 
         // compile...
+        ArrayList<SrcFile> gpuObjectFiles = new ArrayList<SrcFile>();
         ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
         for (SrcFile sf : copy) {
             if (sf.hasExtension("cu")) {
                 SrcFile ofile = builder.getTempBuildArtifact(sf, "o");
+                gpuObjectFiles.add(ofile);
                 Makefile.Target target = makefile.addTarget(ofile.relative, false, be.getRootDir());
                 be.sources.remove(sf);
                 be.sources.add(ofile);
                 dependencyBuffer.clear();
                 target.addDependencies(sf.getAllDependencies(dependencyBuffer));
-                target.addCommand("$(NVCC) -c -o " + ofile.relative + " " + sf.relative + " " + options.createCudaString(), true);
+                target.addCommand("$(NVCC) -o " + ofile.relative + " " + sf.relative + " " + options.createCudaString() + " -dc" , true);
             }
+        }
+
+        // nvcc device code linking
+        if (gpuObjectFiles.size() > 0) {
+            SrcFile ofile = builder.getTempBuildArtifact(be, "o", "gpucode");
+            Makefile.Target target = makefile.addTarget(ofile.relative, false, be.getRootDir());
+            be.sources.add(ofile);
+            String ofiles = "";
+            for (SrcFile file : gpuObjectFiles) {
+                ofiles += file.relative + " ";
+                target.addDependency(file.relative);
+            }
+            target.addCommand("$(NVCC) " + options.createCudaString() + " -dlink " + ofiles + "-o " + ofile.relative , true);
         }
     }
 }
