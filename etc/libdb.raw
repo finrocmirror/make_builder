@@ -121,6 +121,7 @@ qt4_no_warning: -D QT_NO_WARNING_OUTPUT
 qt4network: -D _MCA_QT_4_ -D _MCA_QT_4_NETWORK_ -D QT_THREAD_SUPPORT -I<QtNetwork/qftp.h> -lQtNetwork 
 quarter:    -I<Quarter/Quarter.h> -lQuarter
 qwt:        -I/usr/include/qwt -I<qwt_abstract_scale.h> -lqwt -I /usr/include/qt4/Qt -I /usr/include/qt4/QtGui
+readline:	-I<readline/readline.h> -lreadline
 ros:   -D _ROS_CORE_PRESENT_ -I<ros/ros.h,ros/exception.h,ros/serialized_message.h,ros/console.h,ros/time.h> -lroslib -lroscpp -lroscpp_serialization -lrosconsole -lrostime -lrospack -lxmlrpcpp -L/opt/ros/hydro/lib/ -Wl,-rpath,/opt/ros/hydro/lib
 ros-std_msgs: -I<std_msgs/String.h> -I<std_msgs/header_deprecated_def.h>
 ros-sensor_msgs: -I<sensor_msgs/LaserScan.h>
