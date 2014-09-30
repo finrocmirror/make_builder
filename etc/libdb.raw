@@ -55,7 +55,7 @@ gpsd:       -I<libgpsmm.h> -lgps
 gsl:        -lgsl -lgslcblas
 hokuyo:     -I<urg_sensor.h,urg_connection.h,urg_tcpclient.h,urg_utils.h> -lurg_c
 jack:       -I<jack/jack.h> -ljack
-jaus:	    -I/usr/local/include/jaus++ -L/usr/local/lib/jaus++ -licarusJAUS -ltinyxml-2.6.2 -lCxUtils -lJAUSCore -lJAUSEnvironment -lJAUSExtras -lJAUSMobility
+jaus:	    -I<jaus/core/Header.h> -ltinyxml-2.6.2 -lCxUtils -lJAUSCore -lJAUSEnvironment -lJAUSExtras -lJAUSMobility
 java:       -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h> -ljava
 java:       -I<jni.h,jawt.h,jni_md.h> -ljava
 jni:        -I<jni.h,jawt.h,linux/jni_md.h> -I<jni_md.h,jawt_md.h>
