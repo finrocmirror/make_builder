@@ -196,6 +196,11 @@ public abstract class BuildEntity {
                 mfb.printCannotBuildError(this, Util.color(" due to dependency " + be.getReferenceName() + " (" + be.errorMessageId + ")", Util.Color.X, false) + " (" + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ") " + Util.color("which cannot be built", Util.Color.X, false), Util.Color.X);
                 return;
             }
+            if (this.getFinalHandler() == CppHandler.class && (!be.isLibrary())) {
+                missingDep = true;
+                mfb.printCannotBuildError(this, Util.color(" because it depends on another program ", Util.Color.RED, true) + " (" + be.getReferenceName() + " defined in " + be.buildFile.relative + (be.lineNumber != 0 ? (":" + be.lineNumber) : "") + ")", Util.Color.RED);
+                return;
+            }
         }
         missingDepCheckPerformed = true;
     }
