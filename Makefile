@@ -4,7 +4,7 @@
 all : etc/libdb.txt dist/build.jar
 
 etc/libdb.txt : etc/libdb.raw scripts/updatelibdb
-	updatelibdb
+	scripts/updatelibdb
 
 # using "find" here may break systems that have no "find", but it should be way more robust than before
 JAVA_SOURCES := $(shell find src/makebuilder/ -name "*.java")
