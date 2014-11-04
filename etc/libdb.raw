@@ -25,7 +25,7 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -lgmp -DCGAL_DISABLE_ROUNDING_MA
 clang:      -I<clang/Frontend/FrontendPluginRegistry.h,clang/AST/ASTConsumer.h> -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda
-cudart:     -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUDART)
+cudart:     -L/usr/local/cuda/lib64 -L/opt/cuda/lib64 -l$(LIBNAME_CUDART)
 cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
@@ -88,7 +88,7 @@ opencv_core:    -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cx
 opencv_all: -D_LIB_OPENCV_PRESENT_ -D_LIB_OPENCV_SVN_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_objdetect -lopencv_legacy -lopencv_highgui -lopencv_video -lopencv_ml
 opencv_core:    -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h> -lcxcore -lcv 
 opencv_all: -D_LIB_OPENCV_PRESENT_ -I<cxcore.h,cxmisc.h,cv.h,cvaux.h,highgui.h,ml.h> -lcxcore -lcv -lcvaux -lhighgui -lml
-opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/cl.h>  -lOpenCL
+opencl:     -D _LIB_OPENCL_NVIDIA_PRESENT_ -I<CL/opencl.h>  -lOpenCL
 opencl:     -D _LIB_OPENCL_AMD_PRESENT_ -I<CL/cl.h> -I<CL/cl.hpp> -lOpenCL -lSDKUtil
 openmp:     -I<omp.h> -lgomp -fopenmp -D _LIB_OPENMP_PRESENT_
 openni:     -I<XnOS.h> -lOpenNI
