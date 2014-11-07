@@ -48,6 +48,7 @@ ffmpeg:     -I<libavcodec/avcodec.h> -lavcodec -D__STDC_CONSTANT_MACROS
 fftw3:      -I<fftw3.h> -lfftw3 -lfftw3_threads -lfftw3f -lfftw3f_threads
 flann:      -I<flann.h,flann.hpp> -lflann -lflann_cpp 
 flycap:     -lflycapture -I<FlyCapture2.h>
+freenect2:  -D LIBFREENECT2_THREADING_STDLIB -lfreenect2 -lglfw -I<libfreenect2/libfreenect2.hpp>
 glew:       -I<GL/glew.h> -lGLEW
 glut:       -I<GL/glut.h> -lglut -lGLU -lGL
 glui:       -I<GL/glui.h> -lglui -lGLU -IGL
