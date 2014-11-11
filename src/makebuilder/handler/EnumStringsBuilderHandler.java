@@ -222,7 +222,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
                 Makefile.Target target = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
                 try {
-                    target.addCommand("c++ " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                    target.addCommand("c++ -std=c++11 " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
                     target.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
                 } catch (Exception e) {
                     e.printStackTrace();

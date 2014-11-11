@@ -133,7 +133,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
             }
             clangPlugin = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
             try {
-                clangPlugin.addCommand("c++ " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+                clangPlugin.addCommand("c++ -std=c++11 " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
                 clangPlugin.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
             } catch (Exception e) {
                 e.printStackTrace();
