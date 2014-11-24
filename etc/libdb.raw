@@ -25,7 +25,7 @@ cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -lgmp -DCGAL_DISABLE_ROUNDING_MA
 clang:      -I<clang/Frontend/FrontendPluginRegistry.h,clang/AST/ASTConsumer.h> -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcuda
-cudart:     -L/usr/local/cuda/lib64 -L/opt/cuda/lib64 -l$(LIBNAME_CUDART)
+cudart:     -I<cuda_runtime.h>
 cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
 curses:     -I<curses.h> -lcurses
