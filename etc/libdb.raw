@@ -24,7 +24,7 @@ cg:         -I<Cg/cgGL.h> -lCg -lCgGL
 cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -lgmp -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 clang:      -I<clang/Frontend/FrontendPluginRegistry.h,clang/AST/ASTConsumer.h> -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 cppunit:    -lcppunit
-cuda:       -I<cuda.h,builtin_types.h> -lcuda
+cuda:       -I<cuda.h,builtin_types.h> -lcudart
 cudart:     -I<cuda_runtime.h>
 cufft:      -I<cufft.h> -L/usr/local/cuda/lib -L/opt/cuda/lib -l$(LIBNAME_CUFFT)
 curl:       -I<curl/curl.h> -lcurl
@@ -100,7 +100,7 @@ parapin:    -I<parapin.h,parapindriver.h>
 pcap:       -I<pcap/pcap.h> -lpcap
 pcl:        -I<pcl/pcl_base.h>  -lpcl_filters -lpcl_io -lpcl_segmentation -lpcl_common -lpcl_search -lpcl_surface -lpcl_visualization -lpcl_features
 physx:      -D _LIB_PHYSX_PRESENT_ -DLINUX -DCORELIB -DNX32 -DNX_DISABLE_FLUIDS -DNX_DISABLE_HARDWARE -lPhysXLoader -lPhysXCore -lNxCharacter -lNxCooking -ldl -I<Nx.h> -I<NxPhysics.h> -I<PhysXLoader.h> -lNXU -I<NXU_helper.h>
-physx33:    -DPX_PHYSX_STATIC_LIB -DPX_PROFILE -D_DEBUG -DPX_CHECKED -DPX_SUPPORT_VISUAL_DEBUGGER -I<PxPhysics.h> -L/usr/lib/PhysX/ -Wl,--start-group -lLowLevelCHECKED -lLowLevelClothCHECKED -lPhysX3CHECKED -lPhysX3CharacterKinematicCHECKED -lPhysX3CommonCHECKED -lPhysX3CookingCHECKED -lPhysX3ExtensionsCHECKED -lPhysX3VehicleCHECKED -lPhysXProfileSDKCHECKED -lPhysXVisualDebuggerSDKCHECKED -lPvdRuntimeCHECKED -lSimulationControllerCHECKED -lSceneQueryCHECKED -lPxTaskCHECKED -lrt -lpthread -Wl,--end-group
+physx33:    -DPX_PHYSX_STATIC_LIB -I<PxPhysics.h> -L/usr/lib/PhysX/ -Wl,--start-group -lLowLevelCHECKED -lLowLevelClothCHECKED -lPhysX3CHECKED -lPhysX3CharacterKinematicCHECKED -lPhysX3CommonCHECKED -lPhysX3CookingCHECKED -lPhysX3ExtensionsCHECKED -lPhysX3VehicleCHECKED -lPhysXProfileSDKCHECKED -lPhysXVisualDebuggerSDKCHECKED -lPvdRuntimeCHECKED -lSimulationControllerCHECKED -lSceneQueryCHECKED -lPxTaskCHECKED -lrt -lpthread -Wl,--end-group
 poco:       -I<Poco/Glob.h> -lPocoFoundation -lPocoNet
 postgres:   -lpq -I<pg_config.h,postgres.h>
 pdcom:      -I /opt/etherlab/include/ -I /opt/etherlab/ -Wl,-rpath,/opt/etherlab/lib -lpdcom -lethercat
