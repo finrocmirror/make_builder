@@ -1,6 +1,8 @@
+3dv:		-I<3dv.h> -l3dv
 amicom:     -I<'AmIComInterface.h','VSApplInterface.h','VSCommunication_VSApplInterface.h','App2SdlFormats.h'> -lVSApplInterface -lAmIComInterface
 ann:        -I<ANN/ANN.h> -lANN
 ann:        -I<ANN/ANN.h> -lann
+archive: 	-I<archive_entry.h> -larchive
 aria:       -I<Aria.h> -lAria -ldl
 asn:        -I<asn_application.h> -lasn1c 
 asound:     -I<alsa/asoundlib.h> -lasound
@@ -15,6 +17,7 @@ boost_filesystem:   -I<boost/filesystem.hpp> -lboost_filesystem -lboost_system
 boost_graph:		-I<boost/graph/graph_traits.hpp> -lboost_graph
 boost_iostreams:    -I<boost/iostreams/stream.hpp> -lboost_iostreams
 boost_regex:    -I<boost/regex.hpp> -lboost_regex
+boost_serialization:	-I<boost/serialization/serialization.hpp> -lboost_serialization
 boost_thread:   -I<boost/thread/thread.hpp> -lboost_thread
 boost_system:   -I<boost/system/system_error.hpp> -lboost_system
 can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
