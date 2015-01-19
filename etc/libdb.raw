@@ -154,7 +154,7 @@ usb:        -I<libusb.h> -lusb
 usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
-vrep:       -I/opt/vrep/shared/programming/include -I/opt/vrep/shared/programming/remoteApi -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -D__linux -lvrep -lpthread
+vrep:       -I/usr/include/vrep -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -D__linux -lvrepremoteapi -lpthread
 vtk:	    -I/usr/include/vtk-5.8 -lvtkCommon -lvtkFiltering -lvtkRendering -lvtkHybrid
 websockets: -lwebsockets
 x264:       -I<x264.h> -lx264
