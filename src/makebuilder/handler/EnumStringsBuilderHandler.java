@@ -71,8 +71,11 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     public final String LLVM_CLANG_PLUGIN;
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/enum_strings_builder/clang-plugin-enum_strings.cpp";
 
-    /** Use (experimental) llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
-    public static final boolean USE_LLVM_PLUGIN;
+    /** Use llvm-clang plugin for building enum strings (instead of script utilizing doxygen) */
+    public static final boolean USE_CLANG_PLUGIN;
+
+    /** Detected version of llvm clang */
+    public static final String CLANG_VERSION;
 
     /** Extra flags for compiling with clang */
     public static final String EXTRA_CLANG_FLAGS;
@@ -107,6 +110,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
         } catch (Exception e) {
         }
         // get llvm version
+        String clangVersion = "0";
         try {
             String[] output = Files.readLines(Runtime.getRuntime().exec("clang++ --version").getInputStream()).get(0).split("[ ]");
             String[] versionString = null;
@@ -117,17 +121,19 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
             }
             suitableLlvmVersion = Integer.parseInt(versionString[0]) > 3 || (Integer.parseInt(versionString[0]) == 3 && Integer.parseInt(versionString[1]) >= 3);
+            clangVersion = versionString[0] + "." + versionString[1];
             if (suitableLlvmVersion) {
                 System.out.println("Suitable llvm clang++ version found");
             }
         } catch (Exception e) {
         }
+        CLANG_VERSION = clangVersion;
 
         if (!suitableDoxygenVersion && (!suitableLlvmVersion)) {
             System.err.println("ERROR: Either doxygen version <= 1.7.6.1 or llvm clang++ >= 3.3 required for compiling");
             System.exit(-1);
         }
-        USE_LLVM_PLUGIN = suitableLlvmVersion;
+        USE_CLANG_PLUGIN = suitableLlvmVersion;
 
         // Workaround for bug https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-snapshot/+bug/1215572
         EXTRA_CLANG_FLAGS = System.getProperty("os.arch").equals("i386") ? " -I/usr/include/i386-linux-gnu/c++/4.8" : "";
@@ -141,7 +147,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
     public EnumStringsBuilderHandler(String buildDir, String clangFlags, String nativeArchitectureString) {
         this.buildDir = buildDir;
         this.clangFlags = clangFlags;
-        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-enum_strings-" + nativeArchitectureString + ".so";
+        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-" + CLANG_VERSION + "-plugin-enum_strings-" + nativeArchitectureString + ".so";
     }
 
     @Override
@@ -185,7 +191,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 target = new CppDescrTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
                 target.target.addDependency(be.buildFile);
                 target.target.addMessage("Creating " + sft.relative);
-                target.target.addDependency(USE_LLVM_PLUGIN ? LLVM_CLANG_PLUGIN : DESCRIPTION_BUILDER_BIN);
+                target.target.addDependency(USE_CLANG_PLUGIN ? LLVM_CLANG_PLUGIN : DESCRIPTION_BUILDER_BIN);
                 //target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                 be.sources.add(0, sft);
                 be.opts.libs.add("enum_strings");
@@ -215,7 +221,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.h");
             enumStringsLib.addDependency("make_builder/enum_strings_builder/enum_strings.cpp");
 
-            if (USE_LLVM_PLUGIN) {
+            if (USE_CLANG_PLUGIN) {
                 if (!LibDB.getInstance("native").available("clang")) {
                     System.err.print("LLVM clang headers not available. Please install and run 'updatelibdb'.");
                     System.exit(-1);
@@ -258,7 +264,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             inputFiles = '"' + inputFiles.trim() + '"';
 
             // Create commands
-            if (!USE_LLVM_PLUGIN) {
+            if (!USE_CLANG_PLUGIN) {
                 String outputDir = builder.getTempBuildDir(be) + "/" + be.getTargetFilename() + "_enum_strings";
                 target.target.addCommand("mkdir -p " + outputDir, false);
                 target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen make_builder/enum_strings_builder/doxygen.conf", false);

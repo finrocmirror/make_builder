@@ -70,8 +70,11 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
     public final String LLVM_CLANG_PLUGIN;
     public static final String LLVM_CLANG_PLUGIN_SOURCE = "make_builder/src/makebuilder/ext/finroc/clang-plugin-port_names.cpp";
 
-    /** Use (experimental) llvm-clang plugin for building port names (instead of script utilizing doxygen) */
-    public static final boolean USE_LLVM_PLUGIN = makebuilder.handler.EnumStringsBuilderHandler.USE_LLVM_PLUGIN;
+    /** Use llvm-clang plugin for building port names (instead of script utilizing doxygen) */
+    public static final boolean USE_CLANG_PLUGIN = makebuilder.handler.EnumStringsBuilderHandler.USE_CLANG_PLUGIN;
+
+    /** Detected version of llvm clang */
+    public static final String CLANG_VERSION = makebuilder.handler.EnumStringsBuilderHandler.CLANG_VERSION;
 
     /** Contains a makefile target for each build entity with files to call description build upon */
     private Map<BuildEntity, CppDescrTarget> descrTargets = new HashMap<BuildEntity, CppDescrTarget>();
@@ -91,7 +94,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
      */
     public PortDescriptionBuilderHandler(String clangFlags, String nativeArchitectureString) {
         this.clangFlags = clangFlags;
-        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-plugin-port_names-" + nativeArchitectureString + ".so";
+        LLVM_CLANG_PLUGIN = "make_builder/dist/clang-" + CLANG_VERSION + "-plugin-port_names-" + nativeArchitectureString + ".so";
     }
 
     @Override
@@ -110,7 +113,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
                 target = new CppDescrTarget(makefile.addTarget(sft.relative, true, file.dir), sft);
                 target.target.addDependency(be.buildFile);
                 target.target.addMessage("Creating " + sft.relative);
-                target.target.addDependency(USE_LLVM_PLUGIN ? getClangPlugin(makefile).getName() : DESCRIPTION_BUILDER_BIN);
+                target.target.addDependency(USE_CLANG_PLUGIN ? getClangPlugin(makefile).getName() : DESCRIPTION_BUILDER_BIN);
                 //target.target.addCommand("echo \\/\\/ generated > " + target.target.getName(), false);
                 be.sources.add(sft);
                 descrTargets.put(be, target);
@@ -162,7 +165,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
             inputFiles = '"' + inputFiles.trim() + '"';
 
             // Create commands
-            if (!USE_LLVM_PLUGIN) {
+            if (!USE_CLANG_PLUGIN) {
                 String outputDir = builder.getTempBuildDir(be) + "/" + be.getTargetFilename() + "_descr";
                 target.target.addCommand("mkdir -p " + outputDir, false);
                 target.target.addCommand("INPUT_FILES=" + inputFiles + " OUTPUT_DIR=" + outputDir + " doxygen etc/port_descriptions_doxygen.conf", false);
