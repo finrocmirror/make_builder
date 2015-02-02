@@ -86,7 +86,8 @@ std::string FormatPortNameString(const std::string& s, const std::string& type)
   // cut off prefix?
   bool skip_prefix = (words[0] == "si" && type == "tSensorInput") || (words[0] == "so" && type == "tSensorOutput")
                      || (words[0] == "ci" && type == "tControllerInput") || (words[0] == "co" && type == "tControllerOutput")
-                     || (words[0] == "par" && type == "tParameter") || (words[0] == "in" && type == "tInput") || (words[0] == "out" && type == "tOutput");
+                     || (words[0] == "par" && type == "tParameter") || (words[0] == "par" && type == "tStaticParameter")
+                     || (words[0] == "in" && type == "tInput") || (words[0] == "out" && type == "tOutput");
   size_t start_index = skip_prefix ? 1 : 0;
 
   // transform first letters to upper case
