@@ -24,7 +24,7 @@ can_peak:   -I<pcan.h> -D _MCA_PEAK_CAN_ -lpcan
 can_cc_systems: -I<cccan_public.h> -D _MCA_CC_CAN_ 
 canfestival: -I<canfestival.h> -lcanfestival_unix -lcanfestival
 cg:         -I<Cg/cgGL.h> -lCg -lCgGL
-cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -lgmp -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
+cgal:       -I<CGAL/basic.h> -lCGAL -lCGAL_Core -lmpfr -lgmp -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON 
 clang:      -I<clang/Frontend/FrontendPluginRegistry.h,clang/AST/ASTConsumer.h> -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 cppunit:    -lcppunit
 cuda:       -I<cuda.h,builtin_types.h> -lcudart
