@@ -305,7 +305,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 }
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -c " + options.createOptionString(true, false, true) + " " + clangFlags + EXTRA_CLANG_FLAGS + includeGuards +
+                target.target.addCommand("clang++ -S -c " + options.createOptionString(true, false, true) + " " + clangFlags + EXTRA_CLANG_FLAGS + includeGuards +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang enum-strings " +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-enum-strings -Xclang --inputs=" + inputFiles + " " +
