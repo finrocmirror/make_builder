@@ -258,7 +258,7 @@ sub findPath(@) {
     $statusfail = $look4first;
     foreach (@files) {
         #print "matching $look4first and $_\n";
-        if ($_ =~ /(.*)\Q$look4first\E$/) {
+        if ($_ =~ /(.*)\/\Q$look4first\E$/) {
             my $size = @look4;
             #print "found $look4first in $1 " . "$size\n";
             $curPath = $1;
@@ -306,7 +306,7 @@ sub inPath($) {
     my $file = shift;
     $file =~ /^('?)(.*)\1$/; # remove quotes
     $file = $2; # remove quotes
-    my $search4 = $curPath . $file . "\n";
+    my $search4 = $curPath . "/" . $file . "\n";
     #print "inPath s4 $search4 ";
     foreach (@files) {
         if ($search4 eq $_) {
