@@ -72,6 +72,7 @@ jpeg:		-ljpeg -I<jpeglib.h>
 libgmapping:   -I<gridfastslam/gridslamprocessor.h> -lgridfastslam -lconfigfile -llog -lscanmatcher -lsensor_base -lsensor_odometry -lsensor_range -lutils -L/usr/lib/gmapping -Wl,-rpath,/usr/lib/gmapping/
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 mpfr:	    -lmpfr
+mrpt:		-lmrpt-base -lmrpt-slam -lmrpt-maps -lmrpt-obs -lmrpt-gui -lmrpt-opengl -I<mrpt/base.h> -I<mrpt/slam.h> -I<mrpt/gui.h> -I<mrpt/config.h> -I<mrpt/slam/CMetricMap.h> -I<mrpt/slam/CPointsMap.h> -I<mrpt/opengl/CSetOfObjects.h> -I<mrpt/slam/CLandmarksMap.h> -I<mrpt/bayes/CKalmanFilterCapable.h>
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
 mysqlc++:    -I<mysql.h> -lmysqlclient
 mxpeg:	    -I<mxpeg_sdk/static_component_bootstrap.h> -I/usr/include/qt4/QtCore -I/usr/include/qt4 -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtOpenGL -lmxFramework -lmxm_core -lmxmQt
