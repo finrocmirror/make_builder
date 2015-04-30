@@ -102,6 +102,7 @@ public class CppHandler implements SourceFileHandler {
         makefile.addVariable("LIB_EXTENSION=" + (MakeFileBuilder.getInstance().isStaticLinkingEnabled() ? "a" : "so"));
         makefile.addVariable("CFLAGS_LIB=" + compileOptionsLib);
         makefile.addVariable("CFLAGS_BIN=" + compileOptionsBin);
+        makefile.addVariable("CCFLAGS=$(CFLAGS)");
         makefile.addVariable("CC_OPTIONS=$(CCFLAGS) " + cCompileOptions);
         makefile.addVariable("CC_OPTIONS_LIB=$(CC_OPTIONS) $(CFLAGS_LIB)");
         makefile.addVariable("CC_OPTIONS_BIN=$(CC_OPTIONS) $(CFLAGS_BIN)");
