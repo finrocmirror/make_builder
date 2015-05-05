@@ -70,6 +70,7 @@ lo:         -I<lo/lo.h> -llo
 loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -lLTTS7Util -D _LIB_LOQUENDO_PRESENT_
 jpeg:		-ljpeg -I<jpeglib.h>
 libgmapping:   -I<gridfastslam/gridslamprocessor.h> -lgridfastslam -lconfigfile -llog -lscanmatcher -lsensor_base -lsensor_odometry -lsensor_range -lutils -L/usr/lib/gmapping -Wl,-rpath,/usr/lib/gmapping/
+matlab:     -I/opt/matlab/R2014b/extern/include -Wl,-rpath,/opt/matlab/R2014b/bin/glnxa64,-rpath-link,/opt/matlab/R2014b/bin/glnxa64 -L/opt/matlab/R2014b/bin/glnxa64 -lmat -lmx -leng -lm -D_MATLAB_PRESENT
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 matio:      -I<matio.h> -lmatio  -D_MATIO_PRESENT
 mpfr:	    -lmpfr
