@@ -71,6 +71,7 @@ loqtts:     -L/opt/Loquendo/LTTS7/bin -I/opt/Loquendo/LTTS7/include -lLoqTTS7 -l
 jpeg:		-ljpeg -I<jpeglib.h>
 libgmapping:   -I<gridfastslam/gridslamprocessor.h> -lgridfastslam -lconfigfile -llog -lscanmatcher -lsensor_base -lsensor_odometry -lsensor_range -lutils -L/usr/lib/gmapping -Wl,-rpath,/usr/lib/gmapping/
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
+matio:      -I<matio.h> -lmatio  -D_MATIO_PRESENT
 mpfr:	    -lmpfr
 mrpt:		-lmrpt-base -lmrpt-slam -lmrpt-maps -lmrpt-obs -lmrpt-gui -lmrpt-opengl -I<mrpt/base.h> -I<mrpt/slam.h> -I<mrpt/gui.h> -I<mrpt/config.h> -I<mrpt/slam/CMetricMap.h> -I<mrpt/slam/CPointsMap.h> -I<mrpt/opengl/CSetOfObjects.h> -I<mrpt/slam/CLandmarksMap.h> -I<mrpt/bayes/CKalmanFilterCapable.h>
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
@@ -156,7 +157,7 @@ usb:        -I<libusb.h> -lusb
 usb-1.0:    -I<libusb.h> -lusb-1.0
 uuid:       -I<uuid/uuid.h> -luuid
 v4l1:       -I<libv4l1-videodev.h>
-vrep:       -I/usr/include/vrep -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -D__linux -lvrepremoteapi -lpthread
+vrep:       -I/usr/include/vrep -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -D__linux -lvrepremoteapi -lpthread -D_VREP_PRESENT
 vtk:	    -I/usr/include/vtk-5.8 -lvtkCommon -lvtkFiltering -lvtkRendering -lvtkHybrid
 websockets: -lwebsockets
 x264:       -I<x264.h> -lx264
