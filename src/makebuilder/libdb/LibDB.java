@@ -71,7 +71,6 @@ public class LibDB {
      * @return Reference to this LibDB (for convenience)
      */
     public LibDB reinit(File libdb) {
-        System.out.println("Loading " + libdb.getAbsolutePath());
         libs.clear();
         try {
             if (libdb == null) {
