@@ -17,6 +17,7 @@ find -L ${SYSTEM_ROOT}/usr/src/linux-headers-`uname -r`/include -regex '.*\(\([.
 find -L ${SYSTEM_ROOT}/usr/share/java -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L ${SYSTEM_ROOT}/opt/ros -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 find -L ${SYSTEM_ROOT}/opt/vrep/shared/lib/`uname -m` -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L /opt/matlab -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 
 set +o verbose #echo off
 
