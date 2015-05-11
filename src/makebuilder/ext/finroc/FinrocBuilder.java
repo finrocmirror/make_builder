@@ -48,6 +48,7 @@ import makebuilder.handler.PkgConfigFileHandler;
 import makebuilder.handler.Qt4Handler;
 import makebuilder.handler.ScriptHandler;
 import makebuilder.libdb.LibDB;
+import makebuilder.libdb.PkgConfig;
 import makebuilder.util.CodeBlock;
 import makebuilder.util.Util;
 import makebuilder.util.Util.Color;
@@ -131,9 +132,17 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         }
 
         // init libdb
-        targetLibDB = LibDB.getInstance("native").reinit(null);
+        String newNativeLibDB = "make_builder/etc/libdb." + System.getenv("FINROC_OPERATING_SYSTEM_NATIVE") + "_" + System.getenv("FINROC_ARCHITECTURE_NATIVE");
+        String crossCompilingLibDBPrefix = System.getenv("FINROC_OPERATING_SYSTEM") + "_" + System.getenv("FINROC_ARCHITECTURE");
+        String crossLibDB = "make_builder/etc/libdb." + crossCompilingLibDBPrefix;
+        if (new File(newNativeLibDB).exists()) {
+            targetLibDB = LibDB.getInstance("native").reinit(new File(newNativeLibDB));
+        } else {
+            targetLibDB = LibDB.getInstance("native").reinit(null);
+        }
         if (isCrossCompiling()) {
-            targetLibDB = LibDB.getInstance(System.getenv("FINROC_ARCHITECTURE")).reinit(new File("make_builder/etc/libdb." + System.getenv("FINROC_ARCHITECTURE")));
+            targetLibDB = LibDB.getInstance(crossCompilingLibDBPrefix).reinit(new File(crossLibDB));
+            PkgConfig.reinit(System.getenv("FINROC_CROSS_ROOT") != null ? System.getenv("FINROC_CROSS_ROOT") : "/undefined-cross-compile-dir");
         }
 
         // init target paths

@@ -2,21 +2,21 @@
 
 set -o verbose #echo on
 
-find -L /usr/include
-find -L /usr/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/include
-find -L /usr/local/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/cuda -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/sopas -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/NVIDIA_CUDA_SDK -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/local/NVIDIA_GPU_Computing_SDK -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/share/qt4/bin -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/bin -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/src/linux-`uname -r`/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/src/linux-headers-`uname -r`/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /usr/share/java -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /opt/ros -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
-find -L /opt/vrep/shared/lib/`uname -m` -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/include
+find -L ${SYSTEM_ROOT}/usr/lib -maxdepth 5 -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/local/include
+find -L ${SYSTEM_ROOT}/usr/local/lib -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/local/cuda -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/local/sopas -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/local/NVIDIA_CUDA_SDK -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/local/NVIDIA_GPU_Computing_SDK -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/share/qt4/bin -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/bin -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/src/linux-`uname -r`/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/src/linux-headers-`uname -r`/include -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/usr/share/java -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/opt/ros -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
+find -L ${SYSTEM_ROOT}/opt/vrep/shared/lib/`uname -m` -regex '.*\(\([.]\(h\|so\|hpp\|jar\|a\)\)\|moc\)'
 
 set +o verbose #echo off
 

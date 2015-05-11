@@ -432,7 +432,7 @@ public abstract class BuildEntity {
                 }
             }
             return;
-        } else if (PkgConfig.available(dep) && (!builder.isCrossCompiling())) {
+        } else if (PkgConfig.available(dep)) {
 
             ExtLib xl = PkgConfig.getLib(dep);
             directExtlibs.add(xl);

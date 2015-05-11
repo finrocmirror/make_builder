@@ -44,8 +44,17 @@ unless (-e "etc/libdb.raw") {
 my $LIBDB_RAW = $MAKE_BUILDER_DIR . "etc/libdb.raw";
 my $LIBDB_RAW_LOCAL = $MAKE_BUILDER_DIR . "etc/libdb.raw.local";
 my $LIBDB_TXT = $MAKE_BUILDER_DIR . "etc/libdb.txt";
+if ($#ARGV >= 0) {
+    $LIBDB_TXT = $MAKE_BUILDER_DIR . "etc/libdb.$ARGV[0]";
+}
+
 my $LIBDB_JAVA = $MAKE_BUILDER_DIR . "etc/libdb.java";
 my $LIBDB_SEARCH = $MAKE_BUILDER_DIR . "etc/libdb.search";
+
+my $SYSTEM_ROOT = $ENV{'SYSTEM_ROOT'};
+if (!defined $SYSTEM_ROOT) {
+    $SYSTEM_ROOT = "";
+}
 
 # read libdb.raw.local
 my @lines = ();
@@ -130,7 +139,7 @@ foreach my $line (@lines) {
         if ($path eq "") {
             $opts = "";
             $fail = 1;
-        } elsif ($path eq "/usr/include" || $path =~ /\/gcc\//) {
+        } elsif ($path eq "$SYSTEM_ROOT/usr/include" || $path =~ /\/gcc\//) {
             $opts =~ s/\Q$old\E//;
         } else {
             $opts =~ s/\Q$old\E/-I$path/;
@@ -167,7 +176,7 @@ foreach my $line (@lines) {
                     last;
                 }
             }
-            unless ($path eq "/usr/lib" || $path eq "/usr/local/lib" || $path =~ /^\/usr\/(.+)\/gcc\//) {
+            unless ($path eq "$SYSTEM_ROOT/usr/lib" || $path eq "$SYSTEM_ROOT/usr/local/lib" || $path =~ /^\/usr\/(.+)\/gcc\//) {
                 my $newPath = "-L" . $path . " ";
                 unless ($lpaths =~ /\Q$newPath\E/) {
                     $lpaths .= $newPath;
@@ -325,10 +334,10 @@ sub scorePath($) {
     if ($path =~ /^\/home\//) {
         $score += 10000;
     }
-    if ($path =~ /^\/usr\/local\/include\// || $path2 =~ /^\/usr\/local\/lib\//) {
+    if ($path =~ /^$SYSTEM_ROOT\/usr\/local\/include\// || $path2 =~ /^$SYSTEM_ROOT\/usr\/local\/lib\//) {
         $score += 5000;
     }
-    if ($path =~ /^\/usr\/include\// || $path2 =~ /^\/usr\/lib\//) {
+    if ($path =~ /^$SYSTEM_ROOT\/usr\/include\// || $path2 =~ /^$SYSTEM_ROOT\/usr\/lib\//) {
         $score += 3000;
     }
     my $ld_library_path = $ENV{"LD_LIBRARY_PATH"};

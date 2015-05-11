@@ -48,7 +48,7 @@ public class LibDB {
     private Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
 
     /** File names of files to process */
-    static final String LIBDB_RAW = "libdb.raw", LIBDB_TXT = "libdb.txt", LIBDB_JAVA = "libdb.java";
+    static public final String LIBDB_RAW = "libdb.raw", LIBDB_TXT = "libdb.txt", LIBDB_JAVA = "libdb.java";
 
     /**
      * @param architecture Architecture to obtain libdb for (there should be one "native" for host architecture/system)
@@ -71,6 +71,7 @@ public class LibDB {
      * @return Reference to this LibDB (for convenience)
      */
     public LibDB reinit(File libdb) {
+        System.out.println("Loading " + libdb.getAbsolutePath());
         libs.clear();
         try {
             if (libdb == null) {

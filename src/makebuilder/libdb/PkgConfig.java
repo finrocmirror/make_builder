@@ -41,19 +41,29 @@ public class PkgConfig {
     /** Mapping: Library name => library */
     private static Map<String, ExtLib> known_packages = new HashMap<String, ExtLib>();
 
+    /** Alternative system environment for cross-compiling */
+    private static String[] environmentVariables = null;
 
     static {
-        reinit();
+        reinit(null);
     }
 
     /**
      * reads and processes libdb.txt file
      * may be called again, if file changes
      */
-    public static void reinit() {
+    public static void reinit(String systemRoot) {
+        if (systemRoot == null) {
+            environmentVariables = null;
+        } else {
+            environmentVariables = new String[] { "PKG_CONFIG_DIR=",
+                                                  "PKG_CONFIG_LIBDIR=" + systemRoot + "/usr/lib/pkgconfig:" + systemRoot + "/usr/share/pkgconfig",
+                                                  "PKG_CONFIG_SYSROOT_DIR=" + systemRoot
+                                                };
+        }
         known_packages.clear();
         try {
-            Process p = Runtime.getRuntime().exec("pkg-config --list-all");
+            Process p = Runtime.getRuntime().exec("pkg-config --list-all", environmentVariables);
             p.waitFor();
             if (p.exitValue() != 0) {
                 System.out.println(Util.color("Could not call pkg-config, will not attempt to make use of it.", Util.Color.RED, false));
@@ -101,7 +111,7 @@ public class PkgConfig {
             return el;
         } else {
             // get the info from pkg-config
-            Process p = Runtime.getRuntime().exec(new String[] {"pkg-config", "--cflags", MakeFileBuilder.getInstance().isStaticLinkingEnabled() ? "--static" : "", "--libs", lib});
+            Process p = Runtime.getRuntime().exec(new String[] {"pkg-config", "--cflags", MakeFileBuilder.getInstance().isStaticLinkingEnabled() ? "--static" : "", "--libs", lib}, environmentVariables);
             String options = "";
             p.waitFor();
             if (p.exitValue() != 0) {
