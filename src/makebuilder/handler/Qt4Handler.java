@@ -33,7 +33,6 @@ import makebuilder.Makefile;
 import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
-import makebuilder.libdb.LibDB;
 import makebuilder.util.ToStringComparator;
 
 /**
@@ -64,25 +63,16 @@ public class Qt4Handler extends SourceFileHandler.Impl {
     }
 
     /** moc executable */
-    private final String MOC_CALL;
+    private final String MOC_CALL = "moc-qt4";
 
     /** uic executable */
-    private final String UIC_CALL;
+    private final String UIC_CALL = "uic-qt4";
 
     /** Contains a makefile target for each build entity with files to moc */
     private Map<BuildEntity, CppQtTarget> mocTargets = new HashMap<BuildEntity, CppQtTarget>();
 
     /** Dependency buffer */
     private final TreeSet<SrcFile> dependencyBuffer = new TreeSet<SrcFile>(ToStringComparator.instance);
-
-    public Qt4Handler() {
-        try {
-            MOC_CALL = LibDB.getInstance("native").getLib("moc-qt4").options.trim();
-            UIC_CALL = LibDB.getInstance("native").getLib("uic-qt4").options.trim();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void processSourceFile(SrcFile file, Makefile makefile, SourceScanner scanner, MakeFileBuilder builder) throws Exception {

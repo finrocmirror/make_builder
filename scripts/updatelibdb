@@ -102,7 +102,7 @@ my $ex = "";
 foreach my $file (keys %look4files) {
     $ex .= "\\|/$file\$";
 }
-my @files = `$LIBDB_SEARCH | grep '/moc\$\\|[.]jar\$$ex'`;
+my @files = `$LIBDB_SEARCH | grep '[.]jar\$$ex'`;
 #foreach (@files) {
 #    print "relevant file: $_";
 #}
@@ -200,27 +200,6 @@ foreach my $line (@lines) {
         $opts =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace
         $libs { $libname } = $opts;
         print "yes $statusok\n";
-    }
-}
-
-# add qt4 moc and oic
-$libs { "moc-qt4" } = "N/A";
-$libs { "uic-qt4" } = "N/A";
-my $moc = "";
-foreach my $moc_cand (@files) {
-    if ($moc_cand =~ /.*moc$/) { # moc command
-        $moc_cand =~ s/\n//;     # remove line change
-        #print "calling $moc_cand -v\n";
-        my @output = `$moc_cand -v 2>&1`;
-        #print "called $moc_cand -v\n";
-        foreach (@output) { # call and iterate over output
-            if ($_ =~ / 4[.]/) {
-                $libs { "moc-qt4" } = $moc_cand;
-                $moc_cand =~ s/moc$/uic/;
-                $libs { "uic-qt4" } = $moc_cand;
-                last;
-            }
-        }
     }
 }
 
