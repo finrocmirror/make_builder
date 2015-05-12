@@ -34,7 +34,6 @@ import makebuilder.SourceScanner;
 import makebuilder.SrcDir;
 import makebuilder.SrcFile;
 import makebuilder.handler.EnumStringsBuilderHandler;
-import makebuilder.libdb.LibDB;
 import makebuilder.util.CCOptions;
 import makebuilder.util.ToStringComparator;
 
@@ -130,17 +129,9 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
      */
     private Makefile.Target getClangPlugin(Makefile makefile) {
         if (clangPlugin == null) {
-            if (!LibDB.getInstance("native").available("clang")) {
-                System.err.print("LLVM clang headers not available. Please install and run 'updatelibdb'.");
-                System.exit(-1);
-            }
             clangPlugin = makefile.addTarget(LLVM_CLANG_PLUGIN, false, null);
-            try {
-                clangPlugin.addCommand("c++ -std=c++11 " + LibDB.getInstance("native").getLib("clang").options + " -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
-                clangPlugin.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            clangPlugin.addCommand("c++ -std=c++11 $(shell llvm-config --cxxflags) -shared -fPIC -o " + LLVM_CLANG_PLUGIN + " " + LLVM_CLANG_PLUGIN_SOURCE, true);
+            clangPlugin.addDependency(LLVM_CLANG_PLUGIN_SOURCE);
         }
         return clangPlugin;
     }
