@@ -45,19 +45,22 @@ public class PkgConfig {
     private static String[] environmentVariables = null;
 
     static {
-        reinit(null);
+        reinit(null, null);
     }
 
     /**
      * reads and processes libdb.txt file
      * may be called again, if file changes
+     *
+     * @param systemRoot System root directory
+     * @param pkgConfigExtraPath Any extra paths for pkgconfig relative to systemRoot separated by colons. null for now extra path.
      */
-    public static void reinit(String systemRoot) {
+    public static void reinit(String systemRoot, String pkgConfigExtraPath) {
         if (systemRoot == null) {
             environmentVariables = null;
         } else {
             environmentVariables = new String[] { "PKG_CONFIG_DIR=",
-                                                  "PKG_CONFIG_LIBDIR=" + systemRoot + "/usr/lib/pkgconfig:" + systemRoot + "/usr/share/pkgconfig",
+                                                  "PKG_CONFIG_LIBDIR=" + systemRoot + "/usr/lib/pkgconfig:" + systemRoot + "/usr/share/pkgconfig" + (pkgConfigExtraPath != null ? (":" + pkgConfigExtraPath) : ""),
                                                   "PKG_CONFIG_SYSROOT_DIR=" + systemRoot
                                                 };
         }

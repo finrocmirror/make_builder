@@ -118,10 +118,14 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
             System.out.println(Util.color("Maybe you need to source scripts/setenv again to update your environment.", Color.RED, true));
             System.exit(-1);
         }
+        String pkgConfigExtraPath = null;
         try {
             for (String line : Util.readLinesWithoutComments(TARGET_FILE, false)) {
                 if (line.trim().equals("STATIC_LINKING=true")) {
                     staticLinking = true;
+                }
+                if (line.trim().startsWith("PKG_CONFIG_EXTRA_PATH=")) {
+                    pkgConfigExtraPath = line.trim().substring("PKG_CONFIG_EXTRA_PATH=".length());
                 }
             }
         } catch (Exception e) {
@@ -134,7 +138,7 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         String crossLibDB = "make_builder/etc/libdb." + crossCompilingLibDBPrefix;
         if (isCrossCompiling()) {
             LibDB.reinit(new File(crossLibDB));
-            PkgConfig.reinit(System.getenv("FINROC_CROSS_ROOT") != null ? System.getenv("FINROC_CROSS_ROOT") : "/undefined-cross-compile-dir");
+            PkgConfig.reinit(System.getenv("FINROC_CROSS_ROOT") != null ? System.getenv("FINROC_CROSS_ROOT") : "/undefined-cross-compile-dir", pkgConfigExtraPath);
         } else if (new File(newNativeLibDB).exists()) {
             LibDB.reinit(new File(newNativeLibDB));
         } else {
