@@ -441,13 +441,6 @@ public class MakeFileBuilder implements FilenameFilter, Runnable {
     }
 
     /**
-     * @return Returns libdb to use for actual compiling (may be overridden by subclass)
-     */
-    public LibDB getTargetLibDB() {
-        return LibDB.getInstance("native");
-    }
-
-    /**
      * @return Activity log
      */
     public ActivityLog getActivityLog() {

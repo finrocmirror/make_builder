@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 import makebuilder.handler.CppHandler;
 import makebuilder.libdb.ExtLib;
+import makebuilder.libdb.LibDB;
 import makebuilder.libdb.PkgConfig;
 import makebuilder.util.AddOrderSet;
 import makebuilder.util.CCOptions;
@@ -423,8 +424,8 @@ public abstract class BuildEntity {
         }
 
         // first, try libdb, so it can be used to override pkg-config, as some pkg-config might be wrong
-        if (builder.getTargetLibDB().available(dep)) { // External library dependency?
-            ExtLib xl = builder.getTargetLibDB().getLib(dep);
+        if (LibDB.available(dep)) { // External library dependency?
+            ExtLib xl = LibDB.getLib(dep);
             directExtlibs.add(xl);
             for (BuildEntity be : xl.dependencies) {
                 if (!dependencies.contains(be)) {

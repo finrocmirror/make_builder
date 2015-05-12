@@ -106,9 +106,6 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     /** Is static linking enabled? */
     private boolean staticLinking;
 
-    /** libdb to use for actual compiling */
-    private LibDB targetLibDB;
-
     /** Finroc C++ handler - in case BUILDING_FINROC is true - otherwise null */
     private FinrocCppHandler finrocCppHandler;
 
@@ -135,14 +132,13 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         String newNativeLibDB = "make_builder/etc/libdb." + System.getenv("FINROC_OPERATING_SYSTEM_NATIVE") + "_" + System.getenv("FINROC_ARCHITECTURE_NATIVE");
         String crossCompilingLibDBPrefix = System.getenv("FINROC_OPERATING_SYSTEM") + "_" + System.getenv("FINROC_ARCHITECTURE");
         String crossLibDB = "make_builder/etc/libdb." + crossCompilingLibDBPrefix;
-        if (new File(newNativeLibDB).exists()) {
-            targetLibDB = LibDB.getInstance("native").reinit(new File(newNativeLibDB));
-        } else {
-            targetLibDB = LibDB.getInstance("native").reinit(null);
-        }
         if (isCrossCompiling()) {
-            targetLibDB = LibDB.getInstance(crossCompilingLibDBPrefix).reinit(new File(crossLibDB));
+            LibDB.reinit(new File(crossLibDB));
             PkgConfig.reinit(System.getenv("FINROC_CROSS_ROOT") != null ? System.getenv("FINROC_CROSS_ROOT") : "/undefined-cross-compile-dir");
+        } else if (new File(newNativeLibDB).exists()) {
+            LibDB.reinit(new File(newNativeLibDB));
+        } else {
+            LibDB.reinit(null);
         }
 
         // init target paths
@@ -459,10 +455,5 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
     @Override
     public boolean isStaticLinkingEnabled() {
         return staticLinking;
-    }
-
-    @Override
-    public LibDB getTargetLibDB() {
-        return targetLibDB;
     }
 }

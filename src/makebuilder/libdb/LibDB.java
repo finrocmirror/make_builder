@@ -41,27 +41,11 @@ import makebuilder.util.Util;
  */
 public class LibDB {
 
-    /** LibDB instances: architecture => instance */
-    private static Map<String, LibDB> instances = new HashMap<String, LibDB>();
-
     /** Mapping: Library name => library */
-    private Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
+    private static Map<String, ExtLib> libs = new HashMap<String, ExtLib>();
 
     /** File names of files to process */
     static public final String LIBDB_RAW = "libdb.raw", LIBDB_TXT = "libdb.txt", LIBDB_JAVA = "libdb.java";
-
-    /**
-     * @param architecture Architecture to obtain libdb for (there should be one "native" for host architecture/system)
-     * @return Libdb for specified architecture (a new one is created if it does not exist yet)
-     */
-    public static LibDB getInstance(String architecture) {
-        LibDB instance = instances.get(architecture);
-        if (instance == null) {
-            instance = new LibDB();
-            instances.put(architecture, instance);
-        }
-        return instance;
-    }
 
     /**
      * reads and processes libdb.txt file
@@ -70,7 +54,7 @@ public class LibDB {
      * @param libdb File with libdb. Default libdb is used if null.
      * @return Reference to this LibDB (for convenience)
      */
-    public LibDB reinit(File libdb) {
+    public static void reinit(File libdb) {
         libs.clear();
         try {
             if (libdb == null) {
@@ -84,13 +68,12 @@ public class LibDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return this;
     }
 
     /**
      * @return Does LibDB have any entries?
      */
-    public boolean hasEntries() {
+    public static boolean hasEntries() {
         return libs.size() > 0;
     }
 
@@ -100,7 +83,7 @@ public class LibDB {
      * @param libdbTxt file name (relative to make_builder/etc directory)
      * @param cpp c/c++ library?
      */
-    private void loadLibDb(File libdbTxt, boolean cpp) throws IOException {
+    private static void loadLibDb(File libdbTxt, boolean cpp) throws IOException {
 
         // external libraries
         File f = libdbTxt;
@@ -123,7 +106,7 @@ public class LibDB {
      *
      * @param defines List with defines
      */
-    public void addDefines(List<String> defines) {
+    public static void addDefines(List<String> defines) {
         for (Map.Entry<String, ExtLib> e : libs.entrySet()) {
             String opts = e.getValue().options;
             if (!opts.contains("N/A")) {
@@ -138,7 +121,7 @@ public class LibDB {
      * @return Library with this name
      * @throws Exception Thrown when not found
      */
-    public ExtLib getLib(String lib) throws Exception {
+    public static ExtLib getLib(String lib) throws Exception {
         ExtLib el = libs.get(lib);
         if (el != null) {
             return libs.get(lib);
@@ -150,7 +133,7 @@ public class LibDB {
      * @param lib Library name
      * @return Is library with this name available?
      */
-    public boolean available(String lib) {
+    public static boolean available(String lib) {
         ExtLib el = libs.get(lib);
         if (el != null) {
             return el.available();
@@ -165,10 +148,8 @@ public class LibDB {
      * @param bes All build entities
      */
     public static void findLocalDependencies(Collection<BuildEntity> bes) {
-        for (LibDB instance : instances.values()) {
-            for (ExtLib el : instance.libs.values()) {
-                el.findLocalDependencies(bes);
-            }
+        for (ExtLib el : libs.values()) {
+            el.findLocalDependencies(bes);
         }
     }
 }
