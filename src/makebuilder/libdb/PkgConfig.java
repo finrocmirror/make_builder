@@ -59,8 +59,15 @@ public class PkgConfig {
         if (systemRoot == null) {
             environmentVariables = null;
         } else {
+            String extraPathString = "";
+            if (pkgConfigExtraPath != null) {
+                String[] splitted = pkgConfigExtraPath.split(":");
+                for (String s : splitted) {
+                    extraPathString += ":" + systemRoot + s;
+                }
+            }
             environmentVariables = new String[] { "PKG_CONFIG_DIR=",
-                                                  "PKG_CONFIG_LIBDIR=" + systemRoot + "/usr/lib/pkgconfig:" + systemRoot + "/usr/share/pkgconfig" + (pkgConfigExtraPath != null ? (":" + pkgConfigExtraPath) : ""),
+                                                  "PKG_CONFIG_LIBDIR=" + systemRoot + "/usr/lib/pkgconfig:" + systemRoot + "/usr/share/pkgconfig" + extraPathString,
                                                   "PKG_CONFIG_SYSROOT_DIR=" + systemRoot
                                                 };
         }
