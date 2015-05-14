@@ -160,6 +160,7 @@ v4l1:       -I<libv4l1-videodev.h>
 vrep:       -I/usr/include/vrep -DNON_MATLAB_PARSING -DMAX_EXT_API_CONNECTIONS=255 -D__linux -lvrepremoteapi -lpthread -D_VREP_PRESENT
 vtk:	    -I/usr/include/vtk-5.8 -lvtkCommon -lvtkFiltering -lvtkRendering -lvtkHybrid
 websockets: -lwebsockets
+wiring_pi:  -I<wiringPi.h> -lwiringPi
 x264:       -I<x264.h> -lx264
 xerces:     -I<xercesc/util/PlatformUtils.hpp> -lxerces-c
 xml2:       -D _LIB_XML2_PRESENT_ -I<libxml/parser.h> -lxml2
