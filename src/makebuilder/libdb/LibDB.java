@@ -59,14 +59,15 @@ public class LibDB {
         try {
             if (libdb == null) {
                 loadLibDb(Util.getFileInEtcDir(LIBDB_TXT), true);
-            } else if (libdb.exists()) {
+            } else {
                 loadLibDb(libdb, true);
             }
             if (Util.getFileInEtcDir(LIBDB_JAVA).exists()) {
                 loadLibDb(Util.getFileInEtcDir(LIBDB_JAVA), false);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error loading libdb file: " + e.getMessage());
+            System.exit(-1);
         }
     }
 

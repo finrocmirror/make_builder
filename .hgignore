@@ -1,7 +1,6 @@
 syntax: glob
 
-etc/libdb.java
-etc/libdb.txt
+etc/libdb.*
 
 # build directories
 bin
