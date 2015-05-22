@@ -7,7 +7,7 @@ find -L ${SYSTEM_ROOT}/usr/lib -maxdepth 4 -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)
 find -L ${SYSTEM_ROOT}/usr/lib/jvm/default-java -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
 find -L ${SYSTEM_ROOT}/usr/lib/gcc -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
 find -L ${SYSTEM_ROOT}/usr/local/include
-find -L ${SYSTEM_ROOT}/usr/local/lib -regex'.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
+find -L ${SYSTEM_ROOT}/usr/local/lib -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
 find -L ${SYSTEM_ROOT}/usr/local/cuda -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
 find -L ${SYSTEM_ROOT}/usr/local/sopas -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
 find -L ${SYSTEM_ROOT}/usr/local/NVIDIA_CUDA_SDK -regex '.*\([.]\(h\|so\|hpp\|jar\|a\)\)'
