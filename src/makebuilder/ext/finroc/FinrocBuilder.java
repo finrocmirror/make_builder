@@ -133,8 +133,9 @@ public class FinrocBuilder extends MakeFileBuilder implements JavaHandler.Import
         }
 
         // init libdb
-        if (BUILDING_FINROC) {
-            LibDB.reinit(new File("make_builder/etc/libdb." + System.getenv("FINROC_TARGET")));
+        File newLibDB = new File("make_builder/etc/libdb." + System.getenv("FINROC_TARGET"));
+        if (BUILDING_FINROC && newLibDB.exists()) {
+            LibDB.reinit(newLibDB);
         } else {
             LibDB.reinit(null);
         }
