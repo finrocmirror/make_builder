@@ -46,9 +46,13 @@ public:
   std::vector<std::string> input_files;
   std::string include_dir;
 
-  virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile);
+#if __clang_major__ == 3 && __clang_minor__ < 6
+  virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
+#else
+  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
+#endif
 
-  virtual bool ParseArgs(const clang::CompilerInstance &CI, const std::vector<std::string>& args)
+  virtual bool ParseArgs(const clang::CompilerInstance &CI, const std::vector<std::string>& args) override
   {
     const std::string OUTPUT_PREFIX = "--output=";
     const std::string INPUTS_PREFIX = "--inputs=";
@@ -192,7 +196,7 @@ public:
     }
   }
 
-  virtual void HandleTagDeclDefinition(clang::TagDecl *D)
+  virtual void HandleTagDeclDefinition(clang::TagDecl *D) override
   {
     //const clang::Decl *D = *i;
     //if (const clang::NamedDecl *ND = dynamic_cast<const clang::NamedDecl*>(D))
@@ -204,6 +208,10 @@ public:
       if (D->getOuterLocStart().isFileID())
       {
         filename = ast_context->getSourceManager().getFilename(D->getOuterLocStart());
+        if (filename.length() > 2 && filename[0] == '.' && filename[1] == '/')
+        {
+          filename = filename.substr(2);
+        }
       }
       clang::EnumDecl* enum_decl = dynamic_cast<clang::EnumDecl*>(D);
       if (enum_decl && filename.length() > 0 && filename[0] != '/' &&
@@ -388,9 +396,16 @@ public:
   }
 };
 
-clang::ASTConsumer* GenerateEnumStringsAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
+#if __clang_major__ == 3 && __clang_minor__ < 6
+clang::ASTConsumer *GenerateEnumStringsAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
 {
   return new GenerateEnumStringsConsumer(*this);
 }
+#else
+std::unique_ptr<clang::ASTConsumer> GenerateEnumStringsAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
+{
+  return std::unique_ptr<clang::ASTConsumer>(new GenerateEnumStringsConsumer(*this));
+}
+#endif
 
 static clang::FrontendPluginRegistry::Add<GenerateEnumStringsAction> cREGISTER_PLUGIN("enum-strings", "generate enum strings");

@@ -44,7 +44,11 @@ public:
   std::string output_file;
   std::vector<std::string> input_files;
 
-  virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile);
+#if __clang_major__ == 3 && __clang_minor__ < 6
+  virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
+#else
+  virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
+#endif
 
   virtual bool ParseArgs(const clang::CompilerInstance &CI, const std::vector<std::string>& args)
   {
@@ -183,6 +187,10 @@ public:
       if (D->getOuterLocStart().isFileID())
       {
         filename = ast_context->getSourceManager().getFilename(D->getOuterLocStart());
+        if (filename.length() > 2 && filename[0] == '.' && filename[1] == '/')
+        {
+          filename = filename.substr(2);
+        }
       }
       clang::RecordDecl* class_decl = dynamic_cast<clang::RecordDecl*>(D);
       if (class_decl && filename.length() > 0 && filename[0] != '/' &&
@@ -293,9 +301,16 @@ public:
   }
 };
 
-clang::ASTConsumer* GeneratePortNamesAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
+#if __clang_major__ == 3 && __clang_minor__ < 6
+clang::ASTConsumer *GeneratePortNamesAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
 {
   return new GeneratePortNamesConsumer(*this);
 }
+#else
+std::unique_ptr<clang::ASTConsumer> GeneratePortNamesAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
+{
+  return std::unique_ptr<clang::ASTConsumer>(new GeneratePortNamesConsumer(*this));
+}
+#endif
 
 static clang::FrontendPluginRegistry::Add<GeneratePortNamesAction> cREGISTER_PLUGIN("finroc_port_names", "generate finroc port names");
