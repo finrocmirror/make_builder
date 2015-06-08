@@ -73,7 +73,7 @@ matlab:     -I/opt/matlab/R2014b/extern/include -Wl,-rpath,/opt/matlab/R2014b/bi
 magick:     -fopenmp -I<Magick++.h> -lMagick++ -lMagickCore
 matio:      -I<matio.h> -lmatio  -D_MATIO_PRESENT
 mpfr:	    -lmpfr
-mrpt:		-lmrpt-base -lmrpt-slam -lmrpt-maps -lmrpt-obs -lmrpt-gui -lmrpt-opengl -I<mrpt/base.h> -I<mrpt/slam.h> -I<mrpt/gui.h> -I<mrpt/config.h> -I<mrpt/slam/CMetricMap.h> -I<mrpt/slam/CPointsMap.h> -I<mrpt/opengl/CSetOfObjects.h> -I<mrpt/slam/CLandmarksMap.h> -I<mrpt/bayes/CKalmanFilterCapable.h>
+mrpt:		-lmrpt-base -lmrpt-slam -lmrpt-maps -lmrpt-obs -lmrpt-gui -lmrpt-opengl -lmrpt-nav -I<mrpt/base.h> -I<mrpt/slam.h> -I<mrpt/gui.h> -I<mrpt/config.h> -I<mrpt/slam/CMetricMap.h> -I<mrpt/slam/CPointsMap.h> -I<mrpt/opengl/CSetOfObjects.h> -I<mrpt/slam/CLandmarksMap.h> -I<mrpt/bayes/CKalmanFilterCapable.h> -I<mrpt/nav.h> -I<mrpt/graphs.h>
 mysqlcppconn:   -I<mysql_driver.h> -lmysqlcppconn
 mysqlc++:    -I<mysql.h> -lmysqlclient
 mxpeg:	    -I<mxpeg_sdk/static_component_bootstrap.h> -I/usr/include/qt4/QtCore -I/usr/include/qt4 -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtOpenGL -lmxFramework -lmxm_core -lmxmQt
