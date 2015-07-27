@@ -133,7 +133,8 @@ public class FinrocSystemLibLoader extends SourceFileHandler.Impl {
         }
 
         // find/load all libraries that contain system information
-        for (File f : new File(PKG_CONFIG_DIR).listFiles()) {
+        File[] pkgconfigFiles = new File(PKG_CONFIG_DIR).exists() ? new File(PKG_CONFIG_DIR).listFiles() : new File[0];
+        for (File f : pkgconfigFiles) {
             if (f.getName().startsWith("rrlib_") || f.getName().startsWith("finroc_") || f.getName().startsWith("mca2_")) {
                 String rawName = f.getName().substring(0, f.getName().length() - 3);
                 String libName = "lib" + rawName + ".so";
