@@ -21,6 +21,7 @@
  */
 package makebuilder.handler;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,9 @@ public class CppHandler implements SourceFileHandler {
 
     /** Debug cpp handler? */
     private final boolean debug = MakeFileBuilder.getOptions().containsKey("debug_cpp_handler");
+
+    /** Version string to append to so files - null if no version is appended */
+    private final String soVersion = MakeFileBuilder.getOptions().containsKey("soversion") ? MakeFileBuilder.getOptions().get("soversion").toString() : null;
 
     /**
      * @param compileOptions Standard compile options (included in every compile; C and C++)
@@ -321,7 +325,15 @@ public class CppHandler implements SourceFileHandler {
                 if (builder.isStaticLinkingEnabled()) {
                     be.target.addCommand("ar rs " + be.getTarget() + sources, true);
                 } else {
-                    be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                    if (soVersion == null) {
+                        be.target.addCommand(options.createLinkCommand(sources, be.getTarget(), atLeastOneCxx), true);
+                    } else {
+                        String versionedTarget = be.getTarget() + "." + soVersion;
+                        String versionedTargetFilename = (new File(versionedTarget)).getName();
+                        options.linkOptions.add("-Wl,-soname=" + versionedTargetFilename);
+                        be.target.addCommand(options.createLinkCommand(sources, versionedTarget, atLeastOneCxx), true);
+                        be.target.addCommand("ln -s " + versionedTargetFilename + " " + be.getTarget(), false);
+                    }
                 }
             } else {
                 if (builder.isStaticLinkingEnabled()) {
@@ -380,7 +392,7 @@ public class CppHandler implements SourceFileHandler {
                 }
             }
 
-        } else { // compiling and linking in one step
+        } else { // compiling and linking in one step (static linking and versioned libraries are unsupported in this experimental mode)
             ArrayList<SrcFile> copy = new ArrayList<SrcFile>(be.sources);
             dependencyBuffer.clear();
 

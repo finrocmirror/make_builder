@@ -21,6 +21,7 @@
  */
 package makebuilder.handler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,6 +94,9 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
 
     /** Compiler flags for clang (used instead of ($CXX_OPTS)) */
     private final String clangFlags;
+
+    /** Version string to append to so files - null if no version is appended */
+    private final String soVersion = MakeFileBuilder.getOptions().containsKey("soversion") ? MakeFileBuilder.getOptions().get("soversion").toString() : null;
 
     // Detect which method to use for building enum strings
     static {
@@ -214,6 +218,11 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
                 enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -c -o " + ofile + " -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
                 enumStringsLib.addCommand("ar rs " + enumStringsLib.getName() + " " + ofile, true);
                 enumStringsLib.addCommand("rm " + ofile, false);
+            } else if (soVersion != null) {
+                String versionedTargetFilename = "libenum_strings.so." + soVersion;
+                String versionedTarget = buildDir + "/" + versionedTargetFilename;
+                enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -shared -o " + versionedTarget + " -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp -Wl,-soname=" + versionedTargetFilename, true);
+                enumStringsLib.addCommand("ln -s " + versionedTargetFilename + " " + enumStringsLib.getName(), false);
             } else {
                 enumStringsLib.addCommand("$(CXX) $(CXX_OPTIONS_LIB) -shared -o " + buildDir + "/libenum_strings.so -include make_builder/enum_strings_builder/enum_strings.h make_builder/enum_strings_builder/enum_strings.cpp", true);
             }
