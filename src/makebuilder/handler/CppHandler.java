@@ -332,7 +332,7 @@ public class CppHandler implements SourceFileHandler {
                         String versionedTargetFilename = (new File(versionedTarget)).getName();
                         options.linkOptions.add("-Wl,-soname=" + versionedTargetFilename);
                         be.target.addCommand(options.createLinkCommand(sources, versionedTarget, atLeastOneCxx), true);
-                        be.target.addCommand("ln -s " + versionedTargetFilename + " " + be.getTarget(), false);
+                        be.target.addCommand("ln -f -s " + versionedTargetFilename + " " + be.getTarget(), false);
                     }
                 }
             } else {
