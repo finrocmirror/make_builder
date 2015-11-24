@@ -39,6 +39,10 @@
 #include <clang/AST/ASTConsumer.h>
 #include <clang/Frontend/FrontendPluginRegistry.h>
 
+#ifndef LLVM_VERSION_MAJOR
+#warning LLVM version not defined
+#endif
+
 class GenerateEnumStringsAction : public clang::PluginASTAction
 {
 public:
@@ -46,7 +50,7 @@ public:
   std::vector<std::string> input_files;
   std::string include_dir;
 
-#if __clang_major__ == 3 && __clang_minor__ < 6
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR < 6
   virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
 #else
   virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
@@ -168,12 +172,12 @@ public:
     generated_code()
   {}
 
-  virtual void Initialize(clang::ASTContext &Context)
+  virtual void Initialize(clang::ASTContext &Context) override
   {
     ast_context = &Context;
   }
 
-  virtual bool HandleTopLevelDecl(clang::DeclGroupRef DG)
+  virtual bool HandleTopLevelDecl(clang::DeclGroupRef DG) override
   {
     for (clang::DeclGroupRef::iterator i = DG.begin(), e = DG.end(); i != e; ++i)
     {
@@ -185,7 +189,7 @@ public:
     return true;
   }
 
-  virtual void HandleInterestingDecl(clang::DeclGroupRef DG)
+  virtual void HandleInterestingDecl(clang::DeclGroupRef DG) override
   {
     for (clang::DeclGroupRef::iterator i = DG.begin(), e = DG.end(); i != e; ++i)
     {
@@ -345,7 +349,7 @@ public:
     }
   }
 
-  virtual void HandleTranslationUnit(clang::ASTContext& Ctx)
+  virtual void HandleTranslationUnit(clang::ASTContext& Ctx) override
   {
     if (Ctx.getDiagnostics().hasErrorOccurred())
     {
@@ -396,7 +400,7 @@ public:
   }
 };
 
-#if __clang_major__ == 3 && __clang_minor__ < 6
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR < 6
 clang::ASTConsumer *GenerateEnumStringsAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
 {
   return new GenerateEnumStringsConsumer(*this);

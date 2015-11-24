@@ -44,13 +44,13 @@ public:
   std::string output_file;
   std::vector<std::string> input_files;
 
-#if __clang_major__ == 3 && __clang_minor__ < 6
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR < 6
   virtual clang::ASTConsumer *CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
 #else
   virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile) override;
 #endif
 
-  virtual bool ParseArgs(const clang::CompilerInstance &CI, const std::vector<std::string>& args)
+  virtual bool ParseArgs(const clang::CompilerInstance &CI, const std::vector<std::string>& args) override
   {
     const std::string OUTPUT_PREFIX = "--output=";
     const std::string INPUTS_PREFIX = "--inputs=";
@@ -301,7 +301,7 @@ public:
   }
 };
 
-#if __clang_major__ == 3 && __clang_minor__ < 6
+#if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR < 6
 clang::ASTConsumer *GeneratePortNamesAction::CreateASTConsumer(clang::CompilerInstance &CI, llvm::StringRef InFile)
 {
   return new GeneratePortNamesConsumer(*this);
