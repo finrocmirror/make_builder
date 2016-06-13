@@ -137,9 +137,7 @@ public class EnumStringsBuilderHandler extends SourceFileHandler.Impl {
             System.exit(-1);
         }
         USE_CLANG_PLUGIN = suitableLlvmVersion;
-
-        // Workaround for bug https://bugs.launchpad.net/ubuntu/+source/llvm-toolchain-snapshot/+bug/1215572
-        EXTRA_CLANG_FLAGS = System.getProperty("os.arch").equals("i386") ? " -I/usr/include/i386-linux-gnu/c++/4.8" : "";
+        EXTRA_CLANG_FLAGS = "";
     }
 
     /**
