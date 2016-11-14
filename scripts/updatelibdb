@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 #----------------------------------------------------------------------
-# \file    updatelibdb_experimental
+# \file    updatelibdb
 #
 # \author  Max Reichardt
 #
@@ -33,6 +33,7 @@ sub findPath(@);
 sub scorePath($);
 sub inFinrocRepository($);
 my $curPath = "";
+my $findLibPath = 0;
 
 # etc dir
 my $MAKE_BUILDER_DIR = "";
@@ -74,6 +75,18 @@ while (<$in>) {
     push @lines, $_;
 }
 close $in or die "$in: $!";
+
+# obtain system's default include and library dirs
+my @defaultIncludeDirs = ();
+foreach (`make_builder/scripts/print_default_include_paths`) {
+  $_ =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace (from http://en.wikipedia.org/wiki/Trim_(programming))
+  push @defaultIncludeDirs, $_;
+}
+my @defaultLibDirs = ();
+foreach (`make_builder/scripts/print_linker_default_search_paths`) {
+  $_ =~ s/^\s+|\s+$//g;     # remove both leading and trailing whitespace (from http://en.wikipedia.org/wiki/Trim_(programming))
+  push @defaultLibDirs, $_;
+}
 
 # determine which files we're looking for...
 my %look4files = (); # set
@@ -134,12 +147,13 @@ foreach my $line (@lines) {
     while ($opts =~ /(\s|^)(-I<(\S+)>)(\s|$)/) {
         #print " processing $2\n";
         my $old = $2;
+        $findLibPath = 0;
         my $path = findPath(split(',', $3));
         #print " path $path\n";
         if ($path eq "") {
             $opts = "";
             $fail = 1;
-        } elsif ($path eq "$SYSTEM_ROOT/usr/include" || $path =~ /\/gcc\//) {
+        } elsif (grep { $_ eq $path } @defaultIncludeDirs) {
             $opts =~ s/\Q$old\E//;
         } else {
             $opts =~ s/\Q$old\E/-I$path/;
@@ -167,6 +181,7 @@ foreach my $line (@lines) {
             $skip = 1;
         }
         unless ($skip == 1) {
+            $findLibPath = 1;
             my $path = findPath($so);
             if ($path eq "") {
                 $path = findPath($a);
@@ -176,7 +191,7 @@ foreach my $line (@lines) {
                     last;
                 }
             }
-            unless ($path eq "$SYSTEM_ROOT/usr/lib" || $path eq "$SYSTEM_ROOT/usr/local/lib" || $path =~ /^\/usr\/(.+)\/gcc\//) {
+            unless (grep { $_ eq $path } @defaultLibDirs) {
                 my $newPath = "-L" . $path . " ";
                 unless ($lpaths =~ /\Q$newPath\E/) {
                     $lpaths .= $newPath;
@@ -310,17 +325,31 @@ sub scorePath($) {
     my $path = shift;
     my $path2 = $path;
     my $score = 0;
+
+    # if user invested the effort to specify a search path to his home directory, prefer any files we can find there
     if ($path =~ /^\/home\//) {
         $score += 10000;
     }
-    if ($path =~ /^$SYSTEM_ROOT\/usr\/local\/include\// || $path2 =~ /^$SYSTEM_ROOT\/usr\/local\/lib\//) {
-        $score += 5000;
+
+    # Is this a default system path?
+    my @pathList = @defaultIncludeDirs;
+    if ($findLibPath == 1) {
+        @pathList = @defaultLibDirs;
     }
-    if ($path =~ /^$SYSTEM_ROOT\/usr\/include\// || $path2 =~ /^$SYSTEM_ROOT\/usr\/lib\//) {
-        $score += 3000;
+    my $score_delta = 1000;
+    my $score_for_last = 3000;
+    my $current_candidate_score = $score_for_last + (@pathList - 1) * $score_delta;
+    foreach (@pathList) {
+        if ($path eq $_) {
+            #print "System path hit\n";
+            $score += $current_candidate_score;
+        }
+        $current_candidate_score -= $score_delta;
     }
+
+    # Search for libraries in LD_LIBRARY_PATHS
     my $ld_library_path = $ENV{"LD_LIBRARY_PATH"};
-    if (defined $ld_library_path) {
+    if (defined $ld_library_path && $findLibPath == 1) {
         my @ld_library_paths = split(/:/, $ld_library_path);
         foreach (@ld_library_paths) {
             if ($path eq $_ || $path eq ($_ . '/')) {
