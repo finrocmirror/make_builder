@@ -180,7 +180,7 @@ public class PortDescriptionBuilderHandler extends SourceFileHandler.Impl {
                 clangInputFiles = clangInputFiles.trim();
 
                 // create clang++ command that will create generated file
-                target.target.addCommand("clang++ -S -c " + options.createOptionString(true, false, true) + " " + clangFlags + EnumStringsBuilderHandler.EXTRA_CLANG_FLAGS +
+                target.target.addCommand("clang++ -fPIC -S -c " + options.createOptionString(true, false, true) + " " + clangFlags + EnumStringsBuilderHandler.EXTRA_CLANG_FLAGS +
                                          " -Xclang -load -Xclang " + LLVM_CLANG_PLUGIN + " -Xclang -plugin -Xclang finroc_port_names " +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --output=" + target.target.getName() +
                                          " -Xclang -plugin-arg-finroc_port_names -Xclang --inputs=" + inputFiles + " " +
