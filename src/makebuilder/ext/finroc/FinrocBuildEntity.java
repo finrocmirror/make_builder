@@ -235,7 +235,11 @@ public abstract class FinrocBuildEntity extends BuildEntity {
      * Determines whether this target is an example or test target
      */
     private void determineType() {
-        if (!typeDetermined) {
+        if (typeDetermined) {
+            return;
+        }
+
+        try {
             boolean allTest = true;
             boolean allExample = true;
             boolean oneTest = false;
@@ -266,6 +270,10 @@ public abstract class FinrocBuildEntity extends BuildEntity {
                 throw new RuntimeException("Cannot determine whether " + this.toString() + " is an example program as only some source files are from 'examples' directory. Please clean this up.");
             }
             typeDetermined = true;
+        } catch (RuntimeException e) {
+            System.out.println(this.buildFile + ":" + this.lineNumber + ": error: " + e.getMessage());
+            System.exit(-1);
         }
+
     }
 }
